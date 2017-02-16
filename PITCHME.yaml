@@ -2,3 +2,5 @@ theme-override : PITCHME.css
 footnote : "© 2017 Наташа Самойленко"
 highlight : github
 vertical-center : false
+width : 1280px
+heght : 1280px
