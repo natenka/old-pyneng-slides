@@ -196,7 +196,7 @@ Out[8]: 31671480
 
 ## Типы данных в Python
 
-#HSLIDE
+#VSLIDE
 
 ### Типы данных в Python
 
@@ -209,7 +209,7 @@ Out[8]: 31671480
 * Sets (множества)
 * Boolean
 
-#HSLIDE
+#VSLIDE
 
 ### Типы данных в Python
 
@@ -222,7 +222,7 @@ Out[8]: 31671480
  * Строки
  * Кортежи
 
-#HSLIDE
+#VSLIDE
 
 ### Типы данных в Python
 
