@@ -5,7 +5,7 @@
 
 ## Основы Python
 
-#HSLIDE
+#VSLIDE
 
 ### Синтаксис Python
 
@@ -19,7 +19,7 @@ Tab или пробел:
  * лучше во всем коде
  * обычно используются 2-4 пробела (в курсе используются 4 пробела)
 
-#HSLIDE
+#VSLIDE
 
 ### Синтаксис Python
 
@@ -43,7 +43,7 @@ def open_file( filename ):
         print "Done"
 ```
 
-#HSLIDE
+#VSLIDE
 
 ### Комментарии
 
@@ -64,7 +64,7 @@ a = 10
 b = 5
 ```
 
-#HSLIDE
+#VSLIDE
 
 ### Интерпретатор IPython
 
@@ -91,7 +91,7 @@ In [5]: for i in range(5):
 4
 ```
 
-#HSLIDE
+#VSLIDE
 
 ### Интерпретатор IPython
 
@@ -110,7 +110,7 @@ In [9]: print 'one', 'two', 'three'
 one two three
 ```
 
-#HSLIDE
+#VSLIDE
 
 ### IPython magic
 
@@ -133,7 +133,7 @@ if a > b:
 %history
 ```
 
-#HSLIDE
+#VSLIDE
 
 ### Переменные
 
@@ -146,7 +146,7 @@ if a > b:
 * не может начинаться с цифры
 * не может содержать специальных символов @, $, %
 
-#HSLIDE
+#VSLIDE
 
 ### Переменные
 
@@ -161,7 +161,7 @@ In [4]: print a, b, c, d
 3 Hello 9 Test
 ```
 
-#HSLIDE
+#VSLIDE
 
 ### Переменные
 
@@ -179,7 +179,7 @@ In [8]: id(c)
 Out[8]: 31671480
 ```
 
-#HSLIDE
+#VSLIDE
 
 ### Переменные
 
@@ -236,6 +236,10 @@ Out[8]: 31671480
 
 #HSLIDE
 
+## Числа
+
+#VSLIDE
+
 ### Числа
 
 Пример различных типов числовых значений:
@@ -275,7 +279,7 @@ In [8]: float(10) / 3
 Out[8]: 3.3333333333333335
 ```
 
-С помощью функции round можно округлять числа до нужного количества знаков:
+Функция ```round()```:
 ```python
 In [9]: round(10/3.0, 2)
 Out[9]: 3.33
@@ -288,13 +292,6 @@ Out[10]: 3.3333
 #VSLIDE
 
 ###Числа
-
-
-Остаток от деления:
-```python
-In [11]: 10 % 3
-Out[11]: 1
-```
 
 Операторы сравнения
 ```python
@@ -322,13 +319,14 @@ Out[17]: True
 ###Числа
 
 
-Функция int() позволяет выполнять конвертацию в тип int:
+Конвертация в тип int:
 ```python
 In [18]: a = '11'
 
 In [19]: int(a)
 Out[19]: 11
 ```
+
 Во втором аргументе можно указывать систему исчисления:
 ```python
 In [20]: int(a, 2)
@@ -348,7 +346,7 @@ Out[22]: 3
 
 ###Числа
 
-Функция bin позволяет получить двоичное представление числа (обратите внимание, что результат строка):
+Функция bin:
 ```python
 In [23]: bin(8)
 Out[23]: '0b1000'
@@ -357,7 +355,7 @@ In [24]: bin(255)
 Out[24]: '0b11111111'
 ```
 
-Аналогично, функция hex() позволяет получить шестнадцатеричное значение:
+Функция hex():
 ```python
 In [25]: hex(10)
 Out[25]: '0xa'
@@ -365,72 +363,31 @@ Out[25]: '0xa'
 
 #HSLIDE
 
-#### Python example
+## Строки
+
+#VSLIDE
+
+### Строки
+
+Строка в Python:
+* последовательность символов, заключенная в кавычки
+* неизменяемый, упорядоченный тип данных
 
 ```python
-import multiprocessing
-from netmiko import ConnectHandler
-import sys
-import yaml
+In [1]: 'Hello'
+Out[1]: 'Hello'
 
+In [2]: "Hello"
+Out[2]: 'Hello'
 
-COMMAND = sys.argv[1]
-devices = yaml.load(open('devices.yaml'))
-
-def connect_ssh(device_dict, command, queue):
-    ssh = ConnectHandler(**device_dict)
-    ssh.enable()
-    result = ssh.send_command(command)
-
-    print "Connection to device %s" % device_dict['ip']
-    queue.put({device_dict['ip']: result})
-
-
-def conn_processes(function, devices, command):
-    processes = []
-    queue = multiprocessing.Queue()
-
-    for device in devices:
-        p = multiprocessing.Process(target = function,
-                                    args = (device, command, queue))
-        p.start()
-        processes.append(p)
-
-    for p in processes:
-        p.join()
-
-    results = []
-    for p in processes:
-        results.append(queue.get())
-
-    return results
-
-print( conn_processes(connect_ssh, devices['routers'], COMMAND) )
+In [3]: tunnel = """
+   ....: interface Tunnel0
+   ....:  ip address 10.10.10.1 255.255.255.0
+   ....:  ip mtu 1416
+   ....:  ip ospf hello-interval 5
+   ....:  tunnel source FastEthernet1/0
+   ....:  tunnel protection ipsec profile DMVPN
+   ....: """
 ```
 
-#HSLIDE
 
-Python example
-
-```python
-def conn_processes(function, devices, command):
-    processes = []
-    queue = multiprocessing.Queue()
-
-    for device in devices:
-        p = multiprocessing.Process(target = function,
-                                    args = (device, command, queue))
-        p.start()
-        processes.append(p)
-
-    for p in processes:
-        p.join()
-
-    results = []
-    for p in processes:
-        results.append(queue.get())
-
-    return results
-
-print( conn_processes(connect_ssh, devices['routers'], COMMAND) )
-```
