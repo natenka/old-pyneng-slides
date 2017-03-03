@@ -1443,4 +1443,98 @@ Out[17]: False
 
 #VSLIDE
 
+### Кодировка
+
+```python
+# -*- coding: utf-8 -*-
+
+access_template = ['switchport mode access',
+                   'switchport access vlan %d',
+                   'switchport nonegotiate',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+print "Конфигурация интерфейса в режиме access:"
+print '\n'.join(access_template) % 5
+```
+
+#VSLIDE
+
+### Передача аргументов скрипту
+
+Файл access_template_argv.py:
+```python
+from sys import argv
+
+interface, vlan = argv[1:]
+
+access_template = ['switchport mode access',
+                   'switchport access vlan %d',
+                   'switchport nonegotiate',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+print 'interface %s' % interface
+print '\n'.join(access_template) % int(vlan)
+```
+
+#VSLIDE
+
+### Передача аргументов скрипту
+
+```
+$ python access_template_argv.py Gi0/7 4
+interface Gi0/7
+switchport mode access
+switchport access vlan 4
+switchport nonegotiate
+spanning-tree portfast
+spanning-tree bpduguard enable
+```
+
+В данном случае, в списке argv находятся такие элементы:
+```
+['access_template_argv.py', 'Gi0/7', '4']
+```
+
+#VSLIDE
+
+### Ввод информации пользователем
+
+Файл access_template_raw_input.py:
+```python
+
+interface = raw_input('Enter interface type and number: ')
+vlan = int(raw_input('Enter VLAN number: '))
+
+access_template = ['switchport mode access',
+                   'switchport access vlan %d',
+                   'switchport nonegotiate',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+print '\n' + '-' * 30
+print 'interface %s' % interface
+print '\n'.join(access_template) % vlan
+```
+
+#VSLIDE
+
+### Ввод информации пользователем
+
+```
+$ python access_template_raw_input.py
+Enter interface type and number: Gi0/3
+Enter VLAN number: 55
+
+------------------------------
+interface Gi0/3
+switchport mode access
+switchport access vlan 55
+switchport nonegotiate
+spanning-tree portfast
+spanning-tree bpduguard enable
+```
+
+
 
