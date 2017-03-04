@@ -804,10 +804,8 @@ Out[6]:
 Словари - это изменяемый, неупорядоченный тип данных
 
 Словарь (ассоциативный массив, хеш-таблица):
-* данные в словаре это пары ```ключ: значение```
+* данные в словаре - это пары ```ключ: значение```
 * доступ к значениям осуществляется по ключу, а не по номеру, как в списках
-* словари неупорядоченны, поэтому не стоит полагаться на порядок элементов словаря
-* так как словари изменяемы, то элементы словаря можно менять, добавлять, удалять
 * ключ должен быть объектом неизменяемого типа:
  * число
  * строка
@@ -1842,5 +1840,266 @@ $ python check_password.py
 
 
 #HSLIDE
+
+## Цикл for
+
+
+#VSLIDE
+
+Цикл for проходится по указанной последовательности и выполняет действия, которые указаны в блоке for.
+
+Примеры последовательностей, по которым может проходиться цикл for:
+* строка
+* список
+* словарь
+* функция '''range()''' или итератор '''xrange()'''
+* любой другой итератор (например, '''sorted()''', '''enumerate()''')
+
+#VSLIDE
+
+### Пример цикла for
+
+```python
+In [1]: for letter in 'Test string':
+   ...:     print letter
+   ...:
+T
+e
+s
+t
+
+s
+t
+r
+i
+n
+g
+```
+
+#VSLIDE
+
+### Пример цикла for
+
+```python
+In [2]: for i in xrange(10):
+   ...:     print 'interface FastEthernet0/' + str(i)
+   ...:
+interface FastEthernet0/0
+interface FastEthernet0/1
+interface FastEthernet0/2
+interface FastEthernet0/3
+interface FastEthernet0/4
+interface FastEthernet0/5
+interface FastEthernet0/6
+interface FastEthernet0/7
+interface FastEthernet0/8
+interface FastEthernet0/9
+```
+
+#VSLIDE
+
+### Пример цикла for
+
+```python
+In [3]: vlans = [10, 20, 30, 40, 100]
+In [4]: for vlan in vlans:
+   ...:     print 'vlan %d' % vlan
+   ...:     print ' name VLAN_%d' % vlan
+   ...:
+vlan 10
+ name VLAN_10
+vlan 20
+ name VLAN_20
+vlan 30
+ name VLAN_30
+vlan 40
+ name VLAN_40
+vlan 100
+ name VLAN_100
+```
+
+
+#VSLIDE
+
+### Пример цикла for
+
+Когда цикл идет по словарю, то фактически он проходится по ключам:
+```python
+In [5]: r1 = {
+ 'IOS': '15.4',
+ 'IP': '10.255.0.1',
+ 'hostname': 'london_r1',
+ 'location': '21 New Globe Walk',
+ 'model': '4451',
+ 'vendor': 'Cisco'}
+
+In [6]: for k in r1:
+   ....:     print k
+   ....:
+vendor
+IP
+hostname
+IOS
+location
+model
+```
+
+#VSLIDE
+
+### Пример цикла for
+
+
+Если необходимо выводить пары ключ-значение в цикле:
+```python
+In [7]: for key in r1:
+   ....:     print key + ' => ' + r1[key]
+   ....:
+vendor => Cisco
+IP => 10.255.0.1
+hostname => london_r1
+IOS => 15.4
+location => 21 New Globe Walk
+model => 4451
+```
+
+#VSLIDE
+
+### Пример цикла for
+
+В словаре есть специальный метод items, который позволяет проходится в цикле сразу по паре ключ, значение:
+```python
+In [8]: r1.items()
+Out[8]:
+[('vendor', 'Cisco'),
+ ('IP', '10.255.0.1'),
+ ('hostname', 'london_r1'),
+ ('IOS', '15.4'),
+ ('location', '21 New Globe Walk'),
+ ('model', '4451')]
+
+In [9]: for key, value in r1.items():
+   ....:     print key + ' => ' + value
+   ....:
+vendor => Cisco
+IP => 10.255.0.1
+hostname => london_r1
+IOS => 15.4
+location => 21 New Globe Walk
+model => 4451
+```
+
+#VSLIDE
+
+### Пример цикла for
+
+```python
+In [7]: commands = ['switchport mode access', 'spanning-tree portfast', 'spanning-tree bpduguard enable']
+In [8]: fast_int = ['0/1','0/3','0/4','0/7','0/9','0/10','0/11']
+
+In [9]: for intf in fast_int:
+   ...:     print 'interface FastEthernet ' + intf
+   ...:     for command in commands:
+   ...:         print ' %s' % command
+   ...:
+interface FastEthernet 0/1
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+interface FastEthernet 0/3
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+interface FastEthernet 0/4
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+...
+```
+
+#VSLIDE
+
+### Пример совмещения for и if
+
+Файл generate_access_port_config.py:
+```python
+access_template = ['switchport mode access',
+                   'switchport access vlan',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+fast_int = {'access': { '0/12':'10',
+                        '0/14':'11',
+                        '0/16':'17',
+                        '0/17':'150'}}
+
+for intf in fast_int['access']:
+    print 'interface FastEthernet' + intf
+    for command in access_template:
+        if command.endswith('access vlan'):
+            print ' %s %s' % (command, fast_int['access'][intf])
+        else:
+            print ' %s' % command
+```
+
+#VSLIDE
+
+### Пример совмещения for и if
+
+Результат выполнения скрипта:
+```
+$ python generate_access_port_config.py
+interface FastEthernet0/12
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+interface FastEthernet0/14
+ switchport mode access
+ switchport access vlan 11
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+interface FastEthernet0/16
+ switchport mode access
+ switchport access vlan 17
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+```
+
+
+#VSLIDE
+
+### Итератор ```enumerate()```
+
+Иногда, при переборе объектов в цикле for, нужно не только получить сам объект, но и его порядковый номер. Это можно сделать, создав дополнительную переменную, которая будет расти на единицу с каждым прохождением цикла.
+
+Но, гораздо удобнее это делать с помощью итератора __```enumerate()```__.
+
+Базовый пример:
+```python
+In [1]: list1 = ['str1', 'str2', 'str3']
+
+In [2]: for position, string in enumerate(list1):
+   ...:     print position, string
+   ...:
+0 str1
+1 str2
+2 str3
+```
+
+#VSLIDE
+
+### Итератор ```enumerate()```
+
+```enumerate()``` умеет считать не только с нуля, но и с любого значение, которое ему указали после объекта:
+```python
+In [1]: list1 = ['str1', 'str2', 'str3']
+
+In [2]: for position, string in enumerate(list1, 100):
+   ...:     print position, string
+   ...:
+100 str1
+101 str2
+102 str3
+```
 
 
