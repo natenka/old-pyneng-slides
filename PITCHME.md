@@ -3,7 +3,7 @@
 
 #HSLIDE
 
-## Основы Python
+# Основы Python
 
 #VSLIDE
 
