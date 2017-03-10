@@ -987,7 +987,7 @@ def clear_cfg_and_write_to_file(cfg, to_file, delete_excl=True,
 
 
 Но, если воспользоваться возможностью Python принимать аргументы переменной длины, можно сделать функцию clear_cfg_and_write_to_file такой:
-```python
+```
 def clear_cfg_and_write_to_file(cfg, to_file, **kwargs):
     cfg_as_list = config_to_list(cfg, **kwargs)
     with open(to_file, 'w') as f:
