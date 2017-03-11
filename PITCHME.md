@@ -998,6 +998,57 @@ def clear_cfg_and_write_to_file(cfg, to_file, **kwargs):
 ## Полезные встроенные функции
 
 #VSLIDE
+## Функция sorted
+
+#VSLIDE
+### Функция sorted
+
+```python
+In [1]: list_of_words = ['one', 'two', 'list', '', 'dict']
+
+In [2]: sorted(list_of_words)
+Out[2]: ['', 'dict', 'list', 'one', 'two']
+
+In [3]: sorted(list_of_words, reverse=True)
+Out[3]: ['two', 'one', 'list', 'dict', '']
+```
+
+#VSLIDE
+### Функция sorted
+
+```python
+In [4]: tuple_of_tuples = (('hostname', 'london_r1'),
+  ....:  ('location', '21 New Globe Walk'),
+  ....:  ('vendor', 'Cisco'),
+  ....:  ('model', '4451'),
+  ....:  ('IOS', '15.4'),
+  ....:  ('IP', '10.255.0.1'))
+
+In [5]: sorted(tuple_of_tuples)
+Out[5]:
+[('IOS', '15.4'),
+ ('IP', '10.255.0.1'),
+ ('hostname', 'london_r1'),
+ ('location', '21 New Globe Walk'),
+ ('model', '4451'),
+ ('vendor', 'Cisco')]
+```
+
+#VSLIDE
+### Функция sorted
+
+```python
+In [6]: list_of_words
+Out[6]: ['one', 'two', 'list', '', 'dict']
+
+In [7]: sorted(list_of_words, key=len)
+Out[7]: ['', 'one', 'two', 'list', 'dict']
+
+In [8]: sorted(list_of_words, key=len, reverse=True)
+Out[8]: ['list', 'dict', 'one', 'two', '']
+```
+
+#VSLIDE
 ## Анонимная функция lambda
 
 #VSLIDE
@@ -1169,4 +1220,77 @@ Out[14]:
   'location': '21 New Globe Walk',
   'model': '3850',
   'vendor': 'Cisco'}}
+```
+
+#VSLIDE
+## Функция map()
+
+#VSLIDE
+### Функция map()
+
+Функция map() применяет указанную функцию к каждому элементу последовательности и возвращает список результатов.
+```python
+In [41]: a = ['aaa','bbb','ccc']
+
+In [42]: def to_upper(s):
+   ....:     return s.upper()
+   ....: 
+
+In [43]: map(to_upper, a)
+Out[43]: ['AAA', 'BBB', 'CCC']
+```
+
+#VSLIDE
+### Функция map()
+
+Вместе с map() удобно использовать lambda:
+```python
+In [44]: map(lambda s: s.upper(), a)
+Out[44]: ['AAA', 'BBB', 'CCC']
+```
+
+Если функция, которую использует map(), ожидает два аргумента, то передаются два списка:
+```python
+In [45]: a = ['a', 'b', 'c', 'd']
+
+In [46]: b = [1, 2, 3, 4]
+
+In [47]: map(lambda x,y: x*y, a, b)
+Out[47]: ['a', 'bb', 'ccc', 'dddd']
+```
+
+#VSLIDE
+## Функция filter()
+
+#VSLIDE
+### Функция filter()
+
+Функция filter() применяет функцию ко всем объектам списка, и возвращает те объекты, для которых функция вернула True.
+
+Например, из списка чисел оставить только нечетные:
+```python
+In [48]: filter(lambda x: x%2, [10, 111, 102, 213, 314, 515])
+Out[48]: [111, 213, 515]
+```
+
+Аналогично, только четные:
+```python
+In [49]: filter(lambda x: not x%2, [10, 111, 102, 213, 314, 515])
+Out[49]: [10, 102, 314]
+```
+
+#VSLIDE
+### Функция filter()
+
+```python
+In [50]: list_of_words = ['one', 'two', 'list', '', 'dict']
+
+In [51]: filter(lambda x: len(x) > 2, list_of_words)
+Out[51]: ['one', 'two', 'list', 'dict']
+
+
+In [52]: list_of_strings = ['one', 'two', 'list', '', 'dict', '100', '1', '50']
+
+In [53]: filter(lambda x: x.isdigit(), list_of_strings)
+Out[53]: ['100', '1', '50']
 ```
