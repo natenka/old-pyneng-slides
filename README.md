@@ -8,3 +8,4 @@
  * Работа с файлами
 * [Функции](https://gitpitch.com/natenka/pyneng-slides/functions)
 * [Модули](https://gitpitch.com/natenka/pyneng-slides/modules)
+* [Регулярные выражения](https://gitpitch.com/natenka/pyneng-slides/regex)
