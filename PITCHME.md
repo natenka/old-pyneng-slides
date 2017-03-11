@@ -1094,7 +1094,7 @@ Out[5]: 6
 #VSLIDE
 ### Анонимная функция lambda
 
-Сортировка элементов с помозью lambda:
+Сортировка элементов с помощью lambda:
 ```
 list_of_lists = [['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
                  ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
