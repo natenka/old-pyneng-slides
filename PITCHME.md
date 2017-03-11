@@ -894,8 +894,14 @@ def ping_ip(ip_address, count=3):
         except subprocess.CalledProcessError as e:
             temp.seek(0)
             return e.returncode, temp.read()
+```
+#VSLIDE
+
+### Модуль argparse
 
 
+Пример скрипта ping_function.py (продолжение):
+```python
 parser = argparse.ArgumentParser(description='Ping script')
 
 parser.add_argument('-a', action="store", dest="ip")
@@ -913,13 +919,28 @@ print message
 ### Модуль argparse
 
 Создание парсера:
-* ```parser = argparse.ArgumentParser(description='Ping script')```
+```
+parser = argparse.ArgumentParser(description='Ping script')
+```
+
+#VSLIDE
+
+### Модуль argparse
 
 Добавление аргументов:
-* ```parser.add_argument('-a', action="store", dest="ip")```
- * аргумент, который передается после опции ```-a```, сохранится в переменную ```ip```
-* ```parser.add_argument('-c', action="store", dest="count", default=2, type=int)```
- * аргумент, который передается после опции ```-c```, будет сохранен в переменную ```count```, но, прежде, будет конвертирован в число. Если аргумент не было указан, по умолчанию, будет значение 2
+* аргумент, который передается после опции ```-a```, сохранится в переменную ```ip```
+```
+parser.add_argument('-a', action="store", dest="ip")
+```
+
+* аргумент, который передается после опции ```-c```, будет сохранен в переменную ```count```, но, прежде, будет конвертирован в число. Если аргумент не было указан, по умолчанию, будет значение 2
+```
+parser.add_argument('-c', action="store", dest="count", default=2, type=int)
+```
+
+#VSLIDE
+
+### Модуль argparse
 
 Строка ```args = parser.parse_args()``` указывается, после того как определены все аргументы.
 
@@ -946,7 +967,7 @@ PING 8.8.8.8 (8.8.8.8): 56 data bytes
 round-trip min/avg/max/stddev = 48.673/49.228/50.040/0.610 ms
 ```
 
-> Namespace это объект, который возвращает метод parse_args()
+Namespace - это объект, который возвращает метод parse_args()
 
 #VSLIDE
 
@@ -1071,8 +1092,13 @@ def ping_ip(ip_address, count=3):
         except subprocess.CalledProcessError as e:
             temp.seek(0)
             return e.returncode, temp.read()
+```
+#VSLIDE
 
+### Модуль argparse
 
+Файл ping_function_ver2.py (продолжение):
+```python
 parser = argparse.ArgumentParser(description='Ping script')
 
 parser.add_argument('host', action="store", help="IP or name to ping")
@@ -1142,14 +1168,11 @@ optional arguments:
 # -*- coding: utf-8 -*-
 import argparse
 
-# Default values:
 DFLT_DB_NAME = 'dhcp_snooping.db'
 DFLT_DB_SCHEMA = 'dhcp_snooping_schema.sql'
 
-
 def create(args):
     print "Creating DB %s with DB schema %s" % (args.name, args.schema)
-
 
 def add(args):
     if args.sw_true:
@@ -1157,7 +1180,6 @@ def add(args):
     else:
         print "Reading info from file(s) \n%s" % ', '.join( args.filename )
         print "\nAdding data to db %s" % args.db_file
-
 
 def get(args):
     if args.key and args.value:
@@ -1167,7 +1189,14 @@ def get(args):
         print "Please give two or zero args\n"
     else:
         print "Showing %s content..." % args.db_file
+```
 
+#VSLIDE
+
+### Вложенные парсеры
+
+Файл parse_dhcp_snooping.py:
+```python
 
 parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(title='subcommands',
@@ -1181,8 +1210,14 @@ create_parser.add_argument('-n', metavar='db-filename', dest='name',
 create_parser.add_argument('-s', dest='schema', default=DFLT_DB_SCHEMA,
                            help='db schema filename')
 create_parser.set_defaults( func=create )
+```
 
+#VSLIDE
 
+### Вложенные парсеры
+
+Файл parse_dhcp_snooping.py:
+```python
 add_parser = subparsers.add_parser('add', help='add data to db')
 add_parser.add_argument('filename', nargs='+', help='file(s) to add to db')
 add_parser.add_argument('--db', dest='db_file', default=DFLT_DB_NAME, help='db name')
@@ -1200,8 +1235,6 @@ get_parser.add_argument('-v', dest="value", help='value of key')
 get_parser.add_argument('-a', action='store_true', help='show db content')
 get_parser.set_defaults( func=get )
 
-
-
 if __name__ == '__main__':
     args = parser.parse_args()
     args.func(args)
@@ -1211,7 +1244,6 @@ if __name__ == '__main__':
 
 ### Вложенные парсеры
 
-Теперь создается не только парсер, как в прошлом примере, но и вложенные парсеры.
 Вложенные парсеры будут отображаться как команды.
 Но, фактически, они будут использоваться как обязательные аргументы.
 
@@ -1247,7 +1279,10 @@ create_parser.set_defaults( func=create )
 
 ### Вложенные парсеры
 
-В строке ``create_parser.set_defaults( func=create )``` указывается, что, при вызове парсера ```create_parser```, будет вызвана функция create.
+В строке указывается, что, при вызове парсера ```create_parser```, будет вызвана функция create.
+```
+create_parser.set_defaults( func=create )
+```
 
 Функция create получает как аргумент, все аргументы, которые были переданы.
 И, внутри функции, можно обращаться к нужным:
@@ -1397,7 +1432,7 @@ get_parser.add_argument('-k', dest="key",
                         help='host key (parameter) to search')
 ```
 
-Для некоторых аргументов, важно, чтобы значение было выбрано только из орпределенных вариантов.
+Для некоторых аргументов, важно, чтобы значение было выбрано только из определенных вариантов.
 Для таких случаев, можно указывать ```choices```.
 
 #VSLIDE
@@ -1508,7 +1543,7 @@ args = parser.parse_args('add test.txt test2.txt'.split())
 args.func(args)
 ```
 
-> Необходимо использовать метод split(), так как метод ```parse_args```, ожидает список аргументов.
+Необходимо использовать метод split(), так как метод ```parse_args```, ожидает список аргументов.
 
 #VSLIDE
 
