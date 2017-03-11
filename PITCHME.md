@@ -1294,3 +1294,61 @@ In [52]: list_of_strings = ['one', 'two', 'list', '', 'dict', '100', '1', '50']
 In [53]: filter(lambda x: x.isdigit(), list_of_strings)
 Out[53]: ['100', '1', '50']
 ```
+
+#VSLIDE
+## Функция all()
+
+#VSLIDE
+### Функция all()
+
+Функция all() возвращает True, если все элементы истина (или объект пустой).
+
+```python
+In [54]: all([False, True, True])
+Out[54]: False
+
+In [55]: all([True, True, True])
+Out[55]: True
+
+In [56]: all([])
+Out[56]: True
+```
+
+#VSLIDE
+### Функция all()
+
+```python
+In [57]: IP = '10.0.1.1'
+
+In [58]: digits = [ i for i in IP.split('.') if i.isdigit() ]
+
+In [59]: digits
+Out[59]: ['10', '0', '1', '1']
+
+In [60]: all( i.isdigit() for i in IP.split('.'))
+Out[60]: True
+
+In [61]: all( i.isdigit() for i in '10.1.1.a'.split('.'))
+Out[61]: False
+```
+
+#VSLIDE
+## Функция any()
+
+#VSLIDE
+### Функция any()
+
+Функция any() возвращает True, если хотя бы один элемент истина (или объект пустой).
+```python
+In [62]: any([False, True, True])
+Out[62]: True
+
+In [63]: any([False, False, False])
+Out[63]: False
+
+In [64]: any([])
+Out[64]: False
+
+In [65]: any( i.isdigit() for i in '10.1.1.a'.split('.'))
+Out[65]: True
+```
