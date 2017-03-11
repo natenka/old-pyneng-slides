@@ -985,11 +985,188 @@ def clear_cfg_and_write_to_file(cfg, to_file, delete_excl=True,
 
 #VSLIDE
 
-
 Но, если воспользоваться возможностью Python принимать аргументы переменной длины, можно сделать функцию clear_cfg_and_write_to_file такой:
-```
+```python
 def clear_cfg_and_write_to_file(cfg, to_file, **kwargs):
-    cfg_as_list = config_to_list(cfg, **kwargs)
-    with open(to_file, 'w') as f:
-        f.write('\n'.join(cfg_as_list))
+   cfg_as_list = config_to_list(cfg, **kwargs)
+   with open(to_file, 'w') as f:
+      f.write('\n'.join(cfg_as_list))
+```
+
+#HSLIDE
+
+## Полезные встроенные функции
+
+#VSLIDE
+## Анонимная функция lambda
+
+#VSLIDE
+### Анонимная функция lambda
+
+В анонимной функции lambda:
+* может содержаться только одно выражение
+* аргументов может передаваться сколько угодно
+
+```python
+In [1]: sum_arg = lambda a, b: a + b
+
+In [2]: sum_arg(1,2)
+Out[2]: 3
+
+In [3]: sum_arg(10,22)
+Out[3]: 32
+```
+
+#VSLIDE
+### Анонимная функция lambda
+
+```python
+In [1]: sum_arg = lambda a, b: a + b
+
+In [2]: sum_arg(1,2)
+Out[2]: 3
+
+In [3]: sum_arg(10,22)
+Out[3]: 32
+```
+
+Аналогичная обычная функция:
+```python
+In [4]: def sum_arg(a, b):
+  ....:     return a + b
+  ....:
+
+In [5]: sum_arg(1,5)
+Out[5]: 6
+```
+
+#VSLIDE
+### Анонимная функция lambda
+
+Сортировка элементов с помозью lambda:
+```
+list_of_lists = [['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
+                 ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
+                 ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
+                 ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
+                 ['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
+
+In [6]: sorted(list_of_lists)
+Out[6]:
+[['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
+ ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
+ ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
+ ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
+ ['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
+
+In [7]: sorted(list_of_lists, key=lambda x: x[2])
+Out[7]:
+[['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255'],
+ ['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
+ ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
+ ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
+ ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0']]
+```
+
+#VSLIDE
+## Функция zip()
+
+#VSLIDE
+### Функция zip()
+
+Функция zip():
+* на вход функции передаются последовательности
+* zip() возвращает список кортежей, каждый из которых состоит из элементов
+ * например, десятый кортеж будет содержать десятый элемент каждой из переданных последовательностей
+ * если на вход были переданы последовательности разной длинны, то все они будут отрезаны по самой короткой последовательности
+* последовательность элементов соблюдается
+
+#VSLIDE
+### Функция zip()
+
+```python
+In [1]: a = [1,2,3]
+
+In [2]: b = [100,200,300]
+
+In [3]: zip(a,b)
+Out[3]: [(1, 100), (2, 200), (3, 300)]
+```
+
+Использование zip() со списками разной длинны:
+```python
+In [4]: a = [1,2,3,4,5]
+In [5]: b = [10,20,30,40,50]
+In [6]: c = [100,200,300]
+
+In [7]: zip(a,b,c)
+Out[7]: [(1, 10, 100), (2, 20, 200), (3, 30, 300)]
+```
+
+#VSLIDE
+### Функция zip()
+
+```python
+In [8]: d_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
+In [8]: d_values = ['london_r1', '21 New Globe Walk', 'Cisco', '4451', '15.4', '10.255.0.1']
+
+In [9]: zip(d_keys,d_values)
+Out[9]: 
+[('hostname', 'london_r1'),
+ ('location', '21 New Globe Walk'),
+ ('vendor', 'Cisco'),
+ ('model', '4451'),
+ ('IOS', '15.4'),
+ ('IP', '10.255.0.1')]
+
+In [10]: dict(zip(d_keys,d_values))
+Out[10]: 
+{'IOS': '15.4',
+ 'IP': '10.255.0.1',
+ 'hostname': 'london_r1',
+ 'location': '21 New Globe Walk',
+ 'model': '4451',
+ 'vendor': 'Cisco'}
+In [11]: r1 = dict(zip(d_keys,d_values))
+```
+
+
+#VSLIDE
+### Функция zip()
+
+```python
+In [10]: d_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
+
+In [11]: data = {
+   ....: 'r1': ['london_r1', '21 New Globe Walk', 'Cisco', '4451', '15.4', '10.255.0.1'],
+   ....: 'r2': ['london_r2', '21 New Globe Walk', 'Cisco', '4451', '15.4', '10.255.0.2'],
+   ....: 'sw1': ['london_sw1', '21 New Globe Walk', 'Cisco', '3850', '3.6.XE', '10.255.0.101']
+   ....: }
+
+In [12]: london_co = {}
+
+In [13]: for key in data.keys():
+   ....:     london_co[key] = dict(zip(d_keys,data[key]))
+   ....:     
+
+In [14]: london_co
+Out[14]: 
+{'r1': {'IOS': '15.4',
+  'IP': '10.255.0.1',
+  'hostname': 'london_r1',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'r2': {'IOS': '15.4',
+  'IP': '10.255.0.2',
+  'hostname': 'london_r2',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'sw1': {'IOS': '3.6.XE',
+  'IP': '10.255.0.101',
+  'hostname': 'london_sw1',
+  'location': '21 New Globe Walk',
+  'model': '3850',
+  'vendor': 'Cisco'}}
 ```
