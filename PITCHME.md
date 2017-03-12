@@ -212,7 +212,7 @@ interface FastEthernet0/16
 
 #VSLIDE
 
-### ```if __name__ == "__main__"```
+### if __name__ == "__main__"
 
 Иногда, скрипт, который вы создали, может выполняться и самостоятельно, и может быть импортирован как модуль, другим скриптом.
 
@@ -243,7 +243,7 @@ line vty 0 4
 
 #VSLIDE
 
-### ```if __name__ == "__main__"```
+### if __name__ == "__main__"
 
 В файле generate_sw_cfg.py импортируются шаблоны из sw_cfg_templates.py и функции из предыдущих файлов:
 ```python
@@ -262,7 +262,7 @@ print lines_cfg
 
 #VSLIDE
 
-### ```if __name__ == "__main__"```
+### if __name__ == "__main__"
 
 Результат выполнения:
 ```
@@ -320,7 +320,7 @@ line vty 0 4
 
 #VSLIDE
 
-### ```if __name__ == "__main__"```
+### if __name__ == "__main__"
 
 Полученный вывод не совсем правильный: перед строками шаблона basic_cfg, идет лишняя конфигурация интерфейсов.
 
@@ -335,7 +335,7 @@ print '\n'.join(generate_access_cfg(sw1_fast_int))
 
 #VSLIDE
 
-### ```if __name__ == "__main__"```
+### if __name__ == "__main__"
 
 Файл generate_sw_int_cfg2.py:
 ```python
@@ -361,7 +361,7 @@ if __name__ == "__main__":
 
 #VSLIDE
 
-### ```if __name__ == "__main__"```
+### if __name__ == "__main__"
 
 ```python
 if __name__ == "__main__":
@@ -375,7 +375,7 @@ if __name__ == "__main__":
 
 #VSLIDE
 
-### ```if __name__ == "__main__"```
+### if __name__ == "__main__"
 
 ```python
 $ python generate_sw_cfg.py
@@ -437,7 +437,7 @@ line vty 0 4
 И, в зависимости от ситуации, получать вывод или только проверять, что команда выполнилась без ошибок.
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Функция ```call()```:
 * позволяет выполнить команду
@@ -446,7 +446,7 @@ line vty 0 4
 
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Пример выполнения команды ```ls```:
 ```python
@@ -469,7 +469,7 @@ In [3]: print result
 ```
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Если необходимо вызвать команду с аргументами, её нужно передавать таким образом (как список):
 ```
@@ -497,7 +497,7 @@ total 3624
 ```
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Все файлы, с расширением md:
 ```python
@@ -518,7 +518,7 @@ book.json           exercises.zip
 ```
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Если устанавлен аргумент ```shell=True```, указанная команда выполняется через shell.
 В таком случае, команду можно указывать так:
@@ -535,7 +535,7 @@ In [7]: result = subprocess.call('ls -ls *md', shell=True)
 ```
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Ещё одна особенность функции ```call()``` - она ожидает завершения выполнения команды.
 Если попробовать, например, запустить команду ping, то этот аспект будет заметен:
@@ -554,7 +554,7 @@ round-trip min/avg/max/stddev = 49.243/49.713/50.029/0.339 ms
 Особенно, если попробовать пингануть какой-то недоступный IP-адрес.
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Функция ```call()``` подходит, если нужно:
 * подождать выполнения программы, прежде чем выполнять следующие шаги
@@ -562,7 +562,7 @@ round-trip min/avg/max/stddev = 49.243/49.713/50.029/0.339 ms
 
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Ещё один аспект работы функции ```call()```, она выводит результат выполнения команды, на стандартный поток вывода.
 
@@ -579,7 +579,7 @@ else:
 ```
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Результат выполнения будет таким:
 ```
@@ -598,7 +598,7 @@ Alive
 То есть, результат выполнения команды, выводится на стандартный поток вывода.
 
 #VSLIDE
-### Функция ```subprocess.call()```
+### Функция subprocess.call()
 
 Если нужно это отключить и не выводить результат выполнения, надо перенаправить stdout в devnull (файл subprocess_call_devnull.py):
 ```python
@@ -622,7 +622,8 @@ Alive
 ```
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
+
 
 Функция ```check_output()```:
 * позволяет выполнить команду
@@ -631,7 +632,7 @@ Alive
 * если возникла ошибка, при выполнении команды, функция генерирует исключение
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
 
 Пример использования функции ```check_output()``` (файл subprocess_check_output.py):
 ```python
@@ -644,7 +645,7 @@ print reply
 ```
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
 
 Результат выполнения (если убрать строку ```print reply```, на стандартный поток вывода ничего не будет выведено):
 ```
@@ -661,7 +662,7 @@ round-trip min/avg/max/stddev = 49.785/52.696/57.231/3.250 ms
 ```
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
 
 Если выполнить команду, которая вызовет ошибку и, соответственно, код возрата будет не 0 (файл subprocess_check_output_catch_exception.py):
 ```python
@@ -676,7 +677,7 @@ subprocess.CalledProcessError: Command '['ping', '-c', '3', '-n', 'a']' returned
 ```
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
 
 Функция ```check_output()``` всегда будет возвращать исключение ```CalledProcessError```, когда код возврата не равен 0.
 
@@ -692,7 +693,7 @@ except subprocess.CalledProcessError as e:
 ```
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
 
 Результат выполнения:
 ```
@@ -706,7 +707,7 @@ Return code: 68
 И, хотя сообщение об ошибке, не выводилось, оно попало на стандартный поток вывода.
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
 
 Попробуем собрать всё в финальную функцию и добавим перехват сообщения об ошибке:
 ```python
@@ -738,7 +739,7 @@ print ping_ip('a')
 ```
 
 #VSLIDE
-### Функция ```subprocess.check_output()```
+### Функция subprocess.check_output()
 
 
 Результат выполнения будет таким:
@@ -1336,7 +1337,7 @@ optional arguments:
 
 #VSLIDE
 
-#### ```metavar```
+#### metavar
 
 В парсере create_parser используется новый аргумент - ```metavar```:
 ```python
@@ -1348,7 +1349,7 @@ create_parser.add_argument('-s', dest='schema', default=DFLT_DB_SCHEMA,
 
 #VSLIDE
 
-#### ```metavar```
+#### metavar
 
 Аргумент ```metavar``` позволяет указывать имя аргумента для вывода в сообщении usage и help:
 ```
@@ -1367,7 +1368,7 @@ optional arguments:
 
 #VSLIDE
 
-#### ```nargs```
+#### nargs
 
 В парсере add_parser используется ```nargs```:
 ```python
@@ -1381,7 +1382,7 @@ add_parser.add_argument('filename', nargs='+', help='file(s) to add to db')
 
 #VSLIDE
 
-#### ```nargs```
+#### nargs
 Сообщение help, в таком случае, выглядит так:
 ```
 $ python parse_dhcp_snooping.py add -h
@@ -1399,7 +1400,7 @@ optional arguments:
 
 #VSLIDE
 
-#### ```nargs```
+#### nargs
 
 Если передать несколько файлов, они попадут в список.
 А, так как функция add, просто выводит имена файлов, вывод получится таким:
@@ -1413,7 +1414,7 @@ Adding data to db dhcp_snooping.db
 
 #VSLIDE
 
-#### ```nargs```
+#### nargs
 
 ```nargs``` поддерживает такие значения:
 * ```N``` - должно быть указанное количество аргументов. Аргументы будут в списке (даже, если указан 1)
@@ -1423,7 +1424,7 @@ Adding data to db dhcp_snooping.db
 
 #VSLIDE
 
-#### ```choices```
+#### choices
 
 В парсере get_parser используется ```choices```:
 ```python
@@ -1437,7 +1438,7 @@ get_parser.add_argument('-k', dest="key",
 
 #VSLIDE
 
-#### ```choices```
+#### choices
 
 Для этого парсера, help выглядит так:
 ```
@@ -1457,7 +1458,7 @@ optional arguments:
 
 #VSLIDE
 
-#### ```choices```
+#### choices
 
 А, если выбрать неправильный вариант:
 ```
