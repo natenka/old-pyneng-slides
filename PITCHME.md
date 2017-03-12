@@ -1658,3 +1658,153 @@ Out[2]:
 ### Python package
 
 Структура пакета my_app:
+```
+$ tree ~/.local/lib/python2.7/site-packages/my_app
+├── __init__.py
+├── cfg.py
+└── switches
+    ├── __init__.py
+    ├── access.py
+    └── sw_cfg_templates.py
+```
+
+Файлы __init__.py пустые.
+
+#VSLIDE
+
+### Python package
+
+Файл cfg.py:
+```python
+def config_to_list(cfg_file, delete_excl=True,
+                   delete_empty=True, strip_end=True):
+    result = []
+    with open( cfg_file ) as f:
+        for line in f:
+            if strip_end:
+                line = line.rstrip()
+            if delete_empty and not line:
+                pass
+            elif delete_excl and line.startswith('!'):
+                pass
+            else:
+                result.append(line)
+    return result
+
+def clear_cfg_and_write_to_file(cfg, to_file, **kwargs):
+    cfg_as_list = config_to_list(cfg, **kwargs)
+    with open(to_file, 'w') as f:
+        f.write('\n'.join(cfg_as_list))
+```
+
+#VSLIDE
+
+### Python package
+
+Файл switches/access.py:
+```python
+access_template = ['switchport mode access',
+                   'switchport access vlan',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+
+def generate_access_cfg(sw_dict):
+    result = []
+    for intf in sw_dict['access']:
+        result.append('interface FastEthernet %s' % intf)
+        for command in sw_int_templates.access_template:
+            if command.endswith('access vlan'):
+                result.append(' %s %s' % (command, sw_dict['access'][intf]))
+            else:
+                result.append(' %s' % command)
+    return result
+```
+
+#VSLIDE
+
+### Python package
+
+Файл switches/sw_cfg_templates.py:
+```python
+basic_cfg = """
+service timestamps debug datetime msec localtime show-timezone year
+service timestamps log datetime msec localtime show-timezone year
+service password-encryption
+service sequence-numbers
+!
+no ip domain lookup
+!
+"""
+
+lines_cfg = """
+!
+line con 0
+ logging synchronous
+ history size 100
+line vty 0 4
+ logging synchronous
+ history size 100
+ transport input ssh
+!
+"""
+```
+
+#VSLIDE
+
+### Python package
+
+Импорт модулей/функций из пакета:
+```python
+In [5]: import my_app.cfg
+
+In [6]: dir(my_app.cfg)
+Out[6]: 
+['__builtins__',
+ '__doc__',
+ '__file__',
+ '__name__',
+ '__package__',
+ 'clear_cfg_and_write_to_file',
+ 'config_to_list']
+```
+
+
+#VSLIDE
+
+### Python package
+
+```
+In [5]: import my_app.cfg
+
+In [6]: dir(my_app.cfg)
+Out[6]: 
+['__builtins__',
+ '__doc__',
+ '__file__',
+ '__name__',
+ '__package__',
+ 'clear_cfg_and_write_to_file',
+ 'config_to_list']
+
+In [7]: my_app.cfg.config_to_list
+Out[7]: <function my_app.cfg.config_to_list>
+```
+
+#VSLIDE
+
+### Python package
+
+```
+In [13]: import my_app.switches.access as sw_access
+
+In [14]: sw_access.access_template
+Out[14]: 
+['switchport mode access',
+ 'switchport access vlan',
+ 'spanning-tree portfast',
+ 'spanning-tree bpduguard enable']
+
+In [15]: sw_access.generate_access_cfg
+Out[15]: <function my_app.switches.access.generate_access_cfg>
+```
