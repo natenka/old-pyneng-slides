@@ -1559,3 +1559,102 @@ test.txt, test2.txt
 Adding data to db dhcp_snooping.db
 ```
 
+#HSLIDE
+
+## Python package
+
+#VSLIDE
+
+### Python package
+
+Пакет Python - это набор модулей, которые организованы по каталогам. Каталоги задают структуру пакета
+
+Пакет Python и обычны набор скриптов Python отличаются тем, что в пакете, в каждом каталоге должен находиться специальный файл - ```__init__.py```
+
+#VSLIDE
+
+### Python package
+
+Пример структуры пакета:
+```
+$ tree ~/.local/lib/python2.7/site-packages/my_app
+├── __init__.py
+├── cfg.py
+└── switches
+    ├── __init__.py
+    ├── access.py
+    └── sw_cfg_templates.py
+```
+
+#VSLIDE
+
+### Python package
+
+Для того чтобы можно было импортировать пакет, его необходимо разместить в одном из каталогов, в котором Python ищет модули или добавить новый путь:
+```
+In [1]: import sys
+
+In [2]: sys.path
+Out[2]: 
+['',
+ '/usr/local/bin',
+ '/usr/lib/python2.7',
+ '/usr/lib/python2.7/plat-i386-linux-gnu',
+ '/usr/lib/python2.7/lib-tk',
+ '/usr/lib/python2.7/lib-old',
+ '/usr/lib/python2.7/lib-dynload',
+ '/usr/local/lib/python2.7/dist-packages',
+ '/usr/lib/python2.7/dist-packages',
+ '/usr/lib/python2.7/dist-packages/gst-0.10',
+ '/usr/lib/python2.7/dist-packages/gtk-2.0',
+ '/usr/lib/pymodules/python2.7',
+ '/usr/local/lib/python2.7/dist-packages/IPython/extensions',
+ '/home/nata/.ipython']
+```
+
+
+#VSLIDE
+
+### Python package
+
+Для своих пакетов можно использовать каталог:
+```
+$ python -m site --user-site
+/home/nata/.local/lib/python2.7/site-packages
+```
+
+После того как каталог будет создан, он автоматически будет добавлен в пути поиска модулей:
+```
+$ mkdir -p /home/nata/.local/lib/python2.7/site-packages
+```
+
+#VSLIDE
+### Python package
+
+```
+In [1]: import sys
+
+In [2]: sys.path
+Out[2]: 
+['',
+ '/usr/local/bin',
+ '/usr/lib/python2.7',
+ '/usr/lib/python2.7/plat-i386-linux-gnu',
+ '/usr/lib/python2.7/lib-tk',
+ '/usr/lib/python2.7/lib-old',
+ '/usr/lib/python2.7/lib-dynload',
+ '/home/nata/.local/lib/python2.7/site-packages',
+ '/usr/local/lib/python2.7/dist-packages',
+ '/usr/lib/python2.7/dist-packages',
+ '/usr/lib/python2.7/dist-packages/gst-0.10',
+ '/usr/lib/python2.7/dist-packages/gtk-2.0',
+ '/usr/lib/pymodules/python2.7',
+ '/usr/local/lib/python2.7/dist-packages/IPython/extensions',
+ '/home/nata/.ipython']
+```
+
+#VSLIDE
+
+### Python package
+
+Структура пакета my_app:
