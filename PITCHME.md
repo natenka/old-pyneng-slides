@@ -267,69 +267,102 @@ __JSON (JavaScript Object Notation)__ - это текстовый формат �
 
 #VSLIDE
 
-### Чтение
+### Чтение. json.load()
 Чтение файла в объект Python:
 ```python
 In [1]: import json
 
-In [2]: templates = json.load(open('sw_templates.json'))
-
-In [3]: print templates
-{u'access': [u'switchport mode access', u'switchport access vlan', u'switchport nonegotiate', u'spanning-tree portfast', u'spanning-tree bpduguard enable'], u'trunk': [u'switchport trunk encapsulation dot1q', u'switchport mode trunk', u'switchport trunk native vlan 999', u'switchport trunk allowed vlan']}
-
-In [4]: for section, commands in templates.items():
-   ...:     print section
-   ...:     print '\n'.join(commands)
+In [2]: with open('sw_templates.json') as f:
+   ...:     templates = json.load(f)
    ...:
-access
-switchport mode access
-switchport access vlan
-switchport nonegotiate
-spanning-tree portfast
-spanning-tree bpduguard enable
-trunk
-switchport trunk encapsulation dot1q
-switchport mode trunk
-switchport trunk native vlan 999
-switchport trunk allowed vlan
+
+In [3]: templates
+Out[3]:
+{u'access': [u'switchport mode access',
+  u'switchport access vlan',
+  u'switchport nonegotiate',
+  u'spanning-tree portfast',
+  u'spanning-tree bpduguard enable'],
+ u'trunk': [u'switchport trunk encapsulation dot1q',
+  u'switchport mode trunk',
+  u'switchport trunk native vlan 999',
+  u'switchport trunk allowed vlan']}
 ```
 
 #VSLIDE
-###Запись
 
-Файл json_write.py:
+### Чтение. json.loads()
+
+Считывание строки в формате JSON в объект Python:
 ```python
-import json
 
+In [4]: with open('sw_templates.json') as f:
+   ...:     templates = json.loads(f.read())
+   ...:
 
-trunk_template = ['switchport trunk encapsulation dot1q',
-                  'switchport mode trunk',
-                  'switchport trunk native vlan 999',
-                  'switchport trunk allowed vlan']
-
-
-access_template = ['switchport mode access',
-                   'switchport access vlan',
-                   'switchport nonegotiate',
-                   'spanning-tree portfast',
-                   'spanning-tree bpduguard enable']
-
-to_json = {'trunk':trunk_template, 'access':access_template}
-
-with open('sw_templates.json', 'w') as f:
-    f.write(json.dumps(to_json))
-
-with open('sw_templates.json') as f:
-    print f.read()
+In [5]: templates
+Out[5]:
+{u'access': [u'switchport mode access',
+  u'switchport access vlan',
+  u'switchport nonegotiate',
+  u'spanning-tree portfast',
+  u'spanning-tree bpduguard enable'],
+ u'trunk': [u'switchport trunk encapsulation dot1q',
+  u'switchport mode trunk',
+  u'switchport trunk native vlan 999',
+  u'switchport trunk allowed vlan']}
 ```
+
 
 #VSLIDE
 ###Запись
 
-Содержимое файла sw_templates.json:
-```json
+```python
+In [1]: import json
+
+In [2]: trunk_template = ['switchport trunk encapsulation dot1q',
+   ...:                   'switchport mode trunk',
+   ...:                   'switchport trunk native vlan 999',
+   ...:                   'switchport trunk allowed vlan']
+   ...:
+   ...:
+   ...: access_template = ['switchport mode access',
+   ...:                    'switchport access vlan',
+   ...:                    'switchport nonegotiate',
+   ...:                    'spanning-tree portfast',
+   ...:                    'spanning-tree bpduguard enable']
+   ...:
+   ...: to_json = {'trunk':trunk_template, 'access':access_template}
+   ...:
+```
+
+#VSLIDE
+###Запись. json.dump()
+
+Запись объекта в файл:
+```python
+In [3]: with open('sw_templates.json', 'w') as f:
+   ...:     json.dump(to_json, f)
+   ...:
+
+In [4]: cat sw_templates.json
 {"access": ["switchport mode access", "switchport access vlan", "switchport nonegotiate", "spanning-tree portfast", "spanning-tree bpduguard enable"], "trunk": ["switchport trunk encapsulation dot1q", "switchport mode trunk", "switchport trunk native vlan 999", "switchport trunk allowed vlan"]}
 ```
+
+#VSLIDE
+###Запись. json.dumps()
+
+Преобразование объекта в строку в формате JSON:
+```python
+In [5]: with open('sw_templates.json', 'w') as f:
+   ...:     f.write(json.dumps(to_json))
+   ...:
+   ...:
+
+In [6]: cat sw_templates.json
+{"access": ["switchport mode access", "switchport access vlan", "switchport nonegotiate", "spanning-tree portfast", "spanning-tree bpduguard enable"], "trunk": ["switchport trunk encapsulation dot1q", "switchport mode trunk", "switchport trunk native vlan 999", "switchport trunk allowed vlan"]}
+```
+
 
 #VSLIDE
 ###Запись
@@ -422,6 +455,35 @@ Out[7]: list
 
 In [8]: print templates
 [u'switchport trunk encapsulation dot1q', u'switchport mode trunk', u'switchport trunk native vlan 999', u'switchport trunk allowed vlan']
+```
+
+#VSLIDE
+### Ключи словарей
+
+В формат JSON нельзя записать словарь у котрого ключи - кортежи:
+```python
+In [9]: to_json = {('trunk', 'cisco'):trunk_template, 'access':access_template}
+
+In [10]: with open('sw_templates.json', 'w') as f:
+    ...:     json.dump(to_json, f)
+    ...:
+...
+TypeError: key ('trunk', 'cisco') is not a string
+```
+
+#VSLIDE
+### Ключи словарей
+
+Специальный параметр позволяет игнорировать такие ключи:
+```python
+In [11]: with open('sw_templates.json', 'w') as f:
+    ...:     json.dump(to_json, f, skipkeys=True)
+    ...:
+    ...:
+
+In [12]: cat sw_templates.json
+{"access": ["switchport mode access", "switchport access vlan", "switchport nonegotiate",
+"spanning-tree portfast", "spanning-tree bpduguard enable"]}
 ```
 
 #HSLIDE
