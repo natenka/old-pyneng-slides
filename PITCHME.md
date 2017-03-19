@@ -933,3 +933,192 @@ ospf_ints:
 * переменные задачи (task) (переписывают другие значения только для задачи)
 * переменные, которые передаются при вызове playbook через параметр --extra-vars (всегда наиболее приоритетные)
 
+#HSLIDE
+### Работа с результатами выполнения модуля
+
+#VSLIDE
+### verbose
+
+Флаг verbose -  этот флаг позволяет подробно посмотреть какие шаги выполняет Ansible.
+
+Пример запуска playbook с флагом verbose (вывод сокращен):
+```
+ansible-playbook 1_show_commands_with_raw.yml -v
+```
+
+![Verbose playbook]({{ book.ansible_img_path }}playbook-verbose.png)
+
+#VSLIDE
+### verbose
+
+При увеличении количества букв v в флаге, вывод становится более подробным.
+Попробуйте вызывать этот же playbook и добавлять к флагу буквы v (5 и больше показывают одинаковый вывод), таким образом:
+```
+ansible-playbook 1_show_commands_with_raw.yml -vvv
+```
+
+#VSLIDE
+### verbose
+
+В выводе видны результаты выполнения задачи, они возвращаются в формате JSON:
+* __changed__ - ключ, который указывает были ли внесены изменения
+* __rc__ - return code. Это поле появляется в выводе тех модулей, которые выполняют какие-то команды
+* __stderr__ - ошибки, при выполнении команды. Это поле появляется в выводе тех модулей, которые выполняют какие-то команды
+* __stdout__ - вывод команды
+* __stdout_lines__ - вывод в виде списка команд, разбитых построчно
+
+
+#VSLIDE
+### register
+
+Параметр __register__ сохраняет результат выполнения модуля в переменную.
+Затем эта переменная может использоваться в шаблонах, в принятии решений о ходе сценария или для отображении вывода.
+
+Попробуем сохранить результат выполнения команды.
+
+#VSLIDE
+### register
+
+В playbook 2_register_vars.yml, с помощью register, вывод команды sh ip int br сохранен в перменную sh_ip_int_br_result:
+```
+- name: Run show commands on routers
+  hosts: cisco-routers
+  gather_facts: false
+
+  tasks:
+
+    - name: run sh ip int br
+      raw: sh ip int br | ex unass
+      register: sh_ip_int_br_result
+```
+
+#VSLIDE
+### register
+
+Если запустить этот playbook, вывод не будет отличаться, так как вывод только записан в переменную, но с переменной не выполяется никаких действий.
+Следующий шаг - отобразить результат выполнения команды, с помощью модуля debug.
+
+
+#VSLIDE
+### debug
+
+Модуль debug позволяет отображать информацию на стандартный поток вывода.
+Это может быть произвольная строка, переменная, факты об устройстве.
+
+#VSLIDE
+### debug
+
+Для отображения сохраненных результатов выполнения команды, в playbook 2_register_vars.yml добавлена задача с модулем debug:
+```
+- name: Run show commands on routers
+  hosts: cisco-routers
+  gather_facts: false
+
+  tasks:
+
+    - name: run sh ip int br
+      raw: sh ip int br | ex unass
+      register: sh_ip_int_br_result
+
+    - name: Debug registered var
+      debug: var=sh_ip_int_br_result.stdout_lines
+```
+
+#VSLIDE
+### debug
+
+Обратите внимание, что выводится не всё содержимое переменной sh_ip_int_br_result, а только содержимое stdout_lines.
+В sh_ip_int_br_result.stdout_lines находится список строк, поэтому вывод будут структурированн.
+
+Результат запуска playbook будет выглядит так:
+```
+$ ansible-playbook 2_register_vars.yml
+```
+
+#VSLIDE
+### debug
+
+![Verbose playbook]({{ book.ansible_img_path }}2_register_vars.png)
+
+
+#VSLIDE
+### register, debug, when
+
+С помощью ключевого слова __when__, можно указать условие, при выполнении которого, задача выполняется.
+Если условие не выполняется, то задача пропускается.
+
+when в Ansible используется как if в Python.
+
+
+#VSLIDE
+### register, debug, when
+
+Пример playbook 3_register_debug_when.yml:
+```
+- name: Run show commands on routers
+  hosts: cisco-routers
+  gather_facts: false
+
+  tasks:
+
+    - name: run sh ip int br
+      raw: sh ip int bri | ex unass
+      register: sh_ip_int_br_result
+
+    - name: Debug registered var
+      debug:
+        msg: "Error in command"
+      when: "'invalid' in sh_ip_int_br_result.stdout"
+```
+
+#VSLIDE
+### register, debug, when
+
+В последнем задании несколько изменений:
+* модуль debug отображает не содержимое сохраненной переменной, а сообщение, которое указано в переменной msg.
+* условие when указывает, что данная задача выполнится только при выполнении условия
+ * ```when: "'invalid' in sh_ip_int_br_result.stdout"``` - это условие означает, что задача будет выполнена только в том случае, если в выводе sh_ip_int_br_result.stdout будет найдена строка invalid (например, когда неправильно введена команда)
+
+Модули, которые работают с сетевым оборудованием, автоматически проверяют ошибки, при выполнении команд. Тут этот пример используется для демонстрации возможностей Ansible.
+
+#VSLIDE
+### register, debug, when
+
+Выполнение playbook:
+```
+$ ansible-playbook 3_register_debug_when.yml
+```
+
+![Verbose playbook]({{ book.ansible_img_path }}3_register_debug_when_skip.png)
+
+#VSLIDE
+### register, debug, when
+
+Выполнение того же playbook, но с ошибкой в команде:
+```
+- name: Run show commands on routers
+  hosts: cisco-routers
+  gather_facts: false
+
+  tasks:
+
+    - name: run sh ip int br
+      raw: shh ip int bri | ex unass
+      register: sh_ip_int_br_result
+
+    - name: Debug registered var
+      debug:
+        msg: "Error in command"
+      when: "'invalid' in sh_ip_int_br_result.stdout"
+```
+
+#VSLIDE
+### register, debug, when
+
+Теперь результат выполнения такой:
+```
+$ ansible-playbook 3_register_debug_when.yml
+```
+
+![Verbose playbook]({{ book.ansible_img_path }}3_register_debug_when.png)
+
