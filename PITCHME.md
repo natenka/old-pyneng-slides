@@ -184,7 +184,7 @@ location     text
 
 Удалить таблицу можно так:
 ```sql
-sqlite> DROP table switch
+sqlite> DROP table switch;
 ```
 
 #VSLIDE
