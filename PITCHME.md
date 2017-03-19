@@ -1,3294 +1,1193 @@
 # Python для сетевых инженеров 
 
-
 #HSLIDE
 
-# Основы Python
+# Обработка вывода команд с TextFSM
 
 #VSLIDE
+### Обработка вывода команд с TextFSM
 
-### Синтаксис Python
+TextFSM это библиотека созданная Google для обработки вывода с сетевых устройств.
+Она позволяет создавать шаблоны, по которым будет обрабатываться вывод команды.
 
-Отступы имеют значение. Они определяют:
-* какие выражения попадают в блок кода
-* когда блок кода заканчивается
+Использование TextFSM лучше, чем простая построчная обработка, так как шаблоны дают лучшее представление о том, как вывод будет обрабатываться и шаблонами проще поделиться. А значит, проще найти уже созданные шаблоны и использовать их. Или поделиться своими.
 
-Tab или пробел:
-* лучше использовать пробелы (настроить редактор)
-* количество пробелов должно быть одинаковым в одном блоке:
- * лучше во всем коде
- * обычно используются 2-4 пробела (в курсе используются 4 пробела)
-
-#VSLIDE
-
-### Синтаксис Python
-
-```python
-a = 10
-b = 5
-
-if a > b:
-    print "A больше B"
-    print a - b
-else:
-    print "B больше или равно A"
-    print b - a
-
-print "The End"
-
-def open_file( filename ):
-    print "Reading file", filename
-    with open(filename) as f:
-        return f.read()
-        print "Done"
+Для начала, библиотеку надо установить:
+```
+pip install gtextfsm
 ```
 
 #VSLIDE
+### Обработка вывода команд с TextFSM
 
-### Комментарии
+Для использования TextFSM, надо создать шаблон, по которому будет обрабатываться вывод команды.
 
-Однострочный комментарий:
-```python
-#Очень важный комментарий
-a = 10
-b = 5 #Очень нужный комментарий
+Пример вывода команды traceroute:
+```
+r2#traceroute 90.0.0.9 source 33.0.0.2
+traceroute 90.0.0.9 source 33.0.0.2
+Type escape sequence to abort.
+Tracing the route to 90.0.0.9
+VRF info: (vrf in name/id, vrf out name/id)
+  1 10.0.12.1 1 msec 0 msec 0 msec
+  2 15.0.0.5  0 msec 5 msec 4 msec
+  3 57.0.0.7  4 msec 1 msec 4 msec
+  4 79.0.0.9  4 msec *  1 msec
 ```
 
-Многострочный комментарий:
+#VSLIDE
+### Обработка вывода команд с TextFSM
+Например, из вывода надо получить хопы, через которые прошел пакет.
+
+В таком случае, шаблон TextFSM будет выглядеть так (файл traceroute.template):
+```
+Value ID (\d+)
+Value Hop (\d+(\.\d+){3})
+
+Start
+  ^  ${ID} ${Hop} -> Record
+```
+
+#VSLIDE
+### Обработка вывода команд с TextFSM
+
+Первые две строки определяют переменные:
+* ```Value ID (\d+)```
+ * эта строка определяет переменную ID, которая описывает регулярное выражение: ```(\d+)``` - одна или более цифр
+ * сюда попадут номера хопов
+* ```Value Hop (\d+(\.\d+){3})```
+ * эта строка определяет переменную Hop, которая описывает IP-адрес таким регулярным выражением: ```(\d+(\.\d+){3})```
+
+#VSLIDE
+### Обработка вывода команд с TextFSM
+
+После строки Start начинается сам шаблон. В данном случае, он очень простой:
+* ```^  ${ID} ${Hop} -> Record```
+ * сначала идет символ начала строки, затем два пробела и переменные ID и Hop
+ * в TextFSM переменные описываются таким образом: ```${имя переменной}```
+ * слово ```Record``` в конце означает, что строки, которые попадут под описанный шаблон, будут обработаны и выведены в результаты TextFSM (с этим подробнее мы разберемся в [следующем разделе](./1_textfsm_syntax.md))
+
+#VSLIDE
+### Обработка вывода команд с TextFSM
+
+Скрипт для обработки вывода команды traceroute с помощью TextFSM (parse_traceroute.py):
 ```python
+import textfsm
+
+traceroute = """
+r2#traceroute 90.0.0.9 source 33.0.0.2
+traceroute 90.0.0.9 source 33.0.0.2
+Type escape sequence to abort.
+Tracing the route to 90.0.0.9
+VRF info: (vrf in name/id, vrf out name/id)
+  1 10.0.12.1 1 msec 0 msec 0 msec
+  2 15.0.0.5  0 msec 5 msec 4 msec
+  3 57.0.0.7  4 msec 1 msec 4 msec
+  4 79.0.0.9  4 msec *  1 msec
 """
-Очень важный
-и длинный комментарий
-"""
-a = 10
-b = 5
-```
-
-#VSLIDE
-
-### Интерпретатор IPython
-
-#VSLIDE
-
-### Интерпретатор IPython
-
-```python
-In [1]: 1 + 2
-Out[1]: 3
-
-In [2]: 22*45
-Out[2]: 990
-
-In [3]: 2**3
-Out[3]: 8
-
-In [4]: print 'Hello!'
-Hello!
-
-In [5]: for i in range(5):
-   ...:     print i
-   ...:     
-0
-1
-2
-3
-4
-```
-
-#VSLIDE
-
-### Интерпретатор IPython
-
-Оператор print
-```python
-In [6]: print 'Hello!'
-Hello!
-
-In [7]: print 5*5
-25
-
-In [8]: print 1*5, 2*5, 3*5, 4*5
-5 10 15 20
-
-In [9]: print 'one', 'two', 'three'
-one two three
-```
-
-#VSLIDE
-
-### IPython magic
-
-История текущей сессии:
-```python
-In [1]: a = 10
-
-In [2]: b = 5
-
-In [3]: if a > b:
-   ...:     print "A is bigger"
-   ...:
-A is bigger
-
-In [4]: %history
-a = 10
-b = 5
-if a > b:
-    print "A is bigger"
-%history
-```
-
-#VSLIDE
-
-### IPython help
-
-```python
-In [1]: help(str)
-Help on class str in module __builtin__:
-
-class str(basestring)
- |  str(object='') -> string
- |
- |  Return a nice string representation of the object.
- |  If the argument is a string, the return value is the same object.
- |
-...
-
-In [2]: help(str.strip)
-Help on method_descriptor:
-
-strip(...)
-    S.strip([chars]) -> string or unicode
-
-    Return a copy of the string S with leading and trailing
-    whitespace removed.
-    If chars is given and not None, remove characters in chars instead.
-    If chars is unicode, S will be converted to unicode before stripping
-```
-
-#VSLIDE
-
-### IPython help
-
-```python
-In [3]: ?str
-Docstring:
-str(object='') -> string
-
-Return a nice string representation of the object.
-If the argument is a string, the return value is the same object.
-Type:      type
-
-In [4]: ?str.strip
-Docstring:
-S.strip([chars]) -> string or unicode
-
-Return a copy of the string S with leading and trailing
-whitespace removed.
-If chars is given and not None, remove characters in chars instead.
-If chars is unicode, S will be converted to unicode before stripping
-Type:      method_descriptor
-```
-
-#VSLIDE
-
-### Переменные
-
-#VSLIDE
-
-### Переменные
-
-Переменные в Python:
-* не требуют объявления типа переменной (Python язык с динамической типизацией)
-* являются ссылками на область памяти
-
-Имя переменной:
-* может состоять только из букв, цифр и знака подчеркивания
-* не может начинаться с цифры
-* не может содержать специальных символов @, $, %
-
-#VSLIDE
-
-### Переменные
-
-```python
-In [1]: a = 3
-
-In [2]: b = 'Hello'
-
-In [3]: c, d = 9, 'Test'
-
-In [4]: print a, b, c, d
-3 Hello 9 Test
-```
-
-#VSLIDE
-
-### Переменные
-
-Переменные являются ссылками на область памяти:
-```python
-In [5]: a = b = c = 33
-
-In [6]: id(a)
-Out[6]: 31671480
-
-In [7]: id(b)
-Out[7]: 31671480
-
-In [8]: id(c)
-Out[8]: 31671480
-```
-
-#VSLIDE
-
-### Переменные
-
-Рекомендации по именованию функций, классов и переменных:
-* имена переменных обычно пишутся полностью большими или маленькими буквами
- * DB_NAME
- * db_name
-* имена функций задаются маленькими буквами, с подчеркиваниями между словами
- * get_names
-* имена классов задаются словами с заглавными буквами, без пробелов
- * CiscoSwitch
-
-#HSLIDE
-
-## Типы данных в Python
-
-#VSLIDE
-
-### Типы данных в Python
-
-В Python есть несколько стандартных типов данных:
-* Numbers (числа)
-* Strings (строки)
-* Lists (списки)
-* Dictionary (словари)
-* Tuples (кортежи)
-* Sets (множества)
-* Boolean
-
-#VSLIDE
-
-### Типы данных в Python
-
-* Изменяемые:
- * Списки
- * Словари
- * Множества
-* Неизменяемые
- * Числа
- * Строки
- * Кортежи
-
-#VSLIDE
-
-### Типы данных в Python
-
-* Упорядоченные:
- * Списки
- * Кортежи
- * Строки
-* Неупорядоченные:
- * Словари
- * Множества
-
-#HSLIDE
-
-## Числа
-
-#VSLIDE
-
-### Числа
-
-Пример различных типов числовых значений:
-* int (40, -80)
-* float (1.5, -30.7)
-
-```python
-In [1]: 1 + 2
-Out[1]: 3
-
-In [2]: 1.0 + 2
-Out[2]: 3.0
-
-In [3]: 10 - 4
-Out[3]: 6
-
-In [4]: 2**3
-Out[4]: 8
-```
-
-#VSLIDE
-
-###Числа
-
-Отличия деления int и float:
-```python
-In [5]: 10/3
-Out[5]: 3
-
-In [6]: 10/3.0
-Out[6]: 3.3333333333333335
-
-In [7]: 10 / float(3)
-Out[7]: 3.3333333333333335
-
-In [8]: float(10) / 3
-Out[8]: 3.3333333333333335
-```
-
-Функция ```round()```:
-```python
-In [9]: round(10/3.0, 2)
-Out[9]: 3.33
-
-In [10]: round(10/3.0, 4)
-Out[10]: 3.3333
-```
-
-
-#VSLIDE
-
-###Числа
-
-Операторы сравнения
-```python
-In [12]: 10 > 3.0
-Out[12]: True
-
-In [13]: 10 < 3
-Out[13]: False
-
-In [14]: 10 == 3
-Out[14]: False
-
-In [15]: 10 == 10
-Out[15]: True
-
-In [16]: 10 <= 10
-Out[16]: True
-
-In [17]: 10.0 == 10
-Out[17]: True
-```
-
-#VSLIDE
-
-###Числа
-
-
-Конвертация в тип int:
-```python
-In [18]: a = '11'
-
-In [19]: int(a)
-Out[19]: 11
-```
-
-Во втором аргументе можно указывать систему исчисления:
-```python
-In [20]: int(a, 2)
-Out[20]: 3
-```
-
-Конвертация в int типа float:
-```python
-In [21]: int(3.333)
-Out[21]: 3
-
-In [22]: int(3.9)
-Out[22]: 3
-```
-
-#VSLIDE
-
-###Числа
-
-Функция bin():
-```python
-In [23]: bin(8)
-Out[23]: '0b1000'
-
-In [24]: bin(255)
-Out[24]: '0b11111111'
-```
-
-Функция hex():
-```python
-In [25]: hex(10)
-Out[25]: '0xa'
-```
-
-#HSLIDE
-
-## Строки
-
-#VSLIDE
-
-### Строки
-
-Строка в Python:
-* последовательность символов, заключенная в кавычки
-* неизменяемый, упорядоченный тип данных
-
-```python
-In [1]: 'Hello'
-Out[1]: 'Hello'
-
-In [2]: "Hello"
-Out[2]: 'Hello'
-
-In [3]: tunnel = """
-   ....: interface Tunnel0
-   ....:  ip address 10.10.10.1 255.255.255.0
-   ....:  ip mtu 1416
-   ....:  ip ospf hello-interval 5
-   ....:  tunnel source FastEthernet1/0
-   ....:  tunnel protection ipsec profile DMVPN
-   ....: """
-```
-
-#VSLIDE
-
-#### Строки - упорядоченный тип данных
-
-```python
-In [20]: string1 = 'interface FastEthernet1/0'
-
-In [21]: string1[0]
-Out[21]: 'i'
-
-In [22]: string1[1]
-Out[22]: 'n'
-
-In [23]: string1[-1]
-Out[23]: '0'
-
-In [24]: string1[0:9]
-Out[24]: 'interface'
-
-In [25]: string1[10:22]
-Out[25]: 'FastEthernet'
-
-In [26]:  string1[10:]
-Out[26]: 'FastEthernet1/0'
-
-In [27]: string1[-3:]
-Out[27]: '1/0'
-```
-
-#VSLIDE
-
-#### Строки - упорядоченный тип данных
-
-```python
-In [28]: a = '0123456789'
-
-In [29]: a[::]
-Out[29]: '0123456789'
-
-In [30]: a[::-1]
-Out[30]: '9876543210'
-
-In [31]: a[::2]
-Out[31]: '02468'
-
-In [32]: a[1::2]
-Out[32]: '13579'
-```
-
-#VSLIDE
-
-### Методы работы со строками
-
-#VSLIDE
-
-Методы ```upper(), lower(), swapcase(), capitalize()```
-```python
-In [25]: string1 = 'FastEthernet'
-
-In [26]: string1.upper()
-Out[26]: 'FASTETHERNET'
-
-In [27]: string1.lower()
-Out[27]: 'fastethernet'
-
-In [28]: string1.swapcase()
-Out[28]: 'fASTeTHERNET'
-
-In [29]: string2 = 'tunnel 0'
-
-In [30]: string2.capitalize()
-Out[30]: 'Tunnel 0'
-```
-
-#VSLIDE
-
-Метод __```count()```__ используется для подсчета того, сколько раз символ или подстрока, встречаются в строке:
-```python
-In [33]: string1 = 'Hello, hello, hello, hello'
-
-In [34]: string1.count('hello')
-Out[34]: 3
-
-In [35]: string1.count('ello')
-Out[35]: 4
-```
-
-Методу __```find()```__ можно передать подстроку или символ и он покажет на какой позиции находится первый символ подстроки (для первого совпадения):
-```python
-In [36]: string1 = 'interface FastEthernet0/1'
-
-In [37]: string1.find('Fast')
-Out[37]: 10
-
-In [38]: string1[string1.find('Fast')::]
-Out[38]: 'FastEthernet0/1'
-```
-
-#VSLIDE
-
-Проверка на то начинается (или заканчивается) ли строка на определенные символы (методы __```startswith()```__, __```endswith()```__):
-```python
-In [40]: string1 = 'FastEthernet0/1'
-
-In [41]: string1.startswith('Fast')
-Out[41]: True
-
-In [42]: string1.startswith('fast')
-Out[42]: False
-
-In [43]: string1.endswith('0/1')
-Out[43]: True
-
-In [44]: string1.endswith('0/2')
-Out[44]: False
-```
-
-#VSLIDE
-
-Замена последовательности символов в строке, на другую последовательность (метод __```replace()```__):
-```python
-In [45]: string1 = 'FastEthernet0/1'
-
-In [46]: string1.replace('Fast', 'Gigabit')
-Out[46]: 'GigabitEthernet0/1'
-```
-
-Метод __```strip()```__:
-```python
-In [47]: string1 = '\n\tinterface FastEthernet0/1\n'
-
-In [48]: print string1
-
-    interface FastEthernet0/1
-
-
-In [49]: string1
-Out[49]: '\n\tinterface FastEthernet0/1\n'
-
-In [50]: string1.strip()
-Out[50]: 'interface FastEthernet0/1'
-```
-
-
-#VSLIDE
-
-Метод __```split()```__:
-```python
-In [51]: string1 = 'switchport trunk allowed vlan 10,20,30,100-200'
-
-In [52]: string1.split()
-Out[52]: ['switchport', 'trunk', 'allowed', 'vlan', '10,20,30,100-200']
-
-In [53]: string1 = ' switchport trunk allowed vlan 10,20,30,100-200\n'
-
-In [54]: commands = string1.strip().split()
-
-In [55]: print commands
-['switchport', 'trunk', 'allowed', 'vlan', '10,20,30,100-200']
-
-In [56]: vlans = commands[-1].split(',')
-
-In [57]: print vlans
-['10', '20', '30', '100-200']
-```
-
-
-#VSLIDE
-
-### Форматирование строк
-
-#VSLIDE
-### Форматирование строк
-
-Существует два варианта форматирования строк:
-* с оператором ```%``` (более старый вариант)
-* методом ```format()``` (новый вариант)
-
-Пример использования метода format:
-```python
-In [1]: "interface FastEthernet0/{}".format('1')
-Out[1]: 'interface FastEthernet0/1'
-```
-
-Аналогичный пример с оператором %:
-```python
-In [2]: "interface FastEthernet0/%s" % '1'
-Out[2]: 'interface FastEthernet0/1'
-```
-
-
-#VSLIDE
-### Форматирование строк
-
-Выравнивание по правой стороне:
-```python
-In [3]: vlan, mac, intf = ['100', 'aabb.cc80.7000', 'Gi0/1']
-
-In [4]: print "%15s %15s %15s" % (vlan, mac, intf)
-            100  aabb.cc80.7000           Gi0/1
-
-In [5]: print "{:>15} {:>15} {:>15}".format(vlan, mac, intf)
-            100  aabb.cc80.7000           Gi0/1
-```
-
-Выравнивание по левой стороне:
-```python
-In [6]: print "%-15s %-15s %-15s" % (vlan, mac, intf)
-100             aabb.cc80.7000  Gi0/1
-
-In [7]: print "{:15} {:15} {:15}".format(vlan, mac, intf)
-100             aabb.cc80.7000  Gi0/1
-
-```
-#VSLIDE
-### Форматирование строк
-С помощью форматирования строк, можно также влиять на отображение чисел.
-
-Например, можно указать сколько цифр после запятой выводить:
-```python
-In [8]: print "%.3f" % (10.0/3)
-3.333
-
-In [9]: print "{:.3f}".format(10.0/3)
-3.333
-```
-
-Конвертировать в двоичный формат, указать сколько цифр должно быть в отображении числа и дополнить недостающее нулями:
-```python
-In [10]: '{:08b}'.format(10)
-Out[10]: '00001010'
-```
-
-
-#HSLIDE
-
-## Списки
-
-#VSLIDE
-
-### Список (List)
-
-Список - это изменяемый упорядоченный тип данных.
-
-Список в Python - это последовательность элементов, разделенных между собой запятой и заключенных в квадратные скобки.
-
-Примеры списков:
-```python
-In [1]: list1 = [10,20,30,77]
-
-In [2]: list2 = ['one', 'dog', 'seven']
-
-In [3]: list3 = [1, 20, 4.0, 'word']
-```
-
-#VSLIDE
-
-Список - упорядоченный тип данных:
-```python
-In [4]: list3 = [1, 20, 4.0, 'word']
-
-In [5]: list3[1]
-Out[5]: 20
-
-In [6]: list3[1::]
-Out[6]: [20, 4.0, 'word']
-
-In [7]: list3[-1]
-Out[7]: 'word'
-
-In [8]: list3[::-1]
-Out[8]: ['word', 4.0, 20, 1]
-```
-
-#VSLIDE
-
-Так как списки изменяемые, элементы списка можно менять:
-```python
-In [13]: list3
-Out[13]: [1, 20, 4.0, 'word']
-
-In [14]: list3[0] = 'test'
-
-In [15]: list3
-Out[15]: ['test', 20, 4.0, 'word']
-```
-
-#VSLIDE
-
-Можно создавать и список списков. И, как и в обычном списке, можно обращаться к элементам во вложенных списках:
-```python
-In [16]: interfaces = [['FastEthernet0/0', '15.0.15.1', 'YES', 'manual', 'up', 'up'],
-   ....: ['FastEthernet0/1', '10.0.1.1', 'YES', 'manual', 'up', 'up'],
-   ....: ['FastEthernet0/2', '10.0.2.1', 'YES', 'manual', 'up', 'down']]
-
-In [17]: interfaces[0][0]
-Out[17]: 'FastEthernet0/0'
-
-In [18]: interfaces[2][0]
-Out[18]: 'FastEthernet0/2'
-
-In [19]: interfaces[2][1]
-Out[19]: '10.0.2.1'
-```
-
-#VSLIDE
-
-### Методы для работы со списками
-
-#VSLIDE
-
-Метод __join()__ собирает список строк в одну строку с разделителем, который указан в join():
-```python
-In [16]: vlans = ['10', '20', '30', '100-200']
-
-In [17]: ','.join(vlans[:-1])
-Out[17]: '10,20,30'
-```
-
-Метод __append()__ добавляет в конец списка указанный элемент:
-```python
-In [18]: vlans = ['10', '20', '30', '100-200']
-
-In [19]: vlans.append('300')
-
-In [20]: vlans
-Out[20]: ['10', '20', '30', '100-200', '300']
-```
-
-#VSLIDE
-
-Если нужно объединить два списка, то можно использовать два способа. Метод __extend()__ и операцию сложения:
-```python
-In [21]: vlans = ['10', '20', '30', '100-200']
-
-In [22]: vlans2 = ['300', '400', '500']
-
-In [23]: vlans.extend(vlans2)
-
-In [24]: vlans
-Out[24]: ['10', '20', '30', '100-200', '300', '400', '500']
-
-In [25]: vlans + vlans2
-Out[25]: ['10', '20', '30', '100-200', '300', '400', '500', '300', '400', '500']
-
-In [26]: vlans
-Out[26]: ['10', '20', '30', '100-200', '300', '400', '500']
-```
-
-При этом метод extend() расширяет список "на месте", а при операции сложения выводится итоговый суммарный список, но исходные списки не меняются.
-
-
-#VSLIDE
-
-Метод __pop()__ удаляет элемент, который соответствует указанному номеру. Но, что важно, при этом метод возвращает этот элемент:
-```python
-In [28]: vlans = ['10', '20', '30', '100-200']
-
-In [29]: vlans.pop(-1)
-Out[29]: '100-200'
-
-In [30]: vlans
-Out[30]: ['10', '20', '30']
-```
-
-Метод __remove()__ удаляет указанный элемент.
-remove() не возвращает удаленный элемент:
-```python
-In [31]: vlans = ['10', '20', '30', '100-200']
-
-In [32]: vlans.remove('20')
-
-In [33]: vlans
-Out[33]: ['10', '30', '100-200']
-```
-
-
-#VSLIDE
-
-Метод __index()__ используется для того, чтобы проверить под каким номером в списке хранится элемент:
-```python
-In [35]: vlans = ['10', '20', '30', '100-200']
-
-In [36]: vlans.index('30')
-Out[36]: 2
-```
-
-Метод __insert()__ позволяет вставить элемент на определенное место в списке:
-```python
-In [37]: vlans = ['10', '20', '30', '100-200']
-
-In [38]: vlans.insert(1,'15')
-
-In [39]: vlans
-Out[39]: ['10', '15', '20', '30', '100-200']
-```
-
-
-#VSLIDE
-
-### Варианты создания списка
-
-Создание списка с помощью литерала:
-```python
-In [1]: vlans = [10, 20, 30, 50]
-```
-
-Создание списка с помощью функции __list()__:
-```python
-In [2]: list1 = list('router')
-
-In [3]: print list1
-['r', 'o', 'u', 't', 'e', 'r']
-```
-
-__Генераторы списков__:
-```python
-In [4]: list2 = ['FastEthernet0/'+ str(i) for i in range(3)]
-
-In [5]: list2
-Out[6]:
-['FastEthernet0/0',
- 'FastEthernet0/1',
- 'FastEthernet0/2']
-```
-
-#HSLIDE
-
-## Словари
-
-#VSLIDE
-
-### Словарь (Dictionary)
-
-Словари - это изменяемый, неупорядоченный тип данных
-
-Словарь (ассоциативный массив, хеш-таблица):
-* данные в словаре - это пары ```ключ: значение```
-* доступ к значениям осуществляется по ключу, а не по номеру, как в списках
-* ключ должен быть объектом неизменяемого типа:
- * число
- * строка
- * кортеж
-* значение может быть данными любого типа
-
-
-#VSLIDE
-
-Пример словаря:
-```python
-london = {'name': 'London1', 'location': 'London Str', 
-'vendor': 'Cisco', 'model': '4451', 'IOS': '15.4'}
-```
-
-Можно записывать и так:
-```python
-london = {
-        'id': 1,
-        'name':'London',
-        'IT_VLAN':320,
-        'User_VLAN':1010,
-        'Mngmt_VLAN':99,
-        'to_name': None,
-        'to_id': None,
-        'port':'G1/0/11'
-}
-```
-
-
-#VSLIDE
-
-Для того, чтобы получить значение из словаря, надо обратиться по ключу, таким же образом, как это было в списках, только вместо номера, будет использоваться ключ:
-```python
-In [1]: london = {'name': 'London1', 'location': 'London Str'}
-
-In [2]: london['name']
-Out[2]: 'London1'
-
-In [3]: london['location']
-Out[3]: 'London Str'
-```
-
-Аналогичным образом можно добавить новую пару "ключ:значение":
-```python
-In [4]: london['vendor'] = 'Cisco'
-
-In [5]: print london
-{'vendor': 'Cisco', 'name': 'London1', 'location': 'London Str'}
-```
-
-
-#VSLIDE
-
-В словаре в качестве значения можно использовать словарь:
-```python
-london_co = {
-    'r1' : {
-    'hostname': 'london_r1',
-    'location': '21 New Globe Walk',
-    'vendor': 'Cisco',
-    'model': '4451',
-    'IOS': '15.4',
-    'IP': '10.255.0.1'
-    },
-    'sw1' : {
-    'hostname': 'london_sw1',
-    'location': '21 New Globe Walk',
-    'vendor': 'Cisco',
-    'model': '3850',
-    'IOS': '3.6.XE',
-    'IP': '10.255.0.101'
-    }
-}
-```
-
-#VSLIDE
-
-Получить значения из вложенного словаря можно так:
-```python
-In [7]: london_co['r1']['IOS']
-Out[7]: '15.4'
-
-In [8]: london_co['r1']['model']
-Out[8]: '4451'
-
-In [9]: london_co['sw1']['IP']
-Out[9]: '10.255.0.101'
-```
-
-#VSLIDE
-
-### Методы для работы со словарями
-
-#VSLIDE
-
-Методы __keys()__, __values()__, __items()__:
-```python
-In [24]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
-
-In [25]: london.keys()
-Out[25]: ['vendor', 'name', 'location']
-
-In [26]: london.values()
-Out[26]: ['Cisco', 'London1', 'London Str']
-
-In [27]: london.items()
-Out[27]: [('vendor', 'Cisco'), ('name', 'London1'), ('location', 'London Str')]
-```
-
-#VSLIDE
-
-Метод __clear()__ позволяет очистить словарь:
-```python
-In [1]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco', 'model': '4451', 'IOS': '15.4'}
-
-In [2]: london.clear()
-
-In [3]: london
-Out[3]: {}
-```
-
-Удалить ключ и значение:
-```python
-In [28]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
-
-In [29]: del(london['name'])
-
-In [30]: london
-Out[30]: {'location': 'London Str', 'vendor': 'Cisco'}
-```
-
-
-#VSLIDE
-
-Метод __copy()__ позволяет создать полную копию словаря.
-```python
-In [10]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
-
-In [11]: london2 = london.copy()
-
-In [12]: id(london)
-Out[12]: 25524512
-
-In [13]: id(london2)
-Out[13]: 25563296
-
-In [14]: london['vendor'] = 'Juniper'
-
-In [15]: london2['vendor']
-Out[15]: 'Cisco'
-```
-
-#VSLIDE
-
-Если при обращении к словарю указывается ключ, которого нет в словаре, возникает ошибка:
-```python
-In [16]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
-
-In [17]: london['IOS']
----------------------------------------------------------------------------
-KeyError                                  Traceback (most recent call last)
-<ipython-input-17-b4fae8480b21> in <module>()
-----> 1 london['IOS']
-
-KeyError: 'IOS'
-```
-
-#VSLIDE
-
-Метод __get()__ запрашивает ключ и, если его нет, вместо ошибки возвращает ```None```.
-```python
-In [18]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
-
-In [19]: print london.get('IOS')
-None
-```
-
-Метод get() позволяет указывать другое значение, вместо ```None```:
-```python
-In [20]: print london.get('IOS', 'Ooops')
-Ooops
-```
-
-#VSLIDE
-
-### Варианты создания словаря
-
-#VSLIDE
-
-Словарь можно создать с помощью литерала:
-```python
-In [1]: r1 = {'model': '4451', 'IOS': '15.4'}
-```
-
-#VSLIDE
-
-
-Конструктор __dict__ позволяет создавать словарь несколькими способами.
-
-Если в роли ключей используются строки, можно использовать такой вариант создания словаря:
-```python
-In [2]: r1 = dict(model='4451', IOS='15.4')
-
-In [3]: r1
-Out[3]: {'IOS': '15.4', 'model': '4451'}
-```
-
-Второй вариант создания словаря с помощью dict:
-```python
-In [4]: r1 = dict([('model','4451'), ('IOS','15.4')])
-
-In [5]: r1
-Out[5]: {'IOS': '15.4', 'model': '4451'}
-```
-
-#VSLIDE
-
-В ситуации, когда надо создать словарь с известными ключами, но, пока что, пустыми значениями (или одинаковыми значениями), очень удобен метод __fromkeys()__:
-```python
-In [5]: d_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
-
-In [6]: r1 = dict.fromkeys(d_keys, None)
-
-In [7]: r1
-Out[7]:
-{'IOS': None,
- 'IP': None,
- 'hostname': None,
- 'location': None,
- 'model': None,
- 'vendor': None}
-```
-
-#VSLIDE
-
-Генераторы словарей:
-```python
-In [16]: d_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
-
-In [17]: d = {x: None for x in d_keys}
-
-In [18]: d
-Out[18]:
-{'IOS': None,
- 'IP': None,
- 'hostname': None,
- 'location': None,
- 'model': None,
- 'vendor': None}
-```
-
-#HSLIDE
-
-## Кортеж
-
-#VSLIDE
-
-### Кортеж (Tuple)
-
-Кортеж это неизменяемый упорядоченный тип данных.
-
-Кортеж в Python - это последовательность элементов, которые разделены между собой запятой и заключены в скобки.
-
-
-Создать пустой кортеж:
-```python
-In [1]: tuple1 = tuple()
-
-In [2]: print tuple1
-()
-```
-
-#VSLIDE
-
-Кортеж из одного элемента (обратите внимание на запятую):
-```python
-In [3]: tuple2 = ('password',)
-```
-
-Кортеж из списка:
-```python
-In [4]: list_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
-
-In [5]: tuple_keys = tuple(list_keys)
-
-In [6]: tuple_keys
-Out[6]: ('hostname', 'location', 'vendor', 'model', 'IOS', 'IP')
-```
-
-#HSLIDE
-
-## Множество
-
-#VSLIDE
-
-### Множество (Set)
-
-Множество - это изменяемый неупорядоченный тип данных. В множестве всегда содержатся только уникальные элементы.
-
-Множество в Python - это последовательность элементов, которые разделены между собой запятой и заключены в фигурные скобки.
-
-С помощью множества можно легко убрать повторяющиеся элементы:
-```python
-In [1]: vlans = [10, 20, 30, 40, 100, 10]
-
-In [2]: set(vlans)
-Out[2]: {10, 20, 30, 40, 100}
-
-In [3]: set1 = set(vlans)
-
-In [4]: print set1
-set([40, 100, 10, 20, 30])
-```
-
-#VSLIDE
-
-### Методы работы с множествами
-
-#VSLIDE
-
-Метод __```add()```__ добавляет элемент во множество:
-```python
-In [1]: set1 = {10,20,30,40}
-
-In [2]: set1.add(50)
-
-In [3]: set1
-Out[3]: {10, 20, 30, 40, 50}
-```
-
-Метод __```clear()```__ очищает множество:
-```python
-In [8]: set1 = {10,20,30,40}
-
-In [9]: set1.clear()
-
-In [10]: set1
-Out[10]: set()
-```
-
-#VSLIDE
-
-Метод __```discard()```__ позволяет удалять элементы, не выдавая ошибку, если элемента в множестве нет:
-```python
-In [3]: set1
-Out[3]: {10, 20, 30, 40, 50}
-
-In [4]: set1.discard(55)
-
-In [5]: set1
-Out[5]: {10, 20, 30, 40, 50}
-
-In [6]: set1.discard(50)
-
-In [7]: set1
-Out[7]: {10, 20, 30, 40}
-```
-
-#VSLIDE
-
-### Операции с множествами
-
-Объединение множеств можно получить с помощью метода __```union()```__ или оператора __```|```__:
-```python
-In [1]: vlans1 = {10,20,30,50,100}
-In [2]: vlans2 = {100,101,102,102,200}
-
-In [3]: vlans1.union(vlans2)
-Out[3]: {10, 20, 30, 50, 100, 101, 102, 200}
-
-In [4]: vlans1 | vlans2
-Out[4]: {10, 20, 30, 50, 100, 101, 102, 200}
-```
-
-#VSLIDE
-
-### Операции с множествами
-
-Пересечение множеств можно получить с помощью метода __```intersection()```__ или оператора __```&```__:
-```python
-In [5]: vlans1 = {10,20,30,50,100}
-In [6]: vlans2 = {100,101,102,102,200}
-
-In [7]: vlans1.intersection(vlans2)
-Out[7]: {100}
-
-In [8]: vlans1 & vlans2
-Out[8]: {100}
-```
-
-#VSLIDE
-
-### Варианты создания множества
-
-Нельзя создать пустое множество с помощью литерала (так как в таком случае это будет не множество, а словарь):
-```python
-In [1]: set1 = {}
-
-In [2]: type(set1)
-Out[2]: dict
-```
-
-Но пустое множество можно создать таким образом:
-```python
-In [3]: set2 = set()
-
-In [4]: type(set2)
-Out[4]: set
-```
-
-#VSLIDE
-
-Множество из строки:
-```python
-In [5]: set('long long long long string')
-Out[5]: {' ', 'g', 'i', 'l', 'n', 'o', 'r', 's', 't'}
-```
-
-Множество из списка:
-```python
-In [6]: set([10,20,30,10,10,30])
-Out[6]: {10, 20, 30}
-```
-
-
-#VSLIDE
-
-Генератор множеств:
-```python
-In [7]: set2 = {i + 100 for i in range(10)}
-
-In [8]: set2
-Out[8]: {100, 101, 102, 103, 104, 105, 106, 107, 108, 109}
-
-In [9]: print set2
-set([100, 101, 102, 103, 104, 105, 106, 107, 108, 109])
-```
-
-#HSLIDE
-
-## Преобразование типов
-
-#VSLIDE
-
-```int()``` - преобразует строку в int:
-```python
-In [1]: int("10")
-Out[1]: 10
-```
-
-С помощью функции int можно преобразовать и число в двоичной записи в десятичную (двоичная запись должна быть в виде строки)
-```python
-In [2]: int("11111111", 2)
-Out[2]: 255
-```
-
-#VSLIDE
-
-Преобразовать десятичное число в двоичный формат можно с помощью ```bin()```:
-```python
-In [3]: bin(10)
-Out[3]: '0b1010'
-
-In [4]: bin(255)
-Out[4]: '0b11111111'
-```
-
-Аналогичная функция есть и для преобразования в шестнадцатиричный формат:
-```python
-In [5]: hex(10)
-Out[5]: '0xa'
-
-In [6]: hex(255)
-Out[6]: '0xff'
-```
-
-#VSLIDE
-
-
-Функция ```list()``` преобразует аргумент в список:
-```python
-In [7]: list("string")
-Out[7]: ['s', 't', 'r', 'i', 'n', 'g']
-
-In [8]: list({1,2,3})
-Out[8]: [1, 2, 3]
-
-In [9]: list((1,2,3,4))
-Out[9]: [1, 2, 3, 4]
-```
-
-#VSLIDE
-
-
-Функция ```set()``` преобразует аргумент в множество:
-```python
-In [10]: set([1,2,3,3,4,4,4,4])
-Out[10]: {1, 2, 3, 4}
-
-In [11]: set((1,2,3,3,4,4,4,4))
-Out[11]: {1, 2, 3, 4}
-
-In [12]: set("string string")
-Out[12]: {' ', 'g', 'i', 'n', 'r', 's', 't'}
-```
-
-Эта функция очень полезна, когда нужно получить уникальные элементы в последовательности.
-
-#VSLIDE
-
-
-Функция ```tuple()``` преобразует аргумент в кортеж:
-```python
-In [13]: tuple([1,2,3,4])
-Out[13]: (1, 2, 3, 4)
-
-In [14]: tuple({1,2,3,4})
-Out[14]: (1, 2, 3, 4)
-
-In [15]: tuple("string")
-Out[15]: ('s', 't', 'r', 'i', 'n', 'g')
-```
-
-Это может пригодится в том случае, если нужно получить неизменяемый объект.
-
-
-#VSLIDE
-
 
-Функция ```str()``` преобразует аргумент в строку:
-```python
-In [16]: str(10)
-Out[16]: '10'
-```
-
-list comprehensions:
-```python
-In [17]: vlans = [10, 20, 30, 40]
-
-In [18]: ','.join([ str(vlan) for vlan in vlans ])
-Out[18]: '10,20,30,40'
-```
-
-
-#HSLIDE
-
-## Проверка типов
-
-#VSLIDE
-
-В Python такие методы есть. Например, чтобы проверить состоит ли строка из одних цифр, можно использовать метод ```isdigit()```:
-```python
-In [2]: "a".isdigit()
-Out[2]: False
-
-In [3]: "a10".isdigit()
-Out[3]: False
-
-In [4]: "10".isdigit()
-Out[4]: True
-```
-
-Пример использования метода:
-```python
-In [5]: vlans = ['10', '20', '30', '40', '100-200']
-
-In [6]: [ int(vlan) for vlan in vlans if vlan.isdigit() ]
-Out[6]: [10, 20, 30, 40]
-```
-
-#VSLIDE
-
-Метод ```isalpha()``` позволяет проверить состоит ли строка из одних букв:
-```python
-In [7]: "a".isalpha()
-Out[7]: True
-
-In [8]: "a100".isalpha()
-Out[8]: False
-
-In [9]: "a--  ".isalpha()
-Out[9]: False
-
-In [10]: "a ".isalpha()
-Out[10]: False
-```
-
-Метод ```isalnum()``` позволяет проверить состоит ли строка из  букв и цифр:
-```python
-In [11]: "a".isalnum()
-Out[1]: True
-
-In [12]: "a10".isalnum()
-Out[12]: True
-```
-
-
-#VSLIDE
-
-####type()
-
-Иногда, в зависимости от результата, библиотека или функция может выводить разные типы объектов. Например, если объект один, возращается строка, если несколько, то возвращается кортеж.
-
-Нам же надо построить ход программы по-разному, в зависимости от того, была ли возвращена строка или кортеж.
-
-В этом может помочь функция ```type()```:
-```python
-In [13]: type("string")
-Out[13]: str
-
-In [14]: type("string") is str
-Out[14]: True
-```
-
-#VSLIDE
-
-Аналогично с кортежем (и другими типами данных):
-```python
-In [15]: type((1,2,3))
-Out[15]: tuple
-
-In [16]: type((1,2,3)) is tuple
-Out[16]: True
-
-In [17]: type((1,2,3)) is list
-Out[17]: False
-```
-
-
-#HSLIDE
-
-## Создание базовых скриптов
-
-#VSLIDE
-
-### Кодировка
-
-```python
-# -*- coding: utf-8 -*-
-
-access_template = ['switchport mode access',
-                   'switchport access vlan %d',
-                   'switchport nonegotiate',
-                   'spanning-tree portfast',
-                   'spanning-tree bpduguard enable']
-
-print "Конфигурация интерфейса в режиме access:"
-print '\n'.join(access_template) % 5
-```
-
-#VSLIDE
-
-### Передача аргументов скрипту
-
-Файл access_template_argv.py:
-```python
-from sys import argv
-
-interface, vlan = argv[1:]
-
-access_template = ['switchport mode access',
-                   'switchport access vlan %d',
-                   'switchport nonegotiate',
-                   'spanning-tree portfast',
-                   'spanning-tree bpduguard enable']
-
-print 'interface %s' % interface
-print '\n'.join(access_template) % int(vlan)
-```
-
-#VSLIDE
-
-### Передача аргументов скрипту
-
-```
-$ python access_template_argv.py Gi0/7 4
-interface Gi0/7
-switchport mode access
-switchport access vlan 4
-switchport nonegotiate
-spanning-tree portfast
-spanning-tree bpduguard enable
-```
-
-В данном случае, в списке argv находятся такие элементы:
-```
-['access_template_argv.py', 'Gi0/7', '4']
-```
-
-#VSLIDE
-
-### Ввод информации пользователем
-
-Файл access_template_raw_input.py:
-```python
-
-interface = raw_input('Enter interface type and number: ')
-vlan = int(raw_input('Enter VLAN number: '))
-
-access_template = ['switchport mode access',
-                   'switchport access vlan %d',
-                   'switchport nonegotiate',
-                   'spanning-tree portfast',
-                   'spanning-tree bpduguard enable']
-
-print '\n' + '-' * 30
-print 'interface %s' % interface
-print '\n'.join(access_template) % vlan
-```
-
-#VSLIDE
-
-### Ввод информации пользователем
-
-```
-$ python access_template_raw_input.py
-Enter interface type and number: Gi0/3
-Enter VLAN number: 55
-
-------------------------------
-interface Gi0/3
-switchport mode access
-switchport access vlan 55
-switchport nonegotiate
-spanning-tree portfast
-spanning-tree bpduguard enable
-```
-
-
-#HSLIDE
-
-## Контроль хода программы
-
-#VSLIDE
-
-### if/elif/else
-
-#VSLIDE
-
-### if/elif/else
-
-Конструкция if/elif/else дает возможность выполнять различные действия в зависимости от условий.
-
-```python
-In [1]: a = 9
-
-In [2]: if a == 0:
-   ...:     print 'a равно 0'
-   ...: elif a < 10:
-   ...:     print 'a меньше 10'
-   ...: else:
-   ...:     print 'a больше 10'
-   ...:
-a меньше 10
-```
-
-#VSLIDE
-
-### if/elif/else
-
-Примеры условий:
-```python
-In [7]: 5 > 3
-Out[7]: True
-
-In [8]: 5 == 5
-Out[8]: True
-
-In [9]: 'vlan' in 'switchport trunk allowed vlan 10,20'
-Out[9]: True
-
-In [10]: 1 in [ 1, 2, 3 ]
-Out[10]: True
-
-In [11]: 0 in [ 1, 2, 3 ]
-Out[11]: False
-```
-
-#VSLIDE
-
-###True и False
-
-В Python:
-* True (истина)
- * любое ненулевое число
- * любая не пустая строка
- * любой не пустой объект
-* False (ложь)
- * 0
- * None
- * пустая строка
- * пустой объект
-
-#VSLIDE
-
-###True и False
-
-Так как пустой список это ложь, проверить пустой ли список можно таким образом:
-```python
-In [12]: list_to_test = [1, 2, 3]
-
-In [13]: if list_to_test:
-   ....:     print "В списке есть объекты"
-   ....:
-В списке есть объекты
-```
-
-Тот же результат можно было бы получить таким образом:
-```python
-In [14]: if len(list_to_test) != 0:
-   ....:     print "В списке есть объекты"
-   ....:
-В списке есть объекты
-```
-
-#VSLIDE
-
-###Операторы сравнения
-
-```python
-In [3]: 5 > 6
-Out[3]: False
-
-In [4]: 5 > 2
-Out[4]: True
-
-In [5]: 5 < 2
-Out[5]: False
-
-In [6]: 5 == 2
-Out[6]: False
-
-In [7]: 5 == 5
-Out[7]: True
-
-In [8]: 5 >= 5
-Out[8]: True
-
-In [9]: 5 <= 10
-Out[9]: True
-
-In [10]: 8 != 10
-Out[10]: True
-```
-
-#VSLIDE
-
-###Оператор in
-
-Оператор __```in```__ позволяет выполнять проверку на наличие элемента в последовательности (например, элемента в списке или подстроки в строке):
-```python
-In [8]: 'Fast' in 'FastEthernet'
-Out[8]: True
-
-In [9]: 'Gigabit' in 'FastEthernet'
-Out[9]: False
-
-In [10]: vlan = [10, 20, 30, 40]
-
-In [11]: 10 in vlan
-Out[11]: True
-
-In [12]: 50 in vlan
-Out[12]: False
-```
-
-
-#VSLIDE
-
-###Оператор in
-
-При использовании со словарями условие __in__ выполняет проверку по ключам словаря:
-```python
-In [15]: r1 = {
-   ....:  'IOS': '15.4',
-   ....:  'IP': '10.255.0.1',
-   ....:  'hostname': 'london_r1',
-   ....:  'location': '21 New Globe Walk',
-   ....:  'model': '4451',
-   ....:  'vendor': 'Cisco'}
-
-In [16]: 'IOS' in r1
-Out[16]: True
-
-In [17]: '4451' in r1
-Out[17]: False
-```
-
-#VSLIDE
-
-###Операторы and, or, not
-
-```python
-In [15]: r1 = {
-   ....:  'IOS': '15.4',
-   ....:  'IP': '10.255.0.1',
-   ....:  'hostname': 'london_r1',
-   ....:  'location': '21 New Globe Walk',
-   ....:  'model': '4451',
-   ....:  'vendor': 'Cisco'}
-
-In [18]: vlan = [10, 20, 30, 40]
-
-In [19]: 'IOS' in r1 and 10 in vlan
-Out[19]: True
-
-In [20]: '4451' in r1 and 10 in vlan
-Out[20]: False
-
-In [21]: '4451' in r1 or 10 in vlan
-Out[21]: True
-
-In [22]: not '4451' in r1
-Out[22]: True
-
-In [23]: '4451' not in r1
-Out[23]: True
-```
-
-#VSLIDE
-
-#### Оператор and
-
-В Python оператор ```and``` возвращает не булево значение, а значение одного из операторов.
-
-Если оба операнда являются истиной, результатом выражения будет последнее значение:
-```python
-In [24]: 'string1' and 'string2'
-Out[24]: 'string2'
-
-In [25]: 'string1' and 'string2' and 'string3'
-Out[25]: 'string3'
-```
-
-Если один из операторов является ложью, результатом выражения будет первое ложное значение:
-```python
-In [26]: '' and 'string1'
-Out[26]: ''
-
-In [27]: '' and [] and 'string1'
-Out[27]: ''
-```
-
-#VSLIDE
-
-#### Оператор or
-
-Оператор ```or```, как и оператор and, возвращает значение одного из операторов.
-
-При оценке операндов, возвращается первый истинный операнд:
-```python
-In [28]: '' or 'string1'
-Out[28]: 'string1'
-
-In [29]: '' or [] or 'string1'
-Out[29]: 'string1'
-
-In [30]: 'string1' or 'string2'
-Out[30]: 'string1'
-```
-
-Если все значения являются ложью, возвращается последнее значение:
-```python
-In [31]: '' or [] or {}
-Out[31]: {}
-```
-
-#VSLIDE
-
-#### Оператор or
-
-Важная особенность работы оператора ```or``` - операнды, которые находятся после истинного, не вычисляются:
-```python
-In [32]: def print_str(string):
-   ....:     print string
-   ....:
-
-In [33]: '' or print_str('test string')
-test string
-
-In [34]: '' or 'string1' or print_str('test string')
-Out[34]: 'string1'
-```
-
-
-#VSLIDE
-
-### Пример if/elif/else
-
-Пример скрипта check_password.py, который проверяет длину пароля и есть ли в пароле имя пользователя:
-```python
-# -*- coding: utf-8 -*-
-
-username = raw_input('Введите имя пользователя: ' )
-password = raw_input('Введите пароль: ' )
-
-if len(password) < 8:
-    print 'Пароль слишком короткий'
-elif username in password:
-    print 'Пароль содержит имя пользователя'
-else:
-    print 'Пароль для пользователя %s установлен' % username
-```
+template = open('traceroute.textfsm')
+fsm = textfsm.TextFSM(template)
+result = fsm.ParseText(traceroute)
 
-
-#VSLIDE
-
-### Пример if/elif/else
-
-Проверка скрипта:
-```
-$ python check_password.py
-Введите имя пользователя: nata
-Введите пароль: nata1234
-Пароль содержит имя пользователя
-
-$ python check_password.py
-Введите имя пользователя: nata
-Введите пароль: 123nata123
-Пароль содержит имя пользователя
-
-$ python check_password.py
-Введите имя пользователя: nata
-Введите пароль: 1234
-Пароль слишком короткий
-
-$ python check_password.py
-Введите имя пользователя: nata
-Введите пароль: 123456789
-Пароль для пользователя nata установлен
-```
-
-
-#HSLIDE
-
-## Цикл for
-
-
-#VSLIDE
-### Цикл for
-
-Цикл for проходится по указанной последовательности и выполняет действия, которые указаны в блоке for.
-
-Примеры последовательностей, по которым может проходиться цикл for:
-* строка
-* список
-* словарь
-* функция ```range()``` или итератор ```xrange()```
-* любой другой итератор (например, ```sorted()```, ```enumerate()```)
-
-#VSLIDE
-
-### Пример цикла for
-
-```python
-In [1]: for letter in 'Test string':
-   ...:     print letter
-   ...:
-T
-e
-s
-t
-
-s
-t
-r
-i
-n
-g
-```
-
-#VSLIDE
-
-### Пример цикла for
-
-```python
-In [2]: for i in xrange(10):
-   ...:     print 'interface FastEthernet0/' + str(i)
-   ...:
-interface FastEthernet0/0
-interface FastEthernet0/1
-interface FastEthernet0/2
-interface FastEthernet0/3
-interface FastEthernet0/4
-interface FastEthernet0/5
-interface FastEthernet0/6
-interface FastEthernet0/7
-interface FastEthernet0/8
-interface FastEthernet0/9
-```
-
-#VSLIDE
-
-### Пример цикла for
-
-```python
-In [3]: vlans = [10, 20, 30, 40, 100]
-In [4]: for vlan in vlans:
-   ...:     print 'vlan %d' % vlan
-   ...:     print ' name VLAN_%d' % vlan
-   ...:
-vlan 10
- name VLAN_10
-vlan 20
- name VLAN_20
-vlan 30
- name VLAN_30
-vlan 40
- name VLAN_40
-vlan 100
- name VLAN_100
+print fsm.header
+print result
 ```
 
-
-#VSLIDE
-
-### Пример цикла for
-
-Когда цикл идет по словарю, то фактически он проходится по ключам:
-```python
-In [5]: r1 = {
- 'IOS': '15.4',
- 'IP': '10.255.0.1',
- 'hostname': 'london_r1',
- 'location': '21 New Globe Walk',
- 'model': '4451',
- 'vendor': 'Cisco'}
-
-In [6]: for k in r1:
-   ....:     print k
-   ....:
-vendor
-IP
-hostname
-IOS
-location
-model
-```
-
-#VSLIDE
-
-### Пример цикла for
-
-
-Если необходимо выводить пары ключ-значение в цикле:
-```python
-In [7]: for key in r1:
-   ....:     print key + ' => ' + r1[key]
-   ....:
-vendor => Cisco
-IP => 10.255.0.1
-hostname => london_r1
-IOS => 15.4
-location => 21 New Globe Walk
-model => 4451
-```
-
-#VSLIDE
-
-### Пример цикла for
-
-В словаре есть специальный метод items, который позволяет проходится в цикле сразу по паре ключ, значение:
-```python
-In [8]: r1.items()
-Out[8]:
-[('vendor', 'Cisco'),
- ('IP', '10.255.0.1'),
- ('hostname', 'london_r1'),
- ('IOS', '15.4'),
- ('location', '21 New Globe Walk'),
- ('model', '4451')]
-
-In [9]: for key, value in r1.items():
-   ....:     print key + ' => ' + value
-   ....:
-vendor => Cisco
-IP => 10.255.0.1
-hostname => london_r1
-IOS => 15.4
-location => 21 New Globe Walk
-model => 4451
-```
-
-#VSLIDE
-
-### Пример цикла for
-
-```python
-In [7]: commands = ['switchport mode access', 'spanning-tree portfast', 'spanning-tree bpduguard enable']
-In [8]: fast_int = ['0/1','0/3','0/4','0/7','0/9','0/10','0/11']
-
-In [9]: for intf in fast_int:
-   ...:     print 'interface FastEthernet ' + intf
-   ...:     for command in commands:
-   ...:         print ' %s' % command
-   ...:
-interface FastEthernet 0/1
- switchport mode access
- spanning-tree portfast
- spanning-tree bpduguard enable
-interface FastEthernet 0/3
- switchport mode access
- spanning-tree portfast
- spanning-tree bpduguard enable
-interface FastEthernet 0/4
- switchport mode access
- spanning-tree portfast
- spanning-tree bpduguard enable
-...
-```
-
-#VSLIDE
-
-### Пример совмещения for и if
-
-Файл generate_access_port_config.py:
-```python
-access_template = ['switchport mode access',
-                   'switchport access vlan',
-                   'spanning-tree portfast',
-                   'spanning-tree bpduguard enable']
-
-fast_int = {'access': { '0/12':'10',
-                        '0/14':'11',
-                        '0/16':'17',
-                        '0/17':'150'}}
-
-for intf in fast_int['access']:
-    print 'interface FastEthernet' + intf
-    for command in access_template:
-        if command.endswith('access vlan'):
-            print ' %s %s' % (command, fast_int['access'][intf])
-        else:
-            print ' %s' % command
-```
-
 #VSLIDE
-
-### Пример совмещения for и if
+### Обработка вывода команд с TextFSM
 
 Результат выполнения скрипта:
 ```
-$ python generate_access_port_config.py
-interface FastEthernet0/12
- switchport mode access
- switchport access vlan 10
- spanning-tree portfast
- spanning-tree bpduguard enable
-interface FastEthernet0/14
- switchport mode access
- switchport access vlan 11
- spanning-tree portfast
- spanning-tree bpduguard enable
-interface FastEthernet0/16
- switchport mode access
- switchport access vlan 17
- spanning-tree portfast
- spanning-tree bpduguard enable
+$ python parse_traceroute.py
+['ID', 'Hop']
+[['1', '10.0.12.1'], ['2', '15.0.0.5'], ['3', '57.0.0.7'], ['4', '79.0.0.9']]
 ```
+
+Строки, которые совпали с описанным шаблоном, возвращаются в виде списка списков.
+Каждый элемент это список, который состоит из двух элементов: номера хопа и IP-адреса.
+
+#VSLIDE
+### Обработка вывода команд с TextFSM
+
+Разберемся с содержимым скрипта:
+* traceroute - это переменная, которая содержит вывод команды traceroute
+* ```template = open('traceroute.textfsm')``` - содержимое файла с шаблоном TextFSM считывается в переменную template
+* ```fsm = textfsm.TextFSM(template)``` - класс, который обрабатывает шаблон и создает из него объект в TextFSM
+* ```result = fsm.ParseText(traceroute)``` - метод, который обрабатывает переданный вывод согласно шаблону и возращает список списков, в котором каждый элемент это обработанная строка
+* В конце выводится заголовок: ```print fsm.header```, который содержит имена переменных
+* И результат обработки
+
+#VSLIDE
+### Обработка вывода команд с TextFSM
+
+Для работы с TextFSM нужны вывод команды и шаблон:
+* для разных команд нужны разные шаблоны
+* TextFSM возвращает результат обработки в табличном виде (в виде списка списков)
+ * этот вывод легко преобразовать в csv формат или в список словарей
+
+
+#HSLIDE
+## Синтаксис шаблонов TextFSM
+
+#VSLIDE
+### Синтаксис шаблонов TextFSM
+
+Шаблон TextFSM описывает каким образом данные должны обрабатываться.
+
+Любой шаблон состоит из двух частей:
+* определения переменных
+ * эти переменные описывают какие столбцы будут в табличном представлении
+* определения состояний
+
+#VSLIDE
+### Синтаксис шаблонов TextFSM
+
+Пример разбора команды traceroute:
+```
+# Определение переменных:
+Value ID (\d+)
+Value Hop (\d+(\.\d+){3})
+
+# Секция с определением состояний всегда должна начинаться с состояния Start
+Start
+ #   Переменные      действие
+  ^  ${ID} ${Hop} -> Record
+```
+
+#VSLIDE
+### Определение переменных
+
+В секции с переменными должны идти только определения переменных. Единственное исключение - в этом разделе могут быть комментарии.
+
+В этом разделе не должно быть пустых строк.
+Для TextFSM пустая строка означает завершение секции определения переменных.
+
+Формат описания переменных:
+```
+Value [option[,option...]] name regex
+```
+
+#VSLIDE
+### Определение переменных
+
+Синтаксис описания переменных:
+* ```Value``` - это ключевое слово, которое указывает, что создается переменная. Его обязательно нужно указывать
+* option - опции, которые определяют как работать с переменной. Если нужно указать несколько опций, они должны быть отделены запятой, без пробелов.
+
+#VSLIDE
+### Определение переменных
+
+Поддерживаются такие опции:
+ * __Filldown__ - значение, которое ранее совпало с регулярным выражением, запоминается до следующей обработки строки (если не было явно очищено или снова совпало регулярное выражение).
+   * это значит, что последнее значение столбца, которое совпало с регулярным выражением, запоминается и используется в следующих строках, если в них не присутствовал этот столбец.
+ * __Key__ - определяет, что это поле содержит уникальный идентификатор строки
+ * __Required__ - строка, которая обрабатывается, будет записана только в том случае, если эта переменная присутствует.
+ * __List__ - значение это список и каждое совпадение с регулярным выражением будет добавлять в список элемент. По умолчанию, каждое следующее совпадение перезаписывает предыдущее.
+ * __Fillup__ - работает как Filldown, но заполняет пустые значение выше, до тех пор, пока не найдет совпадение. Не совместимо с Required.
+ 
+#VSLIDE
+### Определение переменных
+
+* ```name``` - имя переменной, которое будет использоваться как имя колонки. Зарезервированные имена не должны использоваться как имя переменной.
+* ```regex``` - регулярное выражение, которое описывает переменную. Регулярное выражение должно быть в скобках.
+
+#VSLIDE
+### Определение состояний
+
+После определения переменных, нужно описать состояния:
+* каждое определение состояния должно быть отделено пустой строкой (как минимум, одной)
+* первая строка - имя состояния
+* затем идут строки, которые описывают правила
+ * правила должны начинаться с пробела и символа ```^```
+
+#VSLIDE
+### Определение состояний
+
+Начальное состояние всегда __Start__.
+Входные данные сравниваются с текущим состоянием, но в строке правила может быть указано, что нужно перейти к другому состоянию.
+
+Проверка выполняется построчно, пока не будет достигнут __EOF__(конец файла) или текущее состояние перейдет в состояние __End__.
+
+#VSLIDE
+#### Зарезервированные состояния
+
+Зарезервированы такие состояния:
+* __Start__ - это состояние обязательно должно быть указано. Без него шаблон не будет работать.
+* __End__ - это состояние завершает  обработку входящих строк и не выполняет состояние __EOF__.
+* __EOF__ - это неявное состояние, которое выполняется всегда, когда обработка долшла до конца файла. Выглядит оно таким образом:
+```
+ EOF
+   ^.* -> Record
+```
+
+#VSLIDE
+#### Зарезервированные состояния
+
+__EOF__ записывает текущую строку, прежде чем обработка завершается. Если это поведение нужно изменить, надо явно, в конце шаблона, написать EOF:
+```
+EOF
+```
+
+#VSLIDE
+### Правила состояний
+
+Каждое состояние состоит из одного или более правил:
+* TextFSM обрабатывает входящие строки и сравнивает их с правилами
+* если правило (регулярное выражение) совпадает со строкой, выполняются действия, которые описаны в правиле и для следующей строки процесс повторяется заново, с начала состояния.
+
+Правила должны быть описаны в таком формате:
+```
+ ^regex [-> action]
+```
+
+#VSLIDE
+### Правила состояний
+
+В правиле:
+* каждое правило должно начинаться с пробела и символа ```^```
+ * символ ```^``` означает начало строки и всегда должен указываться явно
+* regex - это регулярное выражение, в котором могут использоваться переменные
+ * для указания переменной, может использоваться синтаксис ```$ValueName``` или ```${ValueName}```(этот формат предпочтителен)
+ * в правиле, на место переменных подставляются регулярные выражения, которые они описывают
+ * если нужно явно указать символ конца строки, используется значение ```$$```
+
+#VSLIDE
+### Действия в правилах
+
+После регулярного выражения, в правиле могут указываться действия:
+* между регулярным выражением и действием, должен быть символ ```->```
+* действия могут состоять из трех частей, в таком формате __L.R S__
+ * __L - Line Action__ - действия, которые применяются к входящей строке
+ * __R - Record Action__ - действия, которые применяются к собранным значениям
+ * __S - State Action__ - переход в другое состояние
+* если нет указанных действий, то по умолчанию используется действие __Next.NoRecord__.
+
+#VSLIDE
+#### Line Actions
+
+__Line Actions:__
+* __Next__ - обработать строку, прочитать следующую и начать проверять её с начала состояния. Это действие используется по умолчанию, если не указано другое
+* __Continue__ - продолжить обработку правил, как-будто совпадения не было, при этом значения присваиваются
+
+#VSLIDE
+#### Record Action
+__Record Action__ - опциональное действие, которое может быть указано после Line Action. Они должны быть разделены точкой. Типы действий:
+* __NoRecord__ - не выполнять ничего. Это действие по умолчанию, когда другое не указано
+* __Record__ - запомнить значение, которые совпали с правилом. Все переменные, кроме тех, где указана опция Filldown, обнуляются.
+* __Clear__ - обнулить все переменные, кроме тех, где указана опция Filldown.
+* __Clearall__ - обнулить все переменные.
+
+Разделять действия точкой нужно только в том случае, если нужно указать и Line и Record действия. Если нужно указать только одно из них, точку ставить не нужно.
 
 
 #VSLIDE
+#### State Transition
 
-### Итератор enumerate()
+После действия, может быть указано новое состояние:
+* состояние должно быть одним из зарезервированных или состояние определенное в шаблоне
+* если входная строка совпала:
+  * все действия выполняются,
+  * считывается следующая строка,
+  * затем текущее состояние меняется на новое и обработка продолжается в новом состоянии.
 
-Иногда, при переборе объектов в цикле for, нужно не только получить сам объект, но и его порядковый номер. Это можно сделать, создав дополнительную переменную, которая будет расти на единицу с каждым прохождением цикла.
+Если в правиле используется действие __Continue__, то в нем нельзя использовать переход в другое состояние. Это правило нужно для того, чтобы в последовательности состояний не было петель.
 
-Но, гораздо удобнее это делать с помощью итератора __```enumerate()```__.
+#VSLIDE
+#### Error Action
 
-Базовый пример:
+Специальное действие __Error__ останавливает всю обработку строк, отбрасывает все строки, которые были собраны до сих пор и возвращает исключение.
+
+Синтаксис этого действия такой:
+```
+^regex -> Error [word|"string"]
+```
+
+#HSLIDE
+## Примеры использования TextFSM
+
+#VSLIDE
+### Примеры использования TextFSM
+
+Для обработки вывода команд по шаблону используется скрипт parse_output.py.
+Он не привязан к конкретному шаблону и выводу: шаблон и вывод команды будут передаваться как аргументы:
 ```python
-In [1]: list1 = ['str1', 'str2', 'str3']
+import sys
+import textfsm
+from tabulate import tabulate
 
-In [2]: for position, string in enumerate(list1):
-   ...:     print position, string
-   ...:
-0 str1
-1 str2
-2 str3
+template = sys.argv[1]
+output_file = sys.argv[2]
+
+f = open(template)
+output = open(output_file).read()
+
+re_table = textfsm.TextFSM(f)
+
+header = re_table.header
+result = re_table.ParseText(output)
+
+print tabulate(result, headers=header)
+
 ```
 
 #VSLIDE
+### Примеры использования TextFSM
 
-### Итератор enumerate()
+Пример запуска скрипта:
+```
+$ python parse_output.py template command_output
+```
 
-```enumerate()``` умеет считать не только с нуля, но и с любого значение, которое ему указали после объекта:
-```python
-In [1]: list1 = ['str1', 'str2', 'str3']
+Обработка данных по шаблону всегда выполняется одинаково.
+Поэтому скрипт будет одинаковый и только шаблон и данные отличаться.
 
-In [2]: for position, string in enumerate(list1, 100):
-   ...:     print position, string
-   ...:
-100 str1
-101 str2
-102 str3
+
+#HSLIDE
+### show clock
+
+Первый пример - разбор вывода команды sh clock (файл output/sh_clock.txt):
+```
+15:10:44.867 UTC Sun Nov 13 2016
+```
+
+Для начала, в шаблоне надо определить переменные:
+* в начале каждой строки должно быть ключевое слово Value
+ * каждая переменная определяет столбец в таблице
+* следующее слово - название переменной
+* после названия, в скобках, регулярное выражение, которое описывает значение переменной
+
+#VSLIDE
+### show clock
+
+Определение переменных выглядит так:
+```
+Value Time (..:..:..)
+Value Timezone (\S+)
+Value WeekDay (\w+)
+Value Month (\w+)
+Value MonthDay (\d+)
+Value Year (\d+)
+```
+
+#VSLIDE
+### show clock
+
+Подсказка по спецсимволам:
+* ```.``` - любой символ
+* ```+``` - одно или более повторений предыдущего символа
+* ```\S``` - все символы, кроме whitespace
+* ```\w``` - любая буква или цифра
+* ```\d``` - любая цифра
+
+#VSLIDE
+### show clock
+
+После определения переменных, должна идти пустая строка и состояние __Start__, а после, начиная с пробела и символа ```^```, идет правило (файл templates/sh_clock.template):
+```
+Value Time (..:..:..)
+Value Timezone (\S+)
+Value WeekDay (\w+)
+Value Month (\w+)
+Value MonthDay (\d+)
+Value Year (\d+)
+
+Start
+  ^${Time}.* ${Timezone} ${WeekDay} ${Month} ${MonthDay} ${Year} -> Record
+```
+
+#VSLIDE
+### show clock
+
+Так как, в данном случае, в выводе всего одна строка, можно не писать в шаблоне действие Record. Но лучше его использовать в ситуациях, когда надо записать значения, чтобы привыкать к этому синтаксу и не ошибиться, когда нужна обработка нескольких строк.
+
+Когда TextFSM обрабатывает строки вывода, он подставляет вместо переменных, их значения. В итоге правило будет выглядеть так:
+```
+^(..:..:..).* (\S+) (\w+) (\w+) (\d+) (\d+)
+```
+
+#VSLIDE
+### show clock
+
+Когда это регулярное выражение применяется в выводу show clock, в каждой группе регулярного выражения, будет находиться соответствующее значение:
+* 1 группа: 15:10:44
+* 2 группа: UTC
+* 3 группа: Sun
+* 4 группа: Nov
+* 5 группа: 13
+* 6 группа: 2016
+
+#VSLIDE
+### show clock
+
+В правиле, кроме явного действия Record, которое указывает, что запись надо поместить в финальную таблицу, по умолчанию также используется правило Next.
+Оно указывает, что надо перейти к следующей строке текста.
+Так как в выводе команды sh clock, только одна строка, обработка завершается.
+
+#VSLIDE
+### show clock
+
+Результат отработки скрипта будет таким:
+```
+$ python parse_output.py templates/sh_clock.template output/sh_clock.txt
+Time      Timezone    WeekDay    Month      MonthDay    Year
+--------  ----------  ---------  -------  ----------  ------
+15:10:44  UTC         Sun        Nov              13    2016
+```
+
+#HSLIDE
+### show cdp neighbors detail
+
+Теперь попробуем обработать вывод команды show cdp neighbors detail.
+
+Особенность этой команды в том, что данные находятся не в одной строке, а в разных.
+
+#VSLIDE
+### show cdp neighbors detail
+
+В файле output/sh_cdp_n_det.txt находится вывод команды show cdp neighbors detail:
+```
+SW1#show cdp neighbors detail
+-------------------------
+Device ID: SW2
+Entry address(es):
+  IP address: 10.1.1.2
+Platform: cisco WS-C2960-8TC-L,  Capabilities: Switch IGMP
+Interface: GigabitEthernet1/0/16,  Port ID (outgoing port): GigabitEthernet0/1
+Holdtime : 164 sec
+
+Version :
+Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 12.2(55)SE9, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2014 by Cisco Systems, Inc.
+Compiled Mon 03-Mar-14 22:53 by prod_rel_team
+
+advertisement version: 2
+VTP Management Domain: ''
+Native VLAN: 1
+Duplex: full
+Management address(es):
+  IP address: 10.1.1.2
+
+-------------------------
+Device ID: R1
+Entry address(es):
+  IP address: 10.1.1.1
+Platform: Cisco 3825,  Capabilities: Router Switch IGMP
+Interface: GigabitEthernet1/0/22,  Port ID (outgoing port): GigabitEthernet0/0
+Holdtime : 156 sec
+
+Version :
+Cisco IOS Software, 3800 Software (C3825-ADVENTERPRISEK9-M), Version 12.4(24)T1, RELEASE SOFTWARE (fc3)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2009 by Cisco Systems, Inc.
+Compiled Fri 19-Jun-09 18:40 by prod_rel_team
+
+advertisement version: 2
+VTP Management Domain: ''
+Duplex: full
+Management address(es):
+
+-------------------------
+Device ID: R2
+Entry address(es):
+  IP address: 10.2.2.2
+Platform: Cisco 2911,  Capabilities: Router Switch IGMP
+Interface: GigabitEthernet1/0/21,  Port ID (outgoing port): GigabitEthernet0/0
+Holdtime : 156 sec
+
+Version :
+Cisco IOS Software, 2900 Software (C3825-ADVENTERPRISEK9-M), Version 15.2(2)T1, RELEASE SOFTWARE (fc3)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2009 by Cisco Systems, Inc.
+Compiled Fri 19-Jun-09 18:40 by prod_rel_team
+
+advertisement version: 2
+VTP Management Domain: ''
+Duplex: full
+Management address(es):
+
+
+```
+
+#VSLIDE
+### show cdp neighbors detail
+
+Из вывод команды надо получить такие поля:
+* LOCAL_HOST - имя устройства из приглашения
+* DEST_HOST - имя соседа
+* MGMNT_IP - IP-адрес соседа
+* PLATFORM - модель соседнего устройства
+* LOCAL_PORT - локальный интерфейс, который соединен с соседом
+* REMOTE_PORT - порт соседнего устройства
+* IOS_VERSION - версия IOS соседа
+
+#VSLIDE
+### show cdp neighbors detail
+
+Шаблон выглядит таким образом (файл templates/sh_cdp_n_det.template):
+```
+Value LOCAL_HOST (\S+)
+Value DEST_HOST (\S+)
+Value MGMNT_IP (.*)
+Value PLATFORM (.*)
+Value LOCAL_PORT (.*)
+Value REMOTE_PORT (.*)
+Value IOS_VERSION (\S+)
+
+Start
+  ^${LOCAL_HOST}[>#].
+  ^Device ID: ${DEST_HOST}
+  ^.*IP address: ${MGMNT_IP}
+  ^Platform: ${PLATFORM},
+  ^Interface: ${LOCAL_PORT},  Port ID \(outgoing port\): ${REMOTE_PORT}
+  ^.*Version ${IOS_VERSION},
+```
+
+#VSLIDE
+### show cdp neighbors detail
+
+Результат выполнения скрипта:
+```
+$ python parse_output.py templates/sh_cdp_n_det.template output/sh_cdp_n_det.txt
+LOCAL_HOST    DEST_HOST    MGMNT_IP    PLATFORM    LOCAL_PORT             REMOTE_PORT         IOS_VERSION
+------------  -----------  ----------  ----------  ---------------------  ------------------  -------------
+SW1           R2           10.2.2.2    Cisco 2911  GigabitEthernet1/0/21  GigabitEthernet0/0  15.2(2)T1
+```
+
+#VSLIDE
+### show cdp neighbors detail
+
+Несмотря на то, что правила с переменными описаны в разных строках, и, соответственно, работают с разными строками, TextFSM собирает их в одну строку таблицы.
+То есть, переменные, которые определены в начале шаблона, задают строку итоговой таблицы.
+
+Обратите внимание, что в файле sh_cdp_n_det.txt находится вывод с тремя соседями, а в таблице только один сосед, последний.
+
+#VSLIDE
+#### Record
+Так получилось из-за того, что в шаблоне не указано действие __Record__.
+И в итоге, в финальной таблице осталась только последняя строка.
+
+Исправленый шаблон:
+```
+Value LOCAL_HOST (\S+)
+Value DEST_HOST (\S+)
+Value MGMNT_IP (.*)
+Value PLATFORM (.*)
+Value LOCAL_PORT (.*)
+Value REMOTE_PORT (.*)
+Value IOS_VERSION (\S+)
+
+Start
+  ^${LOCAL_HOST}[>#].
+  ^Device ID: ${DEST_HOST}
+  ^.*IP address: ${MGMNT_IP}
+  ^Platform: ${PLATFORM},
+  ^Interface: ${LOCAL_PORT},  Port ID \(outgoing port\): ${REMOTE_PORT}
+  ^.*Version ${IOS_VERSION}, -> Record
+```
+
+#VSLIDE
+#### Record
+
+Теперь результат запуска скрипта выглядит так:
+```
+$ python parse_output.py templates/sh_cdp_n_det.template output/sh_cdp_n_det.txt
+LOCAL_HOST    DEST_HOST    MGMNT_IP    PLATFORM              LOCAL_PORT             REMOTE_PORT         IOS_VERSION
+------------  -----------  ----------  --------------------  ---------------------  ------------------  -------------
+SW1           SW2          10.1.1.2    cisco WS-C2960-8TC-L  GigabitEthernet1/0/16  GigabitEthernet0/1  12.2(55)SE9
+              R1           10.1.1.1    Cisco 3825            GigabitEthernet1/0/22  GigabitEthernet0/0  12.4(24)T1
+              R2           10.2.2.2    Cisco 2911            GigabitEthernet1/0/21  GigabitEthernet0/0  15.2(2)T1
+```
+
+Вывод получен со всех трёх устройств.
+Но, переменная LOCAL_HOST отображается не в каждой строке, а только в первой.
+
+#VSLIDE
+#### Filldown
+
+Это связано с тем, что приглашение, из которого взято значение переменной, появляется только один раз.
+И, для того, чтобы оно появлялось и в последующих строках, надо использовать действие __Filldown__ для переменной LOCAL_HOST:
+```
+Value Filldown LOCAL_HOST (\S+)
+Value DEST_HOST (\S+)
+Value MGMNT_IP (.*)
+Value PLATFORM (.*)
+Value LOCAL_PORT (.*)
+Value REMOTE_PORT (.*)
+Value IOS_VERSION (\S+)
+
+Start
+  ^${LOCAL_HOST}[>#].
+  ^Device ID: ${DEST_HOST}
+  ^.*IP address: ${MGMNT_IP}
+  ^Platform: ${PLATFORM},
+  ^Interface: ${LOCAL_PORT},  Port ID \(outgoing port\): ${REMOTE_PORT}
+  ^.*Version ${IOS_VERSION}, -> Record
+```
+
+#VSLIDE
+#### Filldown
+
+Теперь мы получили такой вывод:
+```
+$ python parse_output.py templates/sh_cdp_n_det.template output/sh_cdp_n_det.txt
+LOCAL_HOST    DEST_HOST    MGMNT_IP    PLATFORM              LOCAL_PORT             REMOTE_PORT         IOS_VERSION
+------------  -----------  ----------  --------------------  ---------------------  ------------------  -------------
+SW1           SW2          10.1.1.2    cisco WS-C2960-8TC-L  GigabitEthernet1/0/16  GigabitEthernet0/1  12.2(55)SE9
+SW1           R1           10.1.1.1    Cisco 3825            GigabitEthernet1/0/22  GigabitEthernet0/0  12.4(24)T1
+SW1           R2           10.2.2.2    Cisco 2911            GigabitEthernet1/0/21  GigabitEthernet0/0  15.2(2)T1
+SW1
+```
+
+Теперь значение переменной LOCAL_HOST появилось во всех трёх строках. Но появился ещё один странный эффект - последняя строка, в которой заполнена только колонка LOCAL_HOST.
+
+#VSLIDE
+#### Required
+
+Дело в том, что все переменные, которые мы определили, опциональны.
+К тому же, одна переменная с параметром Filldown.
+И, чтобы избавиться от последней строки, нужно сделать хотя бы одну переменную обязательной, с помощью параметра __Required__:
+```
+Value Filldown LOCAL_HOST (\S+)
+Value Required DEST_HOST (\S+)
+Value MGMNT_IP (.*)
+Value PLATFORM (.*)
+Value LOCAL_PORT (.*)
+Value REMOTE_PORT (.*)
+Value IOS_VERSION (\S+)
+
+Start
+  ^${LOCAL_HOST}[>#].
+  ^Device ID: ${DEST_HOST}
+  ^.*IP address: ${MGMNT_IP}
+  ^Platform: ${PLATFORM},
+  ^Interface: ${LOCAL_PORT},  Port ID \(outgoing port\): ${REMOTE_PORT}
+  ^.*Version ${IOS_VERSION}, -> Record
+```
+
+#VSLIDE
+#### Required
+
+Теперь мы получим корректный вывод:
+```
+$ python parse_output.py templates/sh_cdp_n_det.template output/sh_cdp_n_det.txt
+LOCAL_HOST    DEST_HOST    MGMNT_IP    PLATFORM              LOCAL_PORT             REMOTE_PORT         IOS_VERSION
+------------  -----------  ----------  --------------------  ---------------------  ------------------  -------------
+SW1           SW2          10.1.1.2    cisco WS-C2960-8TC-L  GigabitEthernet1/0/16  GigabitEthernet0/1  12.2(55)SE9
+SW1           R1           10.1.1.1    Cisco 3825            GigabitEthernet1/0/22  GigabitEthernet0/0  12.4(24)T1
+SW1           R2           10.2.2.2    Cisco 2911            GigabitEthernet1/0/21  GigabitEthernet0/0  15.2(2)T1
+```
+
+#HSLIDE
+### show ip interface brief
+
+В случае, когда нужно обработать данные, которые выведены столбцами, шаблон TextFSM, наиболее удобен.
+
+Шаблон для вывода команды show ip interface brief (файл templates/sh_ip_int_br.template):
+```
+Value INT (\S+)
+Value ADDR (\S+)
+Value STATUS (up|down|administratively down)
+Value PROTO (up|down)
+
+Start
+  ^${INTF}\s+${ADDR}\s+\w+\s+\w+\s+${STATUS}\s+${PROTO} -> Record
+```
+
+#VSLIDE
+### show ip interface brief
+
+В этом случае, правило можно описать одной строкой.
+
+Вывод команды (файл output/sh_ip_int_br.txt):
+```
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            15.0.15.1       YES manual up                    up
+FastEthernet0/1            10.0.12.1       YES manual up                    up
+FastEthernet0/2            10.0.13.1       YES manual up                    up
+FastEthernet0/3            unassigned      YES unset  up                    up
+Loopback0                  10.1.1.1        YES manual up                    up
+Loopback100                100.0.0.1       YES manual up                    up
+```
+
+#VSLIDE
+### show ip interface brief
+
+Результат выполнения будет таким:
+```
+$ python parse_output.py templates/sh_ip_int_br.template output/sh_ip_int_br.txt
+INT              ADDR        STATUS    PROTO
+---------------  ----------  --------  -------
+FastEthernet0/0  15.0.15.1   up        up
+FastEthernet0/1  10.0.12.1   up        up
+FastEthernet0/2  10.0.13.1   up        up
+FastEthernet0/3  unassigned  up        up
+Loopback0        10.1.1.1    up        up
+Loopback100      100.0.0.1   up        up
+```
+
+#HSLIDE
+### show ip route ospf
+
+Рассмотрим случай, когда нам нужно обработать вывод команды show ip route ospf и в таблице маршрутизации есть несколько маршрутов к одной сети.
+
+Для маршрутов к одной и той же сети, вместо нескольких строк, где будет повторяться сеть, будет создана одна запись, в которой все доступные next-hop адреса собраны в список.
+
+
+#VSLIDE
+### show ip route ospf
+
+Пример вывода команды show ip route ospf (файл output/sh_ip_route_ospf.txt):
+```
+R1#sh ip route ospf
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       + - replicated route, % - next hop override
+
+Gateway of last resort is not set
+
+      10.0.0.0/8 is variably subnetted, 10 subnets, 2 masks
+O        10.0.24.0/24 [110/20] via 10.0.12.2, 1w2d, Ethernet0/1
+O        10.0.34.0/24 [110/20] via 10.0.13.3, 1w2d, Ethernet0/2
+O        10.2.2.2/32 [110/11] via 10.0.12.2, 1w2d, Ethernet0/1
+O        10.3.3.3/32 [110/11] via 10.0.13.3, 1w2d, Ethernet0/2
+O        10.4.4.4/32 [110/21] via 10.0.13.3, 1w2d, Ethernet0/2
+                     [110/21] via 10.0.12.2, 1w2d, Ethernet0/1
+                     [110/21] via 10.0.14.4, 1w2d, Ethernet0/3
+O        10.5.35.0/24 [110/20] via 10.0.13.3, 1w2d, Ethernet0/2
+
+
+```
+
+#VSLIDE
+### show ip route ospf
+
+Для этого примера упрощаем задачу и считаем, что маршруты могут быть только OSPF и с обозначением, только O (то есть, только внутризональные маршруты).
+
+Первая версия шаблона выглядит так:
+```
+Value Network (([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}))
+Value Mask (\/\d{1,2})
+Value Distance (\d+)
+Value Metric (\d+)
+Value NextHop ([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})
+
+Start
+  ^O +${Network}${Mask}\s\[${Distance}\/${Metric}\]\svia\s${NextHop}, -> Record
+```
+
+#VSLIDE
+### show ip route ospf
+
+Результат получился такой:
+```
+Network    Mask      Distance    Metric  NextHop
+---------  ------  ----------  --------  ---------
+10.0.24.0  /24            110        20  10.0.12.2
+10.0.34.0  /24            110        20  10.0.13.3
+10.2.2.2   /32            110        11  10.0.12.2
+10.3.3.3   /32            110        11  10.0.13.3
+10.4.4.4   /32            110        21  10.0.13.3
+10.5.35.0  /24            110        20  10.0.13.3
+```
+
+#VSLIDE
+#### List
+
+Всё нормально, но потерялись варианты путей для маршрута 10.4.4.4/32.
+Это логично, ведь нет правила, которое подошло бы для такой строки.
+
+
+Воспользуемся опцией __List__ для переменной NextHop:
+```
+Value Network (([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}))
+Value Mask (\/\d{1,2})
+Value Distance (\d+)
+Value Metric (\d+)
+Value List NextHop ([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})
+
+Start
+  ^O +${Network}${Mask}\s\[${Distance}\/${Metric}\]\svia\s${NextHop}, -> Record
+```
+
+#VSLIDE
+#### List
+
+Теперь вывод получился таким:
+```
+Network    Mask      Distance    Metric  NextHop
+---------  ------  ----------  --------  -------------
+10.0.24.0  /24            110        20  ['10.0.12.2']
+10.0.34.0  /24            110        20  ['10.0.13.3']
+10.2.2.2   /32            110        11  ['10.0.12.2']
+10.3.3.3   /32            110        11  ['10.0.13.3']
+10.4.4.4   /32            110        21  ['10.0.13.3']
+10.5.35.0  /24            110        20  ['10.0.13.3']
+```
+
+#VSLIDE
+#### List
+
+Изменилось то, что в столбце NextHop отображается список, но пока с одним элементом.
+
+Так как, перед записью маршрута, для которого есть несколько путей, надо добавить к нему все доступные адреса NextHop, надо перенести действие __Record__.
+
+
+#VSLIDE
+#### List
+
+Для этого, запись переносится на момент, когда встречается следующая строка с маршрутом.
+В этот момент надо записать предыдущую строку и только после этого, уже записывать текущую.
+Для этого, используется такая запись:
+```
+  ^O -> Continue.Record
+```
+
+#VSLIDE
+#### List
+
+В ней действие __Record__ говорит, что надо записать текущее значение переменных.
+А, так как в этом правиле нет переменных, записывается то, что было в предыдущих значениях.
+
+Действие __Continue__ говорит, что надо продолжить работать с текущей строкой так, как-будто совпадения не было.
+Засчет этого, сработает следующая строка.
+
+Остается добавить правило, которое будет описывать дополнительные маршруты к сети (в них нет сети и маски):
+```
+  ^\s+\[${Distance}\/${Metric}\]\svia\s${NextHop},
+```
+
+#VSLIDE
+#### List
+
+Итоговый шаблон выглядит так (файл templates/sh_ip_route_ospf.template):
+```
+Value Network (([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}))
+Value Mask (\/\d{1,2})
+Value Distance (\d+)
+Value Metric (\d+)
+Value List NextHop ([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3})
+
+Start
+  ^O -> Continue.Record
+  ^O +${Network}${Mask}\s\[${Distance}\/${Metric}\]\svia\s${NextHop},
+  ^\s+\[${Distance}\/${Metric}\]\svia\s${NextHop},
+```
+
+#VSLIDE
+#### List
+
+В результате, мы получим такой вывод:
+```
+Network    Mask      Distance    Metric  NextHop
+---------  ------  ----------  --------  ---------------------------------------
+10.0.24.0  /24            110        20  ['10.0.12.2']
+10.0.34.0  /24            110        20  ['10.0.13.3']
+10.2.2.2   /32            110        11  ['10.0.12.2']
+10.3.3.3   /32            110        11  ['10.0.13.3']
+10.4.4.4   /32            110        21  ['10.0.13.3', '10.0.12.2', '10.0.14.4']
+10.5.35.0  /24            110        20  ['10.0.13.3']
 ```
 
 #HSLIDE
 
-### Цикл while
+## TextFSM CLI Table
 
 #VSLIDE
+### TextFSM CLI Table
 
-### Цикл while
+Благодаря TextFSM, можно обрабатывать вывод команд и получать структурированный результат. 
+Но, всё ещё надо вручную прописывать каким шаблоном обрабатывать команды show, каждый раз, когда используется TextFSM.
 
-В цикле while, как и в выражении if, надо писать условие.
-Если условие истинно, выполняются действия внутри блока while.
-Но, в отличии от if, после выполнения while возвращается в начало цикла.
-
-При использовании циклов while, необходимо обращать внимание на то, будет ли достигнуто такое состояние, при котором условие цикла будет ложным.
+Было бы намного удобней иметь какое-то соответствие между командой и шаблоном.
+Чтобы можно было написать общий скрипт, который выполняет подключения к устройствам, отправляет команды, сам выбирает шаблон и парсит вывод в соответствиее с шаблоном.
 
 #VSLIDE
+### TextFSM CLI Table
 
-### Пример цикла while
+В TextFSM есть такая возможность.
 
+Для того, чтобы ей можно было воспользоваться, надо создать файл в котором описаны соответствия между командами и шаблонами. В TextFSM он называется index.
+
+#VSLIDE
+### TextFSM CLI Table
+
+Файл index должен находится в каталоге с шаблонами и должен иметь такой формат:
+* первая строка - названия колонок
+* каждая следующая строка - это соответствие шаблона команде
+
+#VSLIDE
+### TextFSM CLI Table
+
+* обязательные колонки, местоположение которых фиксировано (должны быть обязательно первой и последней, соответственно):
+ * первая колонка - имена шаблонов
+ * последняя колонка - соответствующая команда
+   * в этой колонке используется специальный формат, чтобы описать то, что команда может быть написана не полностью
+
+#VSLIDE
+### TextFSM CLI Table
+
+* остальные колонки могут быть любыми
+ * например, в примере ниже будут колонки Hostname, Vendor. Они позволяют уточнить информацию об устройстве, чтобы определить какой шаблон использовать.
+   * например, команда show version может быть у оборудования Cisco и HP. Соответственно, только команды недостаточно, чтобы определить какой шаблон использовать. В таком случае, можно передать информацию о том, какой тип оборудования используется, вместе с командой, и тогда получится определить правильный шаблон.
+* во всех столбцах, кроме первого, поддерживаются регулярные выражения
+ * в командах, внутри ```[[]]``` регулярные выражения не поддерживаются
+
+#VSLIDE
+### TextFSM CLI Table
+
+Пример файла index:
+```
+Template, Hostname, Vendor, Command
+sh_cdp_n_det.template, .*, Cisco, sh[[ow]] cdp ne[[ighbors]] de[[tail]]
+sh_clock.template, .*, Cisco, sh[[ow]] clo[[ck]]
+sh_ip_int_br.template, .*, Cisco, sh[[ow]] ip int[[erface]] br[[ief]]
+sh_ip_route_ospf.template, .*, Cisco, sh[[ow]] ip rou[[te]] o[[spf]]
+```
+
+#VSLIDE
+### TextFSM CLI Table
+
+Обратите внимание на то, как записаны команды:
+* ```sh[[ow]] ip int[[erface]] br[[ief]]```
+ * эта запись будет преобразована в выражение sh((ow)?)? ip int((erface)?)? br((ief)?)?
+ * это значит, что TextFSM сможет определить какой шаблон использовать, даже если команда набрана не полностью
+ * например, такие варианты команды сработают:
+     * sh ip int br
+     * show ip inter bri
+
+#VSLIDE
+### Как использовать CLI table
+
+Посмотрим как пользоваться классом clitable и файлом index.
+
+В каталоге templates такие шаблоны и файл index:
+```
+sh_cdp_n_det.template
+sh_clock.template
+sh_ip_int_br.template
+sh_ip_route_ospf.template
+index
+```
+
+#VSLIDE
+### Как использовать CLI table
+
+Сначала попробуем поработать с CLI Table в ipython, чтобы посмотреть какие возможности есть у этого класса, а затем посмотрим на финальный скрипт.
+
+Для начала, импортируем класс clitable:
 ```python
-In [1]: a = 5
-
-In [2]: while a > 0:
-   ...:     print a
-   ...:     a -= 1 # Эта запись равнозначна a = a - 1
-   ...:
-5
-4
-3
-2
-1
+In [1]: import textfsm.clitable as clitable
 ```
 
 #VSLIDE
+### Как использовать CLI table
 
-### Пример цикла while
-
-Файл check_password_with_while.py:
+Проверять работу clitable будем на последнем примере из прошлого раздела - выводе команды show ip route ospf. Считываем вывод, который хранится в файле output/sh_ip_route_ospf.txt, в строку:
 ```python
-# -*- coding: utf-8 -*-
-
-username = raw_input('Введите имя пользователя: ' )
-password = raw_input('Введите пароль: ' )
-
-pass_OK = False
-
-while not pass_OK:
-    if len(password) < 8:
-        print 'Пароль слишком короткий\n'
-        password = raw_input('Введите пароль еще раз: ' )
-    elif username in password:
-        print 'Пароль содержит имя пользователя\n'
-        password = raw_input('Введите пароль еще раз: ' )
-    else:
-        print 'Пароль для пользователя %s установлен' % username
-        pass_OK = True
+In [2]: output_sh_ip_route_ospf = open('output/sh_ip_route_ospf.txt').read()
 ```
 
-
 #VSLIDE
+### Как использовать CLI table
 
-### Пример цикла while
-
-```
-$ python check_password_with_while.py
-Введите имя пользователя: nata
-Введите пароль: nata
-Пароль слишком короткий
-
-Введите пароль еще раз: natanata
-Пароль содержит имя пользователя
-
-Введите пароль еще раз: 123345345345
-Пароль для пользователя nata установлен
-```
-
-#HSLIDE
-
-## break, continue, pass
-
-#VSLIDE
-
-### Оператор break
-
-__Оператор break__ позволяет досрочно прервать цикл:
-* break прерывает текущий цикл и продолжает выполнение следующих выражений
-* если используется несколько вложенных циклов, break прерывает внутренний цикл и продолжает выполнять выражения следующие за блоком
-* break может использоваться в циклах for и while
-
-#VSLIDE
-
-### Оператор break
-
-Пример с циклом for:
-
+Сначала надо инициализировать класс, передав ему имя файла, в котором хранится соответствие между шаблонами и командами, и указать имя каталога, в котором хранятся шаблоны:
 ```python
-In [1]: for num in range(10):
-   ...:     if num < 7:
-   ...:         print num
-   ...:     else:
-   ...:         break
-   ...:
-0
-1
-2
-3
-4
-5
-6
+In [3]: cli_table = clitable.CliTable('index', 'templates')
 ```
 
 #VSLIDE
+### Как использовать CLI table
 
-### Оператор break
-
-Пример с циклом while:
-
+Надо указать какая команда передается и указать дополнительные атрибуты, которые помогут идентифицировать шаблон.
+Для этого, нужно создать словарь, в котором ключи - имена столбцов, которые определены в файле index.
+В данном случае, не обязательно указывать название вендора, так как команде sh ip route ospf соответствет только один шаблон. 
 ```python
-In [2]: i = 0
-In [3]: while i < 10:
-   ...:     if i == 5:
-   ...:         break
-   ...:     else:
-   ...:         print i
-   ...:         i += 1
-   ...:
-0
-1
-2
-3
-4
+In [4]: attributes = {'Command': 'show ip route ospf' , 'Vendor': 'Cisco'}
 ```
 
 #VSLIDE
-### Оператор break
+### Как использовать CLI table
 
-Пример с циклом while:
-
+Методу ParseCmd надо передать вывод команды и словарь с параметрами:
 ```python
-# -*- coding: utf-8 -*-
-
-username = raw_input('Введите имя пользователя: ' )
-password = raw_input('Введите пароль: ' )
-
-while True:
-    if len(password) < 8:
-        print 'Пароль слишком короткий\n'
-        password = raw_input('Введите пароль еще раз: ' )
-    elif username in password:
-        print 'Пароль содержит имя пользователя\n'
-        password = raw_input('Введите пароль еще раз: ' )
-    else:
-        print 'Пароль для пользователя %s установлен' % username
-        break
+In [5]: cli_table.ParseCmd(output_sh_ip_route_ospf, attributes)
 ```
 
+В результате, в объекте cli_table, получаем обработанный вывод команды sh ip route ospf.
 
 #VSLIDE
+### Как использовать CLI table
 
-### Оператор continue
-Оператор continue возвращает управление в начало цикла. То есть, continue позволяет "перепрыгнуть" оставшиеся выражения в цикле и перейти к следующей итерации.
-
-
-#VSLIDE
-
-### Оператор continue
-
-Пример с циклом for:
+Методы cli_table (чтобы посмотреть все методы, надо вызвать dir(cli_table)):
 ```python
-In [4]: for num in range(5):
-   ...:     if num == 3:
-   ...:         continue
-   ...:     else:
-   ...:         print num
-   ...:
-0
-1
-2
-4
+In [6]: cli_table.
+cli_table.AddColumn        cli_table.NewRow           cli_table.index            cli_table.size
+cli_table.AddKeys          cli_table.ParseCmd         cli_table.index_file       cli_table.sort
+cli_table.Append           cli_table.ReadIndex        cli_table.next             cli_table.superkey
+cli_table.CsvToTable       cli_table.Remove           cli_table.raw              cli_table.synchronised
+cli_table.FormattedTable   cli_table.Reset            cli_table.row              cli_table.table
+cli_table.INDEX            cli_table.RowWith          cli_table.row_class        cli_table.template_dir
+cli_table.KeyValue         cli_table.extend           cli_table.row_index
+cli_table.LabelValueTable  cli_table.header           cli_table.separator
 ```
 
 #VSLIDE
+### Как использовать CLI table
 
-### Оператор continue
-
-Пример с циклом while:
+Например, если вызвать ```print cli_table```, получим такой вывод:
 ```python
-In [5]: i = 0
-In [6]: while i < 6:
-   ....:     i += 1
-   ....:     if i == 3:
-   ....:         print "Пропускаем 3"
-   ....:         continue
-   ....:         print "Это никто не увидит"
-   ....:     else:
-   ....:         print "Текущее значение: ", i
+In [7]: print cli_table
+Network, Mask, Distance, Metric, NextHop
+10.0.24.0, /24, 110, 20, ['10.0.12.2']
+10.0.34.0, /24, 110, 20, ['10.0.13.3']
+10.2.2.2, /32, 110, 11, ['10.0.12.2']
+10.3.3.3, /32, 110, 11, ['10.0.13.3']
+10.4.4.4, /32, 110, 21, ['10.0.13.3', '10.0.12.2', '10.0.14.4']
+10.5.35.0, /24, 110, 20, ['10.0.13.3']
+```
+
+#VSLIDE
+### Как использовать CLI table
+
+Метод FormattedTable позволяет получить вывод в виде таблицы:
+```python
+In [8]: print cli_table.FormattedTable()
+ Network    Mask  Distance  Metric  NextHop
+====================================================================
+ 10.0.24.0  /24   110       20      10.0.12.2
+ 10.0.34.0  /24   110       20      10.0.13.3
+ 10.2.2.2   /32   110       11      10.0.12.2
+ 10.3.3.3   /32   110       11      10.0.13.3
+ 10.4.4.4   /32   110       21      10.0.13.3, 10.0.12.2, 10.0.14.4
+ 10.5.35.0  /24   110       20      10.0.13.3
+```
+
+Такой вывод это просто строка, который может пригодится для отображения информации.
+
+#VSLIDE
+### Как использовать CLI table
+
+Чтобы получить из объекта cli_table структурированный вывод, например, список списков, надо обратиться к объекту таким образом:
+```python
+In [9]: data_rows = []
+
+In [10]: for row in cli_table:
+   ....:     current_row = []
+   ....:     for value in row:
+   ....:         current_row.append(value)
+   ....:     data_rows.append(current_row)
    ....:
-Текущее значение:  1
-Текущее значение:  2
-Пропускаем 3
-Текущее значение:  4
-Текущее значение:  5
-Текущее значение:  6
+
+In [11]: data_rows
+Out[11]:
+[['10.0.24.0', '/24', '110', '20', ['10.0.12.2']],
+ ['10.0.34.0', '/24', '110', '20', ['10.0.13.3']],
+ ['10.2.2.2', '/32', '110', '11', ['10.0.12.2']],
+ ['10.3.3.3', '/32', '110', '11', ['10.0.13.3']],
+ ['10.4.4.4', '/32', '110', '21', ['10.0.13.3', '10.0.12.2', '10.0.14.4']],
+ ['10.5.35.0', '/24', '110', '20', ['10.0.13.3']]]
+
+
+
 ```
 
 #VSLIDE
+### Как использовать CLI table
 
-### Оператор pass
-Оператор ```pass``` ничего не делает. Фактически это такая заглушка для объектов.
-
-Например, ```pass``` может помочь в ситуации, когда нужно прописать структуру скрипта.
-Его можно ставить в циклах, функциях, классах. И это не будет влиять на исполнение кода.
-
-Пример использования pass:
+Отдельно можно получить названия столбцов:
 ```python
-In [6]: for num in range(5):
-   ....:     if num < 3:
-   ....:         pass
-   ....:     else:
-   ....:         print num
-   ....:
-3
-4
-```
+In [12]: cli_table.header.viewvalues()
+Out[12]: dict_values([])
 
+In [13]: header = []
 
-#HSLIDE
-
-## Работа с исключениями
-
-#VSLIDE
-
-### try/except
-
-Примеры исключений:
-```python
-In [1]: 2/0
------------------------------------------------------
-ZeroDivisionError: integer division or modulo by zero
-
-In [2]: 'test' + 2
------------------------------------------------------
-TypeError: cannot concatenate 'str' and 'int' objects
-```
-
-В данном случае, возникло два исключения: __ZeroDivisionError__ и __TypeError__.
-
-
-#VSLIDE
-
-### try/except
-
-Для работы с исключениями используется конструкция ```try/except```:
-```python
-In [3]: try:
-   ...:     2/0
-   ...: except ZeroDivisionError:
-   ...:     print "You can't divide by zero"
-   ...:
-You can't divide by zero
-```
-
-#VSLIDE
-
-### try/except
-
-Конструкция try работает таким образом:
-* сначала выполняются выражения, которые записаны в блоке try
-* если при выполнения блока try, не возникло никаких исключений, блок except пропускается. И выполняется дальнейший код
-* если во время выполнения блока try, в каком-то месте, возникло исключение, оставшаяся часть блока try пропускается
- * если в блоке except указано исключение, которое возникло, выполняется код в блоке except
- * иначе выполнение программы прерывается и выдается ошибка
-
-#VSLIDE
-
-### try/except
-
-```python
-In [4]: try:
-   ...:     print "Let's divide some numbers"
-   ...:     2/0
-   ...:     print 'Cool!'
-   ...: except ZeroDivisionError:
-   ...:     print "You can't divide by zero"
-   ...:
-Let's divide some numbers
-You can't divide by zero
-```
-
-
-#VSLIDE
-
-### try/except
-
-```python
-# -*- coding: utf-8 -*-
-
-try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
-    print "Результат: ", int(a)/int(b)
-except ValueError:
-    print "Пожалуйста, вводите только числа"
-except ZeroDivisionError:
-    print "На ноль делить нельзя"
-```
-
-#VSLIDE
-
-### try/except
-
-Примеры выполнения скрипта:
-```
-$ python divide.py
-Введите первое число: 3
-Введите второе число: 1
-Результат:  3
-
-$ python divide.py
-Введите первое число: 5
-Введите второе число: 0
-Результат:  На ноль делить нельзя
-
-$ python divide.py
-Введите первое число: qewr
-Введите второе число: 3
-Результат:  Пожалуйста, вводите только числа
-```
-
-#VSLIDE
-
-### try/except
-
-Если нет необходимости выводить различные сообщения на ошибки ValueError и ZeroDivisionError, можно сделать так (файл divide_ver2.py):
-```python
-# -*- coding: utf-8 -*-
-
-try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
-    print "Результат: ", int(a)/int(b)
-except (ValueError, ZeroDivisionError):
-    print "Что-то пошло не так..."
-```
-
-Проверка:
-```python
-$ python divide_ver2.py
-Введите первое число: wer
-Введите второе число: 4
-Результат:  Что-то пошло не так...
-
-$ python divide_ver2.py
-Введите первое число: 5
-Введите второе число: 0
-Результат:  Что-то пошло не так...
-```
-
-#VSLIDE
-
-### try/except/else
-В конструкции try/except есть опциональный блок else. Он выполняется в том случае, если не было исключения.
-
-Например, если необходимо выполнять в дальнейшем какие-то операции с данными, которые ввел пользователь, можно записать их в блоке else (файл divide_ver3.py):
-```python
-# -*- coding: utf-8 -*-
-
-try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
-    result = int(a)/int(b)
-except (ValueError, ZeroDivisionError):
-    print "Что-то пошло не так..."
-else:
-    print "Результат в квадрате: ", result**2
-```
-
-#VSLIDE
-
-### try/except/else
-
-Пример выполнения:
-```python
-$ python divide_ver3.py
-Введите первое число: 10
-Введите второе число: 2
-Результат в квадрате:  25
-
-$ python divide_ver3.py
-Введите первое число: werq
-Введите второе число: 3
-Что-то пошло не так...
-```
-
-
-#VSLIDE
-
-### try/except/finally
-
-Блок finally это еще один опциональный блок в конструкции try. Он выполняется __всегда__, независимо от того, было ли исключение или нет.
-
-Сюда ставятся действия, которые надо выполнить в любом случае. Например, это может быть закрытие файла.
-
-Файл divide_ver4.py с блоком finally:
-```python
-# -*- coding: utf-8 -*-
-
-try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
-    result = int(a)/int(b)
-except (ValueError, ZeroDivisionError):
-    print "Что-то пошло не так..."
-else:
-    print "Результат в квадрате: ", result**2
-finally:
-    print "Вот и сказочке конец, а кто слушал - молодец."
-```
-
-#VSLIDE
-
-### try/except/finally
-
-Проверка:
-```python
-$ python divide_ver4.py
-Введите первое число: 10
-Введите второе число: 2
-Результат в квадрате:  25
-Вот и сказочке конец, а кто слушал - молодец.
-
-$ python divide_ver4.py
-Введите первое число: qwerewr
-Введите второе число: 3
-Что-то пошло не так...
-Вот и сказочке конец, а кто слушал - молодец.
-
-$ python divide_ver4.py
-Введите первое число: 4
-Введите второе число: 0
-Что-то пошло не так...
-Вот и сказочке конец, а кто слушал - молодец.
-```
-
-
-#HSLIDE
-
-##Работа с файлами
-
-#VSLIDE
-
-### Открытие файлов
-
-#VSLIDE
-
-## Открытие файлов
-Для начала работы с файлом, его надо открыть.
-
-```python
-file = open('file_name.txt', 'r')
-```
-
-В функции open():
-* ```'file_name.txt'``` - имя файла
- * тут можно указывать не только имя, но и путь (абсолютный или относительный)
-* ```'r'``` - режим открытия файла
-
-Функция ```open()``` создает объект file, к которому потом можно применять различные методы, для работы с ним.
-
-
-
-#VSLIDE
-
-#### Режимы открытия файлов
-
-* ```r``` - открыть файл только для чтения (значение по умолчанию)
-* ```r+``` - открыть файл для чтения и записи
-* ```w``` - открыть файл для записи
- * если файл существует, то его содержимое удаляется. Если файла нет, создается новый
-* ```w+``` - открыть файл для чтения и записи
- * если файл существует, то его содержимое удаляется. Если файла нет, создается новый
-* ```a``` - открыть файл для дополнение записи. Данные добавляются в конец файла
-* ```a+``` - открыть файл для чтения и записи. Данные добавляются в конец файла
-
-#VSLIDE
-
-### Чтение файлов
-
-#VSLIDE
-
-### Чтение файлов
-
-В Python есть несколько методов чтения файла:
-* ```read()``` - считывает содержимое файла в строку
-* ```readline()``` - считывает файл построчно
-* ```readlines()``` - считывает строки файла и создает список из строк
-
-#VSLIDE
-
-### Чтение файлов
-
-Посмотрим как считывать содержимое файлов, на примере файла r1.txt:
-```
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
-
-#VSLIDE
-
-### Чтение файлов. Метод read()
-
-Метод ```read()``` - считывает весь файл в одну строку.
-
-Пример использования метода ```read()```:
-```python
-In [1]: f = open('r1.txt')
-
-In [2]: f.read()
-Out[2]: '!\nservice timestamps debug datetime msec localtime show-timezone year\nservice timestamps log datetime msec localtime show-timezone year\nservice password-encryption\nservice sequence-numbers\n!\nno ip domain lookup\n!\nip ssh version 2\n!\n'
-
-In [3]: f.read()
-Out[3]: ''
-```
-
-#VSLIDE
-
-### Чтение файлов. Метод readline()
-
-Построчно файл можно считать с помощью метода ```readline()```:
-```python
-In [4]: f = open('r1.txt')
-
-In [5]: f.readline()
-Out[5]: '!\n'
-
-In [6]: f.readline()
-Out[6]: 'service timestamps debug datetime msec localtime show-timezone year\n'
-```
-
-
-#VSLIDE
-
-### Чтение файлов. Метод readline()
-
-Но, чаще всего, проще пройтись по объекту file в цикле, не используя методы ```read...```:
-```python
-In [7]: f = open('r1.txt')
-
-In [8]: for line in f:
-   ...:     print line
-   ...:
-!
-
-service timestamps debug datetime msec localtime show-timezone year
-
-service timestamps log datetime msec localtime show-timezone year
-
-service password-encryption
-
-service sequence-numbers
-
-!
-
-no ip domain lookup
-
-!
-
-ip ssh version 2
-
-!
-
-```
-
-
-
-#VSLIDE
-
-### Чтение файлов. Метод readlines()
-
-Еще один полезный метод - ```readlines()```. Он считывает строки файла в список:
-```python
-In [9]: f = open('r1.txt')
-
-In [10]: f.readlines()
-Out[10]:
-['!\n',
- 'service timestamps debug datetime msec localtime show-timezone year\n',
- 'service timestamps log datetime msec localtime show-timezone year\n',
- 'service password-encryption\n',
- 'service sequence-numbers\n',
- '!\n',
- 'no ip domain lookup\n',
- '!\n',
- 'ip ssh version 2\n',
- '!\n']
-```
-
-#VSLIDE
-
-### Чтение файлов. Метод readlines()
-
-Если нужно получить строки файла, но без перевода строки в конце, можно воспользоваться методом ```split``` и как разделитель, указать символ ```\n```:
-```
-In [11]: f = open('r1.txt')
-
-In [12]: f.read().split('\n')
-Out[12]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- 'ip ssh version 2',
- '!',
- '']
-```
-
-Обратите внимание, что последний элемент списка - пустая строка.
-
-#VSLIDE
-
-### Чтение файлов. Метод readlines()
-
-Если перед выполнением ```split()```, воспользоваться методом ```rstrip()```, список будет без пустой строки в конце:
-```python
-In [13]: f = open('r1.txt')
-
-In [14]: f.read().rstrip().split('\n')
-Out[14]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- 'ip ssh version 2',
- '!']
-```
-
-#VSLIDE
-
-#### seek()
-
-До сих пор, файл каждый раз приходилось открывать заново, чтобы снова его считать.
-Так происходит из-за того, что после методов чтения, курсор находится в конце файла.
-И повторное чтение возвращает пустую строку.
-
-Чтобы ещё раз считать информацию из файла, нужно воспользоваться методом ```seek```, который перемещает курсор в необходимое положение.
-
-```python
-In [15]: f = open('r1.txt')
-
-In [16]: print f.read()
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
-#VSLIDE
-
-#### seek()
-
-Если вызывать ещё раз метод ```read```, возвращается пустая строка:
-```python
-In [17]: print f.read()
-```
-
-Но, с помощью метода ```seek```, можно перейти в начало файла (0 означает начало файла):
-```python
-In [18]: f.seek(0)
-```
-
-После того, как, с помощью ```seek```, курсор был переведен в начало файла, можно опять считывать содержимое:
-```python
-In [19]: print f.read()
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
-#VSLIDE
-
-### Запись файлов
-
-#VSLIDE
-
-### Запись файлов
-
-При записи, очень важно определиться с режимом открытия файла, чтобы случайно его не удалить:
-* append - добавить строки в существующий файл
-* write - перезаписать файл
-* оба режима создают файл, если он не существует
-
-Для записи в файл используются такие методы:
-* ```write()``` - записать в файл одну строку
-* ```writelines()``` - позволяет передавать в качестве аргумента список строк
-
-#VSLIDE
-
-####write()
-
-Метод ```write``` ожидает строку, для записи.
-
-Для примера, возьмем список строк с конфигурацией:
-```python
-In [1]: cfg_lines = ['!',
-   ...:  'service timestamps debug datetime msec localtime show-timezone year',
-   ...:  'service timestamps log datetime msec localtime show-timezone year',
-   ...:  'service password-encryption',
-   ...:  'service sequence-numbers',
-   ...:  '!',
-   ...:  'no ip domain lookup',
-   ...:  '!',
-   ...:  'ip ssh version 2',
-   ...:  '!']
-```
-
-
-#VSLIDE
-
-####write()
-
-Открытие файла r2.txt в режиме для записи:
-```python
-In [2]: f = open('r2.txt', 'w')
-```
-
-Преобразуем список команд в одну большую строку с помощью ```join```:
-```python
-In [3]: cfg_lines_as_string = '\n'.join(cfg_lines)
-
-In [4]: cfg_lines_as_string
-Out[4]: '!\nservice timestamps debug datetime msec localtime show-timezone year\nservice timestamps log datetime msec localtime show-timezone year\nservice password-encryption\nservice sequence-numbers\n!\nno ip domain lookup\n!\nip ssh version 2\n!'
-```
-
-#VSLIDE
-
-####write()
-
-Запись строки в файл:
-```python
-In [5]: f.write(cfg_lines_as_string)
-```
-
-Аналогично можно добавить строку вручную:
-```python
-In [6]: f.write('\nhostname r2')
-```
-
-После завершения работы с файлом, его необходимо закрыть:
-```python
-In [7]: f.close()
-```
-
-#VSLIDE
-
-####write()
-
-Так как ipython поддерживает команду cat, можно легко посмотреть содержимое файла:
-```python
-In [8]: cat r2.txt
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-hostname r2
-```
-
-
-#VSLIDE
-
-#### writelines()
-
-Метод ```writelines()``` ожидает список строк, как аргумент.
-
-```python
-In [1]: cfg_lines = ['!',
-   ...:  'service timestamps debug datetime msec localtime show-timezone year',
-   ...:  'service timestamps log datetime msec localtime show-timezone year',
-   ...:  'service password-encryption',
-   ...:  'service sequence-numbers',
-   ...:  '!',
-   ...:  'no ip domain lookup',
-   ...:  '!',
-   ...:  'ip ssh version 2',
-   ...:  '!']
-
-In [9]: f = open('r2.txt', 'w')
-
-In [10]: f.writelines(cfg_lines)
-
-In [11]: f.close()
-
-In [12]: cat r2.txt
-!service timestamps debug datetime msec localtime show-timezone yearservice timestamps log datetime msec localtime show-timezone yearservice password-encryptionservice sequence-numbers!no ip domain lookup!ip ssh version 2!
-```
-
-
-#VSLIDE
-
-#### writelines()
-
-```python
-In [13]: cfg_lines2 = []
-
-In [14]: for line in cfg_lines:
-   ....:     cfg_lines2.append( line + '\n' )
+In [13]: for name in cli_table.header:
+   ....:     header.append(name)
    ....:
 
-In [15]: cfg_lines2
-Out[15]:
-['!\n',
- 'service timestamps debug datetime msec localtime show-timezone year\n',
- 'service timestamps log datetime msec localtime show-timezone year\n',
- 'service password-encryption\n',
- 'service sequence-numbers\n',
- '!\n',
- 'no ip domain lookup\n',
- '!\n',
- 'ip ssh version 2\n',
+In [14]: header
+Out[14]: ['Network', 'Mask', 'Distance', 'Metric', 'NextHop']
 ```
+
+Теперь вывод аналогичен тому, который был получен в прошлом разделе.
 
 
 #VSLIDE
+### Как использовать CLI table
 
-#### writelines()
-
+Соберем всё в один скрипт (файл textfsm_clitable.py):
 ```python
-In [18]: f = open('r2.txt', 'w')
+import textfsm.clitable as clitable
 
-In [19]: f.writelines(cfg_lines3)
+output_sh_ip_route_ospf = open('output/sh_ip_route_ospf.txt').read()
+cli_table = clitable.CliTable('index', 'templates')
+attributes = {'Command': 'show ip route ospf' , 'Vendor': 'Cisco'}
+cli_table.ParseCmd(output_sh_ip_route_ospf, attributes)
 
-In [20]: f.close()
+print "CLI Table output:\n", cli_table
+print "Formatted Table:\n", cli_table.FormattedTable()
 
-In [21]: cat r2.txt
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
+data_rows = []
 
-#VSLIDE
+for row in cli_table:
+    current_row = []
+    for value in row:
+        current_row.append(value)
+    data_rows.append(current_row)
 
-### Закрытие файлов
+header = []
+for name in cli_table.header:
+    header.append(name)
 
-#VSLIDE
+print header
+for row in data_rows:
+    print row
 
-### Закрытие файлов
-
-> В реальной жизни, для закрытия файлов, чаще всего, используется конструкция ```with```. Её намного удобней использовать, чем закрытия файла явно. Но, так как в жизни можно встретить и метод ```close```, в этом разделе рассматривается его использование.
-
-После завершения работы с файлом, его нужно закрыть.
-В некоторых случаях, Python может самостоятельно закрыть файл.
-Но лучше на это не расчитывать и закрывать файл явно.
-
-
-#VSLIDE
-
-####close()
-
-```python
-In [1]: f = open('r1.txt', 'r')
-```
-
-Теперь можно считать содержимое:
-```python
-In [2]: print f.read()
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
-#VSLIDE
-
-####close()
-
-У объекта file есть специальный атрибут ```closed```, который позволяет проверить закрыт файл или нет.
-Если файл открыт, он возвращает ```False```:
-```python
-In [3]: f.closed
-Out[3]: False
-```
-
-Теперь закрываем файл и снова проверяем ```closed```:
-```python
-In [4]: f.close()
-
-In [5]: f.closed
-Out[5]: True
-```
-
-#VSLIDE
-
-####close()
-
-Если попробовать прочитать файл, возникнет исключение:
-```python
-In [6]: print f.read()
-------------------------------------------------------------------
-ValueError                       Traceback (most recent call last)
-<ipython-input-53-2c962247edc5> in <module>()
-----> 1 print f.read()
-
-ValueError: I/O operation on closed file
-```
-
-
-#VSLIDE
-
-#### Использование try/finally для работы с файлами
-
-#VSLIDE
-
-#### Использование try/finally для работы с файлами
-
-С помощью обработки исключений, можно:
-* перехватывать исключения, которые возникают, при попытке прочитать несуществующий файл
-* закрывать файл, после всех операций, в блоке ```finally```
-
-
-Если попытаться открыть для чтения файл, которого не существует, возникнет такое исключение:
-```python
-In [7]: f = open('r3.txt', 'r')
----------------------------------------------------------------------------
-IOError                                   Traceback (most recent call last)
-<ipython-input-54-1a33581ca641> in <module>()
-----> 1 f = open('r3.txt', 'r')
-
-IOError: [Errno 2] No such file or directory: 'r3.txt'
-```
-
-
-#VSLIDE
-
-#### Использование try/finally для работы с файлами
-
-С помощью конструкции ```try/except```, можно перехватить это исключение и вывести своё сообщение:
-```python
-In [8]: try:
-  ....:     f = open('r3.txt', 'r')
-  ....: except IOError:
-  ....:     print 'No such file'
-  ....:
-No such file
-```
-
-
-#VSLIDE
-
-#### Использование try/finally для работы с файлами
-
-А с помощью части ```finally```, можно закрыть файл, после всех операций:
-```python
-In [9]: try:
-  ....:     f = open('r1.txt', 'r')
-  ....:     print f.read()
-  ....: except IOError:
-  ....:     print 'No such file'
-  ....: finally:
-  ....:     f.close()
-  ....:
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-
-In [10]: f.closed
-Out[10]: True
-```
-
-#VSLIDE
-
-### Конструкция with
-
-#VSLIDE
-
-### Конструкция with
-
-```python
-In [1]: with open('r1.txt', 'r') as f:
-  ....:     for line in f:
-  ....:         print line
-  ....:
-!
-
-service timestamps debug datetime msec localtime show-timezone year
-
-service timestamps log datetime msec localtime show-timezone year
-
-service password-encryption
-
-service sequence-numbers
-
-!
-
-no ip domain lookup
-
-!
-
-ip ssh version 2
-
-!
-```
-
-#VSLIDE
-
-### Конструкция with
-
-```python
-In [2]: with open('r1.txt', 'r') as f:
-  ....:     for line in f:
-  ....:         print line.rstrip()
-  ....:
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-
-In [3]: f.closed
-Out[3]: True
 
 ```
 
 #VSLIDE
+### Как использовать CLI table
 
-### Конструкция with
 
-С конструкцией ```with``` можно использовать не только такой построчный вариант считывания, все методы, которые рассматривались до этого, также работают:
-```python
-In [4]: with open('r1.txt', 'r') as f:
-  ....:     print f.read()
-  ....:
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
+Вывод будет таким:
 ```
+$ python textfsm_clitable.py
+CLI Table output:
+Network, Mask, Distance, Metric, NextHop
+10.0.24.0, /24, 110, 20, ['10.0.12.2']
+10.0.34.0, /24, 110, 20, ['10.0.13.3']
+10.2.2.2, /32, 110, 11, ['10.0.12.2']
+10.3.3.3, /32, 110, 11, ['10.0.13.3']
+10.4.4.4, /32, 110, 21, ['10.0.13.3', '10.0.12.2', '10.0.14.4']
+10.5.35.0, /24, 110, 20, ['10.0.13.3']
 
-> Конструкция ```with``` может использоваться не только с файлами.
+Formatted Table:
+ Network    Mask  Distance  Metric  NextHop
+====================================================================
+ 10.0.24.0  /24   110       20      10.0.12.2
+ 10.0.34.0  /24   110       20      10.0.13.3
+ 10.2.2.2   /32   110       11      10.0.12.2
+ 10.3.3.3   /32   110       11      10.0.13.3
+ 10.4.4.4   /32   110       21      10.0.13.3, 10.0.12.2, 10.0.14.4
+ 10.5.35.0  /24   110       20      10.0.13.3
 
+['Network', 'Mask', 'Distance', 'Metric', 'NextHop']
+['10.0.24.0', '/24', '110', '20', ['10.0.12.2']]
+['10.0.34.0', '/24', '110', '20', ['10.0.13.3']]
+['10.2.2.2', '/32', '110', '11', ['10.0.12.2']]
+['10.3.3.3', '/32', '110', '11', ['10.0.13.3']]
+['10.4.4.4', '/32', '110', '21', ['10.0.13.3', '10.0.12.2', '10.0.14.4']]
+['10.5.35.0', '/24', '110', '20', ['10.0.13.3']]
+
+
+```
 
