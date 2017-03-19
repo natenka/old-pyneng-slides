@@ -26,5 +26,6 @@
 .reveal section img {
   border: 0;
   box-shadow: none;
+  margin-left: 30%;
   float: center !important;
 }
