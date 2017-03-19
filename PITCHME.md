@@ -105,7 +105,7 @@ Ansible:
 Но ad-hoc команды намного проще начать использовать. И с ними легче начать разбираться с Ansible.
 
 #HSLIDE
-## Инвентарный файл
+### Инвентарный файл
 
 #VSLIDE
 ### Инвентарный файл
@@ -305,7 +305,7 @@ $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
 
 #HSLIDE
 
-## Конфигурационный файл
+### Конфигурационный файл
 
 #VSLIDE
 ### Конфигурационный файл
@@ -464,7 +464,7 @@ Ansible сам добавил ключи устройств в файл ~/.ssh/k
 
 #HSLIDE
 
-# Модули Ansible
+### Модули Ansible
 
 #VSLIDE
 ### Модули Ansible
@@ -515,3 +515,219 @@ $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
 Также в Ansible модули разделены по функциональности.
 Список всех категорий находится в [документации](http://docs.ansible.com/ansible/modules_by_category.html).
 
+
+#HSLIDE
+## Основы playbooks
+
+#VSLIDE
+### Основы playbooks
+
+Playbook (файл сценариев) — это файл в котором описываются действия, которые нужно выполнить на какой-то группе хостов.
+
+Внутри playbook:
+* play - это набор задач, которые нужно выполнить для группы хостов
+* task - это конкретная задача. В задаче есть, как минимум:
+ * описание (название задачи можно не писать, но очень рекомендуется)
+ * модуль и команда (действие в модуле)
+
+
+#HSLIDE
+### Синтаксис playbook
+
+#VSLIDE
+### Синтаксис playbook
+
+Playbook описываются в формате YAML.
+
+Пример plabook 1_show_commands_with_raw.yml:
+```
+---
+
+- name: Run show commands on routers
+  hosts: cisco-routers
+  gather_facts: false
+
+  tasks:
+
+    - name: run sh ip int br        
+      raw: sh ip int br | ex unass
+
+    - name: run sh ip route
+      raw: sh ip route
+
+
+- name: Run show commands on switches
+  hosts: cisco-switches
+  gather_facts: false
+
+  tasks:
+
+    - name: run sh int status
+      raw: sh int status
+
+    - name: run sh vlan
+      raw: show vlan
+```
+
+#VSLIDE
+### Синтаксис playbook
+
+В playbook два сценария (play):
+* ```name: Run show commands on routers``` - имя сценария (play). Этот параметр обязательно должен быть в любом сценарии
+* ```hosts: cisco-routers``` - сценарий будет применяться к устройствам в группе cisco-routers
+ * тут может быть указано и несколько групп, например, таким образом: ```hosts: cisco-routers:cisco-switches```. Подробнее, в [документации](http://docs.ansible.com/ansible/intro_patterns.html)
+
+#VSLIDE
+### Синтаксис playbook
+
+* обычно, в play надо указывать параметр __remote_user__. Но, так как мы указали его в конфигурационном файле Ansible, можно не указывать его в play.
+* ```gather_facts: false``` - отключение сбора фактов об устройстве, так как для сетевого оборудования надо использовать отдельные модули для сбора фактов.
+ * в разделе [конфигурационный файл](../1_ansible_basics/configuration..md) рассматривалось как отключить сбор фактов по умолчанию. Если он отключен, то параметр gather_facts в play не нужно указывать.
+
+#VSLIDE
+### Синтаксис playbook
+
+* ```tasks:``` - дальше идет перечень задач
+ * в каждой задаче настроено имя (опционально) и действие. Действие может быть только одно.
+ * в действии указывается какой модуль использовать и параметры модуля.
+
+#VSLIDE
+
+И тот же playbook с отображением элементов:
+
+![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook.png)
+
+#VSLIDE
+### Синтаксис playbook
+
+Так выглядит выполнение playbook:
+```
+$ ansible-playbook 1_show_commands_with_raw.yml
+```
+
+#VSLIDE
+Так выглядит выполнение playbook:
+
+![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook_execution.png)
+
+#VSLIDE
+### Синтаксис playbook
+
+Для того, чтобы убедится, что команды, которые указаны в задачах, выполнились на устройствах, запустите playbook с опцией -v (вывод сокращен):
+```
+$ ansible-playbook 1_show_commands_with_raw.yml -v
+```
+
+#VSLIDE
+
+![Verbose playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook-verbose.png)
+
+
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Сценарии (play) и задачи (task) выполняются последовательно, в том порядке, в котором они описаны в playbook.
+
+Если в сценарии, например, две задачи, то сначала первая задача должна быть выполнена для всех устройств, которые указаны в параметре hosts.
+Только после того, как первая задача была выполнена для всех хостов, начинается выполнение второй задачи.
+
+Если в ходе выполнения playbook, возникла ошибка в задаче на каком-то устройстве, это устройство исключается, и другие задачи на нем выполняться не будут.
+
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Например, заменим пароль пользователя cisco на cisco123 (правильный cisco) на маршрутизаторе 192.168.100.1, и запустим playbook заново:
+```
+$ ansible-playbook 1_show_commands_with_raw.yml
+```
+
+#VSLIDE
+
+![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook_failed_execution.png)
+
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Обратите внимание на ошибку в выполнении первой задачи для маршрутизатора 192.168.100.1.
+
+Во второй задаче 'TASK [run sh ip route]', Ansible уже исключил маршрутизатор и выполняет задачу только для маршрутизаторов 192.168.100.2 и 192.168.100.3.
+
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Еще один важный аспект - Ansible выдал сообщение:
+```
+to retry, use: --limit @/home/nata/pyneng_course/chapter15/1_show_commands_with_raw.retry
+```
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Если, при выполнении playbook, на каком-то устройстве возникла ошибка, Ansible создает специальный файл, который называется точно так же как playbook, но расширение меняется на retry.
+(Если вы выполняете задания параллельно, то этот файл должен появится у вас)
+
+В этом файле хранится имя или адрес устройства на котором возникла ошибка.
+Так выглядит файл 1_show_commands_with_raw.retry сейчас:
+```
+192.168.100.1
+```
+
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Создается этот файл для того, чтобы можно было перезапустить playbook заново только для проблемного устройства (устройств).
+То есть, надо исправить проблему с устройством, и заново запустить playbook.
+
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Настраиваем правильный пароль на маршрутизаторе 192.168.100.1, а затем перезапускаем playbook таким образом:
+```
+$ ansible-playbook 1_show_commands_with_raw.yml --limit @/home/nata/pyneng_course/chapter15/1_show_commands_with_raw.retry
+```
+
+#VSLIDE
+
+![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook-retry.png)
+
+#VSLIDE
+### Порядок выполнения задач и сценариев
+
+Ansible взял список устройств, которые перечислены в файле retry и выполнил playbook только для них.
+
+Можно было запустить playbook и так (то есть, писать не полный путь к файлу retry):
+```
+$ ansible-playbook 1_show_commands_with_raw.yml --limit @1_show_commands_with_raw.retry
+```
+
+#VSLIDE
+### Параметр --limit
+
+Параметр --limit очень полезная вещь.
+Он позволяет ограничивать, для каких хостов или групп будет выполняться playbook, при этом, не меняя сам playbook.
+
+Например, таким образом playbook запустить только для маршрутизатора 192.168.100.1:
+```
+$ ansible-playbook 1_show_commands_with_raw.yml --limit 192.168.100.1
+```
+
+#VSLIDE
+
+### Идемпотентность
+
+Модули Ansible идемпотентны.
+Это означает, что модуль можно выполнять сколько угодно раз, но при этом модуль будет выполнять изменения, только если система не находится в желаемом состоянии.
+
+Но, есть исключения из такого поведения.
+Например, модуль raw всегда вносит изменения.
+Поэтому в выполнении playbook выше, всегда отоброжалось состояние changed.
+
+#VSLIDE
+
+### Идемпотентность
+
+Но, если, например, в задаче указано, что на сервер Linux надо установить пакет httpd, то он будет установлен только в том случае, если его нет.
+То есть, действие не будет повторяться снова и снова, при каждом запуске.
+А лишь тогда, когда пакета нет.
+
+Аналогично, и с сетевым оборудованием.
+Если задача модуля выполнить команду в конфигурационном режиме, а она уже есть на устройстве, модуль не будет вносить изменения.
