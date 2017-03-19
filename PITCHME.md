@@ -295,6 +295,10 @@ $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
 
 ![ad-hoc](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/1_ad-hoc.png)
 
+#VSLIDE
+### Ad Hoc команды
+
+<img src="https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/1_ad-hoc.png" alt="Smiley face" align="middle">
 
 #VSLIDE
 ### Ad Hoc команды
