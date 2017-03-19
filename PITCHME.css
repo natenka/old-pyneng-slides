@@ -8,12 +8,6 @@
     font-family: Monaco, "Ubuntu Mono";
 }
 
-.reveal section img {
-  border: 0;
-  box-shadow: none;
-  text-align: center;
-}
-
 .reveal .slides {
     text-align: left;
     font-size: 32px !important;
@@ -27,4 +21,10 @@
 .reveal .slides section>ul {
     margin-left: 10%;
     margin-right: 0;
+}
+
+.reveal section img {
+  border: 0;
+  box-shadow: none;
+  text-align: center;
 }
