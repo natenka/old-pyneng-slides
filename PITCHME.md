@@ -261,6 +261,10 @@ $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
  * этот модуль позволяет отправлять команды в SSH сессии, но при этом не загружает на хост модуль Python. То есть, этот модуль просто отправляет указанную команду как строку и всё
  * плюс модуля raw в том, что он может использоваться для любой системы, которую поддерживает Ansible
  * ```-a "sh ip int br"``` - параметр ```-a``` указывает какую команду отправить
+
+#VSLIDE
+### Ad Hoc команды
+
 * ```-u cisco``` - подключение выполняется от имени пользователя cisco
 * ```--ask-pass``` - параметр который нужно указать, чтобы аутентификация была по паролю, а не по ключам
 
@@ -293,18 +297,170 @@ $ sudo apt-get install sshpass
 $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
 ```
 
-![ad-hoc](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/1_ad-hoc.png)
-
 #VSLIDE
 
 Результат выполнения команды
-<img src="https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/1_ad-hoc.png" alt="Smiley face" align="middle">
+![ad-hoc](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/1_ad-hoc.png)
+
+
+#HSLIDE
+
+## Конфигурационный файл
 
 #VSLIDE
-### Ad Hoc команды
+### Конфигурационный файл
 
-Теперь всё прошло успешно.
-Команда выполнилась и отобразился вывод с каждого устройства.
+Настройки Ansible можно менять в конфигурационном файле.
 
-Аналогичным образом можно попробовать выполнять и другие команды и/или на других комбинациях устройств.
+Конфигурационный файл Ansible может хранится в разных местах (файлы перечислены в порядке уменьшения приоритетности):
+* ANSIBLE_CONFIG (переменная окружения)
+* ansible.cfg (в текущем каталоге)
+* .ansible.cfg (в домашнем каталоге пользователя)
+* /etc/ansible/ansible.cfg
+
+Ansible ищет файл конфигурации в указанном порядке и использует первый найденный (конфигурация из разных файлов не совмещается).
+
+#VSLIDE
+### Конфигурационный файл
+
+В конфигурационном файле можно менять множество параметров.
+Полный список параметров и их описание, можно найти в [документации](http://docs.ansible.com/ansible/intro_configuration.html).
+
+В текущем каталоге должен быть инвентарный файл myhosts:
+```
+[cisco-routers]
+192.168.100.1
+192.168.100.2
+192.168.100.3
+
+[cisco-switches]
+192.168.100.100
+```
+
+#VSLIDE
+### Конфигурационный файл
+
+В текущем каталоге надо создать такой конфигурационный файл ansible.cfg:
+```
+[defaults]
+
+inventory = ./myhosts
+remote_user = cisco
+ask_pass = True
+```
+
+#VSLIDE
+### Конфигурационный файл
+
+Настройки в конфигурационном файле:
+* ```[defaults]``` - это секция конфигурации описывает общие параметры по умолчанию
+* ```inventory = ./myhosts``` - параметр inventory позволяет указать местоположение инвентарного файла.
+ * Если настроить этот параметр, не придется указывать, где находится файл, при каждом запуске Ansible
+* ```remote_user = cisco``` - от имени какого пользователя будет подключаться Ansible
+* ```ask_pass = True``` - этот параметр аналогичен опции --ask-pass в командной строке. Если он выставлен в конфигурации Ansible, то уже не нужно указывать его в командной строке.
+
+#VSLIDE
+### Конфигурационный файл
+
+Теперь вызов ad-hoc команды будет выглядеть так:
+```
+$ ansible cisco-routers -m raw -a "sh ip int br"
+```
+
+Теперь не нужно указывать инвентарный файл, пользователя и опцию --ask-pass.
+
+
+#VSLIDE
+### gathering
+
+По умолчанию, Ansible собирает факты об устройствах.
+
+Факты - это информация о хостах, к которым подключается Ansible.
+Эти факты можно использовать в playbook и шаблонах как переменные.
+
+Сбором фактов, по умолчанию, занимается модуль [setup](http://docs.ansible.com/ansible/setup_module.html).
+
+Но, для сетевого оборудования, модуль setup не подходит, поэтому сбор фактов надо отключить.
+Это можно сделать в конфигурационном файле Ansible или в playbook.
+
+#VSLIDE
+### gathering
+
+Для сетевого оборудования нужно использовать отдельные модули для сбора фактов (если они есть).
+
+Отключение сбора фактов в конфигурационном файле:
+```yml
+gathering = explicit
+```
+
+
+#VSLIDE
+### host_key_checking
+
+Параметр host_key_checking отвечает за проверкy ключей, при подключении по SSH.
+Если указать в конфигурационном файле ```host_key_checking=False```, проверка будет отключена.
+
+Это полезно, когда с управляющего хоста Ansible надо подключиться к большому количеству устройств первый раз.
+
+#VSLIDE
+### host_key_checking
+
+Чтобы проверить этот функционал, надо удалить сохраненные ключи для устройств Cisco, к которым уже выполнялось подкление.
+В линукс они находятся в файле ~/.ssh/known_hosts.
+
+Если выполнить ad-hoc команду, после удаления ключей, вывод будет таким:
+```
+$ ansible cisco-routers -m raw -a "sh ip int br"
+```
+
+#VSLIDE
+
+Результат выполнения команды:
+![host_key_checking](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/host_key_checking.png)
+
+
+#VSLIDE
+### host_key_checking
+
+Добавляем в конфигурационный файл параметр host_key_checking:
+```
+[defaults]
+
+inventory = ./myhosts
+
+remote_user = cisco
+ask_pass = True
+
+host_key_checking=False
+```
+
+#VSLIDE
+### host_key_checking
+
+И повторим ad-hoc команду:
+```
+$ ansible cisco-routers -m raw -a "sh ip int br"
+```
+
+#VSLIDE
+Результат выполнения команды:
+
+![host_key_checking2](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/host_key_checking2.png)
+
+#VSLIDE
+### host_key_checking
+
+Обратите внимание на строки:
+```
+ Warning: Permanently added '192.168.100.1' (RSA) to the list of known hosts.
+```
+
+Ansible сам добавил ключи устройств в файл ~/.ssh/known_hosts.
+При подключении в следующий раз этого сообщения уже не будет.
+
+
+Другие параметры конфигурационного файла можно посмотреть в документации.
+Пример конфигурационного файла в [репозитории Ansible](https://github.com/ansible/ansible/blob/devel/examples/ansible.cfg).
+
+
 
