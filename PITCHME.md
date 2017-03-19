@@ -862,8 +862,6 @@ cli:
 
 group_vars/cisco-routers.yml
 ```
----
-
 log_server: 10.255.100.1
 ntp_server: 10.255.100.1
 users:
@@ -877,8 +875,6 @@ users:
 
 group_vars/cisco-switches.yml
 ```
----
-
 vlans:
   - 10
   - 20
@@ -892,8 +888,6 @@ vlans:
 
 Файл host_vars/192.168.100.1
 ```
----
-
 hostname: london_r1
 mgmnt_loopback: 100
 mgmnt_ip: 10.0.0.1
