@@ -946,7 +946,7 @@ ospf_ints:
 ansible-playbook 1_show_commands_with_raw.yml -v
 ```
 
-![Verbose playbook]({{ book.ansible_img_path }}playbook-verbose.png)
+![Verbose playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook-verbose.png)
 
 #VSLIDE
 ### verbose
@@ -1038,7 +1038,7 @@ $ ansible-playbook 2_register_vars.yml
 #VSLIDE
 ### debug
 
-![Verbose playbook]({{ book.ansible_img_path }}2_register_vars.png)
+![Verbose playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/2_register_vars.png)
 
 
 #VSLIDE
@@ -1089,7 +1089,7 @@ when в Ansible используется как if в Python.
 $ ansible-playbook 3_register_debug_when.yml
 ```
 
-![Verbose playbook]({{ book.ansible_img_path }}3_register_debug_when_skip.png)
+![Verbose playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/3_register_debug_when_skip.png)
 
 #VSLIDE
 ### register, debug, when
@@ -1120,5 +1120,5 @@ $ ansible-playbook 3_register_debug_when.yml
 $ ansible-playbook 3_register_debug_when.yml
 ```
 
-![Verbose playbook]({{ book.ansible_img_path }}3_register_debug_when.png)
+![Verbose playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/3_register_debug_when.png)
 
