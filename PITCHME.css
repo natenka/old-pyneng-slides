@@ -23,7 +23,7 @@
     margin-right: 0;
 }
 
-.reveal img {
+.reveal .slides section>img {
   border: 0;
   box-shadow: none;
   text-align: center;
