@@ -272,7 +272,7 @@ $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
 $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
 ```
 
-![ad-hoc-fail]({{ book.ansible_img_path }}2_ad-hoc-fail.png)
+![ad-hoc-fail](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/2_ad-hoc-fail.png)
 
 #VSLIDE
 ### Ad Hoc команды
@@ -293,7 +293,7 @@ $ sudo apt-get install sshpass
 $ ansible cisco-routers -i myhosts -m raw -a "sh ip int br" -u cisco --ask-pass
 ```
 
-![ad-hoc]({{ book.ansible_img_path }}1_ad-hoc.png)
+![ad-hoc](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/1_ad-hoc.png)
 
 
 #VSLIDE
