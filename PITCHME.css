@@ -13,20 +13,3 @@
   box-shadow: none;
   text-align: center;
 }
-
-.reveal .slides {
-    text-align: left;
-    font-size: 32px !important;
-}
-
-.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
-    font-family: Monaco, Arial, "Ubuntu Mono";
-    text-align: center;
-}
-
-.reveal .slides section>ul {
-    margin-left: 10%;
-    margin-right: 0;
-}
-
-
