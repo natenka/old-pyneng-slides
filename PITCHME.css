@@ -23,8 +23,8 @@
     margin-right: 0;
 }
 
-.reveal .slides section>img {
+.reveal section img {
   border: 0;
   box-shadow: none;
-  text-align: center;
+  text-align: center !important;
 }
