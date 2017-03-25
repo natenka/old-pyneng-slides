@@ -467,6 +467,30 @@ cursor = sqlite3.connect('dhcp_snooping.db').cursor()
 * __```fetchall()```__ - возвращает все строки в виде списка
 
 #VSLIDE
+### Пример использования sqlite3
+
+```python
+import sqlite3
+
+conn = sqlite3.connect('example.db')
+c = conn.cursor()
+
+c.execute('''CREATE TABLE stocks
+             (date text, trans text, symbol text, qty real, price real)''')
+c.execute('''create table dhcp
+             (mac          text primary key,
+              ip           text,
+              vlan         text,
+              interface    text)''')
+              
+c.execute("""insert into dhcp (mac, ip, vlan, interface)
+           values ('00:04:A3:3E:5B:69', '10.1.5.2', '5', 'FastEthernet0/10')""")
+
+conn.commit()
+conn.close()
+```
+
+#VSLIDE
 ### Connection как менеджер контекста
 
 После выполнения операций, изменения должны быть сохранены: надо выполнить ```commit()```, а затем можно закрыть курсор, если он больше не нужен.
