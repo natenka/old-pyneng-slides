@@ -876,6 +876,9 @@ $ python create_sw_inventory_ver1.py
 #VSLIDE
 #### Обработка исключений
 
+#VSLIDE
+#### Обработка исключений
+
 В таблице switch поле mac должно быть уникальным.
 И, если попытаться записать пересекающийся MAC-адрес, возникнет ошибка:
 ```python
@@ -904,6 +907,9 @@ In [25]: try:
     ...:
 Error occured:  UNIQUE constraint failed: switch.mac
 ```
+
+#VSLIDE
+### Connection как менеджер контекста
 
 #VSLIDE
 ### Connection как менеджер контекста
@@ -947,7 +953,6 @@ for row in con.execute("select * from switch"):
 #VSLIDE
 ### Connection как менеджер контекста
 
-Для проверки этого функционала, попробуем записать в таблицу данные, в которых MAC-адрес повторяется (файл create_sw_inventory_ver3.py):
 ```python
 # -*- coding: utf-8 -*-
 import sqlite3
@@ -1020,9 +1025,6 @@ Error occured:  UNIQUE constraint failed: switch.mac
 #VSLIDE
 ### Connection как менеджер контекста
 
-Если же надо чтобы игнорировались только строки с ошибками, надо использовать метод execute и записывать каждую строку отдельно.
-
-Файл create_sw_inventory_ver4.py:
 ```python
 # -*- coding: utf-8 -*-
 import sqlite3
@@ -1068,7 +1070,6 @@ for row in con.execute("select * from switch"):
 #VSLIDE
 ### Connection как менеджер контекста
 
-Теперь результат выполнения будет таким (пропущен только sw7):
 ```
 $ python create_sw_inventory_ver4.py
 (u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
