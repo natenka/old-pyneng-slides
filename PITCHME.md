@@ -141,7 +141,13 @@ PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+```
 
+#VSLIDE
+### Пример использования pexpect
+
+Пример использования pexpect для подключения к оборудованию и передачи команды show (файл 1_pexpect.py):
+```python
 for IP in DEVICES_IP:
     print "Connection to device %s" % IP
     t = pexpect.spawn('ssh %s@%s' % (USER, IP))
@@ -319,6 +325,14 @@ PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+```
+
+#VSLIDE
+
+### Модуль telnetlib
+
+Файл 2_telnetlib.py:
+```python
 
 for IP in DEVICES_IP:
     print "Connection to device %s" % IP
@@ -444,6 +458,13 @@ PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+```
+
+#VSLIDE
+### Модуль paramiko
+
+Пример использования Paramiko (файл 3_paramiko.py):
+```python
 
 for IP in DEVICES_IP:
     print "Connection to device %s" % IP
@@ -628,7 +649,13 @@ PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+```
 
+#VSLIDE
+### Модуль netmiko
+
+Пример использования netmiko (файл 4_netmiko.py):
+```python
 for IP in DEVICES_IP:
     print "Connection to device %s" % IP
     DEVICE_PARAMS = {'device_type': 'cisco_ios',
@@ -890,7 +917,13 @@ PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+```
 
+#VSLIDE
+### Telnet
+
+Файл 4_netmiko_telnet.py:
+```python
 for IP in DEVICES_IP:
     print "Connection to device %s" % IP
     DEVICE_PARAMS = {'device_type': 'cisco_ios_telnet',
