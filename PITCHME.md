@@ -1141,8 +1141,6 @@ Ansible поддерживает такие типы подключений:
 * connection: local
 
 ```
----
-
 - name: Run show commands on routers
   hosts: cisco-routers
   gather_facts: false
@@ -1193,8 +1191,6 @@ ansible_connection=local
 
 Или в файлах переменных, например, в group_vars/all.yml:
 ```
----
-
 ansible_connection: local
 ```
 
@@ -1203,8 +1199,6 @@ ansible_connection: local
 
 В следующих разделах будет использоваться такой вариант:
 ```
----
-
 - name: Run show commands on routers
   hosts: cisco-routers
   gather_facts: false
@@ -1271,8 +1265,6 @@ Ansible также позволяет собрать их в один аргум
 
 Например, если у всех устройств одинаковые значения аргументов, можно задать их в файле group_vars/all.yml:
 ```
----
-
 cli:
   host: "{{ inventory_hostname }}"
   username: cisco
@@ -1351,8 +1343,6 @@ ask_pass = True
 
 В файле group_vars/all.yml надо создать переменную cli, чтобы не указывать каждый раз все параметры, которые нужно передать аргументу provider:
 ```
----
-
 cli:
   host: "{{ inventory_hostname }}"
   username: "cisco"
