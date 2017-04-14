@@ -2239,7 +2239,7 @@ Playbook 5_ios_config_backup.yml:
 $ ansible-playbook 5_ios_config_backup.yml -v
 ```
 
-![6d_ios_config_backup]({{ book.ansible_img_path }}6d_ios_config_backup.png)
+![6d_ios_config_backup](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6d_ios_config_backup.png)
 
 #VSLIDE
 ### backup
@@ -2325,7 +2325,7 @@ $ ansible-playbook 5_ios_config_backup.yml -v
 $ ansible-playbook 6_ios_config_defaults.yml
 ```
 
-![6e_ios_config_default]({{ book.ansible_img_path }}6e_ios_config_defaults.png)
+![6e_ios_config_default](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6e_ios_config_defaults.png)
 
 #HSLIDE
 ## after
@@ -2380,7 +2380,7 @@ $ ansible-playbook 6_ios_config_defaults.yml
 $ ansible-playbook 7_ios_config_after.yml -v
 ```
 
-![6f_ios_config_after.png]({{ book.ansible_img_path }}6f_ios_config_after.png)
+![6f_ios_config_after.png](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6f_ios_config_after.png)
 
 #VSLIDE
 ### after
@@ -2389,7 +2389,7 @@ $ ansible-playbook 7_ios_config_after.yml -v
 ```
 $ ansible-playbook 7_ios_config_after.yml -v
 ```
-![6f_ios_config_after_no_change]({{ book.ansible_img_path }}6f_ios_config_after_no_change.png)
+![6f_ios_config_after_no_change](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6f_ios_config_after_no_change.png)
 
 #VSLIDE
 ### after
@@ -2423,7 +2423,7 @@ $ ansible-playbook 7_ios_config_after.yml -v
 ```
 $ ansible-playbook 7_ios_config_after_save.yml -v
 ```
-![6f_ios_config_after_save]({{ book.ansible_img_path }}6f_ios_config_after_save.png)
+![6f_ios_config_after_save](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6f_ios_config_after_save.png)
 
 
 #HSLIDE
@@ -2485,7 +2485,7 @@ Playbook 8_ios_config_before.yml:
 ```
 $ ansible-playbook 8_ios_config_before.yml -v
 ```
-![6g_ios_config_before]({{ book.ansible_img_path }}6g_ios_config_before.png)
+![6g_ios_config_before](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6g_ios_config_before.png)
 
 #VSLIDE
 ### before
@@ -2494,7 +2494,7 @@ $ ansible-playbook 8_ios_config_before.yml -v
 ```
 $ ansible-playbook 8_ios_config_before.yml -v
 ```
-![6g_ios_config_before_no_updates]({{ book.ansible_img_path }}6g_ios_config_before_no_updates.png)
+![6g_ios_config_before_no_updates](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6g_ios_config_before_no_updates.png)
 
 
 #HSLIDE
@@ -2557,7 +2557,7 @@ ip access-list extended IN_to_OUT
 ```
 $ ansible-playbook 9_ios_config_match_line.yml -v
 ```
-![6h_ios_config_match_line]({{ book.ansible_img_path }}6h_ios_config_match_line.png)
+![6h_ios_config_match_line](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6h_ios_config_match_line.png)
 
 
 #VSLIDE
@@ -2627,7 +2627,7 @@ Playbook 9_ios_config_match_exact.yml (будет постепенно допо�
 ```
 $ ansible-playbook 9_ios_config_match_exact.yml -v
 ```
-![6h_ios_config_match_exact]({{ book.ansible_img_path }}6h_ios_config_match_exact_1.png)
+![6h_ios_config_match_exact](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6h_ios_config_match_exact_1.png)
 
 #VSLIDE
 ### match: exact
@@ -2692,7 +2692,7 @@ ip access-list extended IN_to_OUT
 ```
 $ ansible-playbook 9_ios_config_match_exact.yml -v
 ```
-![6h_ios_config_match_exact]({{ book.ansible_img_path }}6h_ios_config_match_exact_2.png)
+![6h_ios_config_match_exact](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6h_ios_config_match_exact_2.png)
 
 #VSLIDE
 ### match: exact
@@ -2747,7 +2747,7 @@ ip access-list extended IN_to_OUT
 ```
 $ ansible-playbook 9_ios_config_match_exact.yml -v
 ```
-![6h_ios_config_match_exact]({{ book.ansible_img_path }}6h_ios_config_match_exact_final.png)
+![6h_ios_config_match_exact](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6h_ios_config_match_exact_final.png)
 
 #VSLIDE
 ### match: exact
@@ -2818,7 +2818,7 @@ ip access-list extended IN_to_OUT
 ```
 $ ansible-playbook 9_ios_config_match_exact.yml -v
 ```
-![6h_ios_config_match_exact]({{ book.ansible_img_path }}6h_ios_config_match_exact_final_2.png)
+![6h_ios_config_match_exact](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6h_ios_config_match_exact_final_2.png)
 
 #VSLIDE
 ### match: exact
@@ -2878,7 +2878,7 @@ Playbook 9_ios_config_match_strict.yml:
 ```
 $ ansible-playbook 9_ios_config_match_strict.yml -v
 ```
-![6h_ios_config_match_strict]({{ book.ansible_img_path }}6h_ios_config_match_strict.png)
+![6h_ios_config_match_strict](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6h_ios_config_match_strict.png)
 
 #VSLIDE
 ### match: strict
@@ -2926,7 +2926,7 @@ $ ansible-playbook 9_ios_config_match_strict.yml -v
 ```
 $ ansible-playbook 9_ios_config_match_none.yml -v
 ```
-![6h_ios_config_match_none]({{ book.ansible_img_path }}6h_ios_config_match_none.png)
+![6h_ios_config_match_none](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6h_ios_config_match_none.png)
 
 
 Использование ```match: none``` подходит в тех случаях, когда, независимо от текущей конфигурации, нужно отправить все команды.
@@ -2991,7 +2991,7 @@ ip access-list extended IN_to_OUT
 ```
 $ ansible-playbook 10_ios_config_replace_line.yml -v
 ```
-![6i_ios_config_replace_line]({{ book.ansible_img_path }}6i_ios_config_replace_line.png)
+![6i_ios_config_replace_line](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6i_ios_config_replace_line.png)
 
 #VSLIDE
 ### replace: line
@@ -3064,7 +3064,7 @@ Playbook 10_ios_config_replace_block.yml:
 ```
 $ ansible-playbook 10_ios_config_replace_block.yml -v
 ```
-![6i_ios_config_replace_block]({{ book.ansible_img_path }}6i_ios_config_replace_block.png)
+![6i_ios_config_replace_block](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6i_ios_config_replace_block.png)
 
 #VSLIDE
 ### replace: block
@@ -3126,7 +3126,7 @@ ip access-list extended IN_to_OUT
 ```
 $ ansible-playbook 11_ios_config_src.yml -v
 ```
-![6j_ios_config_src]({{ book.ansible_img_path }}6j_ios_config_src.png)
+![6j_ios_config_src](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6j_ios_config_src.png)
 
 #VSLIDE
 ### src
@@ -3154,7 +3154,7 @@ ip access-list extended IN_to_OUT
 ```
 $ ansible-playbook 11_ios_config_src.yml -v
 ```
-![6j_ios_config_src_2]({{ book.ansible_img_path }}6j_ios_config_src_2.png)
+![6j_ios_config_src_2](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6j_ios_config_src_2.png)
 
 
 #VSLIDE
@@ -3253,7 +3253,7 @@ ospf_ints:
 ```
 $ ansible-playbook 11_ios_config_src_jinja.yml -v
 ```
-![6j_ios_config_src_jinja]({{ book.ansible_img_path }}6j_ios_config_src_jinja.png)
+![6j_ios_config_src_jinja](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6j_ios_config_src_jinja.png)
 
 
 #VSLIDE
@@ -3295,7 +3295,7 @@ router ospf 1
 ```
 $ ansible-playbook 11_ios_config_src_jinja.yml -v
 ```
-![6j_ios_config_src_jinja_2]({{ book.ansible_img_path }}6j_ios_config_src_jinja_2.png)
+![6j_ios_config_src_jinja_2](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6j_ios_config_src_jinja_2.png)
 
 #VSLIDE
 ### Совмещение с другими параметрами
@@ -3427,7 +3427,7 @@ $ ansible-playbook 1_ntc-ansible.yml
 #VSLIDE
 ### ntc_show_command
 
-![Ansible playbook]({{ book.ansible_img_path }}7_ntc_ansible.png)
+![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/7_ntc_ansible.png)
 
 
 #VSLIDE
@@ -3495,7 +3495,7 @@ $ ansible-playbook 2_ntc-ansible_save.yml
 #VSLIDE
 ### Сохранение результатов выполнения команды
 
-![Ansible playbook]({{ book.ansible_img_path }}7a_ntc_ansible_save.png)
+![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/7a_ntc_ansible_save.png)
 
 #VSLIDE
 ### Сохранение результатов выполнения команды
