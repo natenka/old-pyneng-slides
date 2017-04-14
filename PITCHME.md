@@ -1816,3 +1816,127 @@ $ ansible-playbook 3_ios_facts.yml --diff --limit=192.168.100.1
 #VSLIDE
 
 ![5a_ios_facts](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/5a_ios_facts_diff.png)
+
+#HSLIDE
+## Модуль ios_config
+
+Модуль ios_config - позволяет настраивать устройства под управлением IOS, а также, генерировать шаблоны конфигураций или отправлять команды на основании шаблона.
+
+#VSLIDE
+## Модуль ios_config
+
+Параметры модуля:
+* __after__ - какие действия выполнить после команд
+* __before__ - какие действия выполнить до команд
+* __backup__ - параметр, который указывает нужно ли делать резервную копию текущей конфигурации устройства перед внесением изменений. Файл будет копироваться в каталог backup, относительно каталога в котором находится playbook
+* __config__ - параметр, который позволяет указать базовый файл конфигурации, с которым будут сравниваться изменения. Если он указан, модуль не будет скачивать конфигурацию с устройства.
+
+#VSLIDE
+## Модуль ios_config
+
+* __defaults__ - параметр указывает нужно ли собирать всю информацию с устройства, в том числе, и значения по умолчанию. Если включить этот параметр, то модуль будет собирать текущую кофигурацию с помощью команды sh run all. По умолчанию этот параметр отключен и конфигурация проверяется командой sh run
+* __lines (commands)__ - список команд, которые должны быть настроены. Команды нужно указывать без сокращений и ровно в том виде, в котором они будут в конфигурации.
+* __match__ - параметр указывает как именно нужно сравнивать команды
+
+#VSLIDE
+## Модуль ios_config
+
+* __parents__ - название секции, в которой нужно применить команды. Если команда находится внутри вложенной секции, нужно указывать весь путь. Если этот параметр не указан, то считается, что команда должны быть в глобальном режиме конфигурации
+* __replace__ - параметр указывает как выполнять настройку устройства
+* __save__ - сохранять ли текущую конфигурацию в стартовую. По умолчанию конфигурация не сохраняется
+* __src__ - параметр указывает путь к файлу, в котором находится конфигурация или шаблон конфигурации. Взаимоисключающий параметр с lines (то есть, можно указывать или lines или src). Заменяет модуль ios_template, который скоро будет удален.
+
+#HSLIDE
+## lines (commands)
+
+Самый простой способ использовать модуль ios_config - отправлять команды глобального конфигурационного режима с параметром lines.
+
+Для параметра lines есть alias commands, то есть, можно вместо lines писать commands.
+
+#VSLIDE
+## lines (commands)
+
+Пример playbook 1_ios_config_lines.yml:
+```yml
+- name: Run cfg commands on routers
+  hosts: cisco-routers
+  gather_facts: false
+  connection: local
+
+  tasks:
+
+    - name: Config password encryption
+      ios_config:
+        lines:
+          - service password-encryption
+        provider: "{{ cli }}"
+```
+
+#VSLIDE
+## lines (commands)
+
+Результат выполнения playbook:
+```
+$ ansible-playbook 1_ios_config_lines.yml
+```
+
+#VSLIDE
+## lines (commands)
+
+![6_ios_config_lines]({{ book.ansible_img_path }}6_ios_config_lines.png)
+
+#VSLIDE
+## lines (commands)
+
+Ansible выполняет такие команды:
+* terminal length 0
+* enable
+* show running-config - чтобы проверить есть ли эта команда на устройстве. Если команда есть, задача выполняться не будет. Если команды нет, задача выполнится
+* если команды, которая указана в задаче нет в конфигурации:
+ * configure terminal
+ * service password-encryption
+ * end
+
+#VSLIDE
+## lines (commands)
+
+Так как модуль каждый раз проверяет конфигурацию, прежде чем применит команду, модуль идемпотентен.
+То есть, если ещё раз запустить playbook, изменения не будут выполнены:
+```
+$ ansible-playbook 1_ios_config_lines.yml
+```
+
+![6_ios_config_lines]({{ book.ansible_img_path }}6_ios_config_lines_2.png)
+
+#VSLIDE
+## lines (commands)
+
+Параметр lines позволяет отправлять и несколько команд (playbook 1_ios_config_mult_lines.yml):
+```
+- name: Run cfg commands on routers
+  hosts: cisco-routers
+  gather_facts: false
+  connection: local
+
+  tasks:
+
+    - name: Send config commands
+      ios_config:
+        lines:
+          - service password-encryption
+          - no ip http server
+          - no ip http secure-server
+          - no ip domain lookup
+        provider: "{{ cli }}"
+```
+
+#VSLIDE
+## lines (commands)
+
+Результат выполнения:
+```
+$ ansible-playbook 1_ios_config_mult_lines.yml
+```
+
+![6_ios_config_mult_lines]({{ book.ansible_img_path }}6_ios_config_mult_lines.png)
+
