@@ -1820,7 +1820,7 @@ $ ansible-playbook 3_ios_facts.yml --diff --limit=192.168.100.1
 ![5a_ios_facts](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/5a_ios_facts_diff.png)
 
 #HSLIDE
-### Модуль ios_config
+## Модуль ios_config
 
 #VSLIDE
 ### Модуль ios_config
@@ -1889,9 +1889,6 @@ $ ansible-playbook 3_ios_facts.yml --diff --limit=192.168.100.1
 $ ansible-playbook 1_ios_config_lines.yml
 ```
 
-#VSLIDE
-## lines (commands)
-
 ![6_ios_config_lines](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6_ios_config_lines.png)
 
 #VSLIDE
@@ -1950,6 +1947,10 @@ $ ansible-playbook 1_ios_config_mult_lines.yml
 ![6_ios_config_mult_lines](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6_ios_config_mult_lines.png)
 
 #HSLIDE
+### Модуль ios_config
+### Параметр parents
+
+#VSLIDE
 ### parents
 
 Параметр parents используется, чтобы указать в каком подрежиме применить команды.
@@ -2028,8 +2029,8 @@ policy-map OUT_QOS
         provider: "{{ cli }}"
 ```
 
-
 #HSLIDE
+### Модуль ios_config
 ### Отображение обновлений
 
 #VSLIDE
@@ -2142,7 +2143,8 @@ $ ansible-playbook 3_ios_config_debug.yml
 Теперь второе задание отображает информацию о том, какие именно изменения были внесены на маршрутизаторе.
 
 #HSLIDE
-## save
+### Модуль ios_config
+### Параметр save
 
 #VSLIDE
 ### save
@@ -2209,7 +2211,8 @@ $ ansible-playbook 4_ios_config_save.yml
 ![6c_ios_config_save](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6c_ios_config_save_2.png)
 
 #HSLIDE
-## backup
+### Модуль ios_config
+### Параметр backup
 
 #VSLIDE
 ### backup
@@ -2261,7 +2264,8 @@ $ ansible-playbook 5_ios_config_backup.yml -v
 ```
 
 #HSLIDE
-## defaults
+### Модуль ios_config
+### Параметр defaults
 
 #VSLIDE
 ### defaults
@@ -2337,7 +2341,8 @@ $ ansible-playbook 6_ios_config_defaults.yml
 ![6e_ios_config_default](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/6e_ios_config_defaults.png)
 
 #HSLIDE
-## after
+### Модуль ios_config
+### Параметр after
 
 #VSLIDE
 ### after
@@ -2436,7 +2441,8 @@ $ ansible-playbook 7_ios_config_after_save.yml -v
 
 
 #HSLIDE
-## before
+### Модуль ios_config
+### Параметр before
 
 #VSLIDE
 ### before
@@ -2507,7 +2513,8 @@ $ ansible-playbook 8_ios_config_before.yml -v
 
 
 #HSLIDE
-## match
+### Модуль ios_config
+### Параметр match
 
 #VSLIDE
 ### match
@@ -2943,7 +2950,8 @@ $ ansible-playbook 9_ios_config_match_none.yml -v
 
 
 #HSLIDE
-## replace
+### Модуль ios_config
+### Параметр replace
 
 #VSLIDE
 ### replace
@@ -3089,7 +3097,8 @@ ip access-list extended IN_to_OUT
 ```
 
 #HSLIDE
-## src
+### Модуль ios_config
+### Параметр src
 
 #VSLIDE
 ### src
@@ -3316,7 +3325,8 @@ $ ansible-playbook 11_ios_config_src_jinja.yml -v
 * save (но у самого save в Ansible 2.2 проблемы с работой) 
 
 #HSLIDE
-## ntc-ansible
+### Модуль ios_config
+### Параметр ntc-ansible
 
 #VSLIDE
 ### ntc-ansible
