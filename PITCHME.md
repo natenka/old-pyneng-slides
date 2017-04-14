@@ -1615,8 +1615,6 @@ Ansible собирает такие факты:
 $ ansible-playbook 1_ios_facts.yml
 ```
 
-#VSLIDE
-
 ![5_ios_facts](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/5_ios_facts.png)
 
 
@@ -1628,8 +1626,6 @@ $ ansible-playbook 1_ios_facts.yml
 $ ansible-playbook 1_ios_facts.yml -v
 Using /home/nata/pyneng_course/chapter15/ansible.cfg as config file
 ```
-
-#VSLIDE
 
 ![5_ios_facts](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/5_ios_facts_verbose.png)
 
@@ -1686,7 +1682,7 @@ $ ansible-playbook 2_ios_facts_debug.yml
 #VSLIDE
 ### Сохранение фактов
 
-Playbook 3_ios_facts.yml собирает всю информацию об устройствах и записывает в разные файлы (создайте каталог all_facts перед запуском playbook или раскомментируйте задачу Create all_facts dir и Ansible создаст каталог сам):
+Playbook 3_ios_facts.yml:
 ```
 - name: Collect IOS facts
   hosts: cisco-routers
@@ -1745,14 +1741,11 @@ Playbook 3_ios_facts.yml собирает всю информацию об ус�
 
 
 #VSLIDE
-### Сохранение фактов
 
 Результат выполнения playbook:
 ```
 $ ansible-playbook 3_ios_facts.yml
 ```
-
-#VSLIDE
 
 ![5a_ios_facts](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/5a_ios_facts.png)
 
@@ -1798,6 +1791,8 @@ $ ansible-playbook 3_ios_facts.yml
 Если информация изменилась, для соответствующего устройства, будет выставлен статус changed.
 Таким образом, по выполнению playbook всегда понятно, когда какая-то информация изменилась.
 
+#VSLIDE
+
 Повторный запуск playbook (без изменений):
 ```
 $ ansible-playbook 3_ios_facts.yml
@@ -1821,6 +1816,3 @@ $ ansible-playbook 3_ios_facts.yml --diff --limit=192.168.100.1
 #VSLIDE
 
 ![5a_ios_facts](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/5a_ios_facts_diff.png)
-
-В этом выводе видно не только то, что были внесены изменения, но то, на каком устройстве и какие именно изменения.
-
