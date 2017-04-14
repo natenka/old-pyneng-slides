@@ -3400,14 +3400,14 @@ pip install ntc-ansible
 #VSLIDE
 ### ntc_show_command
 
-Как и с предыдущими сетевыми модулями, в ntc-ansible нужно указывать ряд параметров для подключения:
+Параметры для подключения:
 * __connection__ - тут возможны два варианта: ssh (подключение netmiko) или offline (чтение из файла для тестовых целей)
 * __platform__ - платформа, которая существует в index файле (library/ntc-ansible/ntc-templates/templates/index)
 * __command__ - команда, которую нужно выполнить на устройстве
 * __host__ - IP-адрес или имя устройства
 * __username__ - имя пользователя
 * __password__ - пароль
-* __template_dir__ - путь к каталогу в котором находятся шаблоны (в текущем варианте установки они находятся в каталоге library/ntc-ansible/ntc-templates/templates
+* __template_dir__ - путь к каталогу с шаблонами (library/ntc-ansible/ntc-templates/templates
 
 #VSLIDE
 ### ntc_show_command
@@ -3444,7 +3444,6 @@ $ ansible-playbook 1_ntc-ansible.yml
 ```
 
 #VSLIDE
-### ntc_show_command
 
 ![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/7_ntc_ansible.png)
 
@@ -3473,9 +3472,6 @@ Start
 ```
 
 #VSLIDE
-### Сохранение результатов выполнения команды
-
-Для того, чтобы сохранить вывод, можно использовать тот же прием, который использовался для модуля ios_facts.
 
 Пример playbook 2_ntc_ansible_save.yml с сохранением результатов команды:
 ```
@@ -3519,7 +3515,7 @@ $ ansible-playbook 2_ntc-ansible_save.yml
 #VSLIDE
 ### Сохранение результатов выполнения команды
 
-В результате, в каталоге all_facts повяляются соответствующие файлы для каждого маршрутизатора.
+В результате, в каталоге all_facts появляются соответствующие файлы для каждого маршрутизатора.
 Пример файла all_facts/192.168.100.1_sh_ip_int_br.json:
 ```
 [
@@ -3541,19 +3537,7 @@ $ ansible-playbook 2_ntc-ansible_save.yml
         "proto": "down",
         "status": "administratively down"
     },
-    {
-        "intf": "Ethernet0/3",
-        "ipaddr": "unassigned",
-        "proto": "up",
-        "status": "up"
-    },
-    {
-        "intf": "Loopback0",
-        "ipaddr": "10.1.1.1",
-        "proto": "up",
-        "status": "up"
-    }
-]
+...
 ```
 
 #VSLIDE
