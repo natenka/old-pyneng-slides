@@ -1408,7 +1408,6 @@ $ ansible-playbook 1_ios_command.yml
 ```
 
 #VSLIDE
-### Модуль ios_command
 
 ![ios_command](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/2_ios_command.png)
 
@@ -1446,7 +1445,6 @@ $ ansible-playbook 2_ios_command.yml
 ```
 
 #VSLIDE
-### Выполнение нескольких команд
 
 ![ios_command](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/2a_ios_command.png)
 
@@ -1477,6 +1475,9 @@ $ ansible-playbook 2_ios_command.yml
 ### Обработка ошибок
 
 ![ios_command](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/2_ios_command-fail.png)
+
+#VSLIDE
+### Обработка ошибок
 
 Ansible обнаружил ошибку и возвращает сообщение ошибки.
 В данном случае - 'Invalid input'.
