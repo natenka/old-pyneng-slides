@@ -5,7 +5,7 @@
 #HSLIDE
 ## Преподаватель
 
-#HSLIDE
+#VSLIDE
 ## Наташа Самойленко:
 
 ![automate](https://raw.githubusercontent.com/natenka/pyneng-slides/course_intro/images/course_intro/automate.jpg)
