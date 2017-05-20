@@ -135,3 +135,5 @@
 #VSLIDE
 ### Задания
 
+![task_schedule](https://raw.githubusercontent.com/natenka/pyneng-slides/course_intro/images/course_intro/task_schedule.png)
+
