@@ -189,8 +189,6 @@
 #VSLIDE
 ### Remember to have fun :)
 
-![fun](http://katerawlings.com/wp-content/uploads/2014/01/remember-to-have-fun.jpg)
-
 #VSLIDE
 ### Выполняйте задания
 
