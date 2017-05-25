@@ -22,3 +22,19 @@
 * распределенная система контроля версий
 * широко используется
 * выпущен под лицензией GNU GPL v2
+
+#VSLIDE
+### Git
+
+![stream of snapshots](https://git-scm.com/figures/18333fig0105-tn.png)
+
+#VSLIDE
+### Git
+
+Файл в Git может быть в таких состояниях:
+
+* committed
+* modified
+* staged
+зафиксированном (committed), изменённом (modified) и подготовленном (staged)
+
