@@ -4,6 +4,10 @@
 #HSLIDE
 ## Инструменты курса
 
+* [Slack](https://pyneng.slack.com) - общение, вопросы
+* [Git, GitHub](https://github.com/pyneng) - хранение заданий, проверка заданий
+* [Cloud 9](https://c9.io/) - виртуальная среда для выполнения заданий
+
 #HSLIDE
 ### Git
 
