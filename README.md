@@ -2,6 +2,7 @@
 
 Презентации к курсу ["Python для сетевых инженеров"](https://www.gitbook.com/book/natenka/pyneng/details):
 * [Введение](https://gitpitch.com/natenka/pyneng-slides/course_intro)
+* [Инструменты](https://gitpitch.com/natenka/pyneng-slides/course_tools)
 * [Основы Python](https://gitpitch.com/natenka/pyneng-slides):
   * Типы данных в Python
   * Создание базовых скриптов
