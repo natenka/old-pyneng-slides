@@ -16,3 +16,12 @@
 * [Jinja2](https://gitpitch.com/natenka/pyneng-slides/jinja2)
 * [TextFSM](https://gitpitch.com/natenka/pyneng-slides/textfsm)
 * [Ansible](https://gitpitch.com/natenka/pyneng-slides/ansible)
+
+
+# pyneng-slides Python 3.6
+* [Введение](https://gitpitch.com/natenka/pyneng-slides/course_intro)
+* [Основы Python](https://gitpitch.com/natenka/pyneng-slides/python3-basics):
+  * Типы данных в Python
+  * Создание базовых скриптов
+  * Контроль хода программы
+  * Работа с файлами
