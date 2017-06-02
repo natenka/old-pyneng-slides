@@ -99,7 +99,7 @@ In [5]: for i in range(5):
 
 ### Интерпретатор IPython
 
-Оператор print()
+Функция print()
 ```python
 In [6]: print( 'Hello!' )
 Hello!
@@ -143,26 +143,26 @@ if a > b:
 
 ```python
 In [1]: help(str)
-Help on class str in module __builtin__:
+Help on class str in module builtins:
 
-class str(basestring)
- |  str(object='') -> string
+class str(object)
+ |  str(object='') -> str
+ |  str(bytes_or_buffer[, encoding[, errors]]) -> str
  |
- |  Return a nice string representation of the object.
- |  If the argument is a string, the return value is the same object.
- |
+ |  Create a new string object from the given object. If encoding or
+ |  errors is specified, then the object must expose a data buffer
+ |  that will be decoded using the given encoding and error handler.
 ...
 
 In [2]: help(str.strip)
 Help on method_descriptor:
 
 strip(...)
-    S.strip([chars]) -> string or unicode
+    S.strip([chars]) -> str
 
     Return a copy of the string S with leading and trailing
     whitespace removed.
     If chars is given and not None, remove characters in chars instead.
-    If chars is unicode, S will be converted to unicode before stripping
 ```
 
 #VSLIDE
@@ -171,21 +171,27 @@ strip(...)
 
 ```python
 In [3]: ?str
+Init signature: str(self, /, *args, **kwargs)
 Docstring:
-str(object='') -> string
+str(object='') -> str
+str(bytes_or_buffer[, encoding[, errors]]) -> str
 
-Return a nice string representation of the object.
-If the argument is a string, the return value is the same object.
-Type:      type
+Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.__str__() (if defined)
+or repr(object).
+encoding defaults to sys.getdefaultencoding().
+errors defaults to 'strict'.
+Type:           type
 
 In [4]: ?str.strip
 Docstring:
-S.strip([chars]) -> string or unicode
+S.strip([chars]) -> str
 
 Return a copy of the string S with leading and trailing
 whitespace removed.
 If chars is given and not None, remove characters in chars instead.
-If chars is unicode, S will be converted to unicode before stripping
 Type:      method_descriptor
 ```
 
@@ -324,23 +330,14 @@ Out[4]: 8
 
 ###Числа
 
-Отличия деления int и float:
+Деление int и float:
 ```python
 In [5]: 10/3
-Out[5]: 3
+Out[5]: 3.3333333333333335
 
 In [6]: 10/3.0
 Out[6]: 3.3333333333333335
 
-In [7]: 10 / float(3)
-Out[7]: 3.3333333333333335
-
-In [8]: float(10) / 3
-Out[8]: 3.3333333333333335
-```
-
-Функция ```round()```:
-```python
 In [9]: round(10/3.0, 2)
 Out[9]: 3.33
 
