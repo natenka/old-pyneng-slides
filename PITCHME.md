@@ -1086,6 +1086,38 @@ None
 In [20]: print(london.get('IOS', 'Ooops'))
 Ooops
 ```
+#VSLIDE
+
+Метод __setdefault()__ ищет ключ и, если его нет, вместо ошибки, создает ключ со значением ```None```.
+```python
+In [21]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
+
+In [22]: IOS = london.setdefault('IOS')
+
+In [23]: print(IOS)
+None
+
+In [24]: london
+Out[24]: {'IOS': None, 'location': 'London Str', 'name': 'London1', 'vendor': 'Cisco'}
+```
+
+#VSLIDE
+
+Второй аргумент позволяет указать, какое значение должно соответствовать ключу:
+```python
+In [25]: Model = london.setdefault('Model', 'Cisco3580')
+
+In [26]: print(Model)
+Cisco3580
+
+In [27]: london
+Out[27]:
+{'IOS': None,
+ 'Model': 'Cisco3580',
+ 'location': 'London Str',
+ 'name': 'London1',
+ 'vendor': 'Cisco'}
+```
 
 #VSLIDE
 
