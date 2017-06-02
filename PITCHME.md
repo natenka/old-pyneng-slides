@@ -987,13 +987,30 @@ Out[9]: '10.255.0.101'
 In [24]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
 
 In [25]: london.keys()
-Out[25]: ['vendor', 'name', 'location']
+Out[25]: dict_keys(['name', 'location', 'vendor'])
 
 In [26]: london.values()
-Out[26]: ['Cisco', 'London1', 'London Str']
+Out[26]: dict_values(['London1', 'London Str', 'Cisco'])
 
 In [27]: london.items()
-Out[27]: [('vendor', 'Cisco'), ('name', 'London1'), ('location', 'London Str')]
+Out[27]: dict_items([('name', 'London1'), ('location', 'London Str'), ('vendor', 'Cisco')])
+
+```
+
+#VSLIDE
+
+```python
+In [28]: london = {'name': 'London1', 'location': 'London Str', 'vendor': 'Cisco'}
+
+In [29]: keys = london.keys()
+
+In [30]: print(keys)
+dict_keys(['name', 'location', 'vendor'])
+
+In [31]: london['ip'] = '10.1.1.1'
+
+In [32]: keys
+Out[32]: dict_keys(['name', 'location', 'vendor', 'ip'])
 ```
 
 #VSLIDE
