@@ -1371,7 +1371,7 @@ In [8]: set2
 Out[8]: {100, 101, 102, 103, 104, 105, 106, 107, 108, 109}
 
 In [9]: print(set2)
-set([100, 101, 102, 103, 104, 105, 106, 107, 108, 109])
+{100, 101, 102, 103, 104, 105, 106, 107, 108, 109}
 ```
 
 #HSLIDE
@@ -1486,7 +1486,7 @@ Out[18]: '10,20,30,40'
 
 #VSLIDE
 
-В Python такие методы есть. Например, чтобы проверить состоит ли строка из одних цифр, можно использовать метод ```isdigit()```:
+Чтобы проверить состоит ли строка из одних цифр, можно использовать метод ```isdigit()```:
 ```python
 In [2]: "a".isdigit()
 Out[2]: False
@@ -1577,13 +1577,13 @@ Out[17]: False
 # -*- coding: utf-8 -*-
 
 access_template = ['switchport mode access',
-                   'switchport access vlan %d',
+                   'switchport access vlan {}',
                    'switchport nonegotiate',
                    'spanning-tree portfast',
                    'spanning-tree bpduguard enable']
 
 print("Конфигурация интерфейса в режиме access:")
-print('\n'.join(access_template) % 5)
+print('\n'.join(access_template).format(5))
 ```
 
 #VSLIDE
@@ -1597,13 +1597,13 @@ from sys import argv
 interface, vlan = argv[1:]
 
 access_template = ['switchport mode access',
-                   'switchport access vlan %d',
+                   'switchport access vlan {}',
                    'switchport nonegotiate',
                    'spanning-tree portfast',
                    'spanning-tree bpduguard enable']
 
-print('interface %s' % interface)
-print('\n'.join(access_template) % int(vlan))
+print('interface {}'.format(interface))
+print('\n'.join(access_template).format(vlan))
 ```
 
 #VSLIDE
@@ -1632,18 +1632,18 @@ spanning-tree bpduguard enable
 Файл access_template_raw_input.py:
 ```python
 
-interface = raw_input('Enter interface type and number: ')
-vlan = int(raw_input('Enter VLAN number: '))
+interface = input('Enter interface type and number: ')
+vlan = int(input('Enter VLAN number: '))
 
 access_template = ['switchport mode access',
-                   'switchport access vlan %d',
+                   'switchport access vlan {}',
                    'switchport nonegotiate',
                    'spanning-tree portfast',
                    'spanning-tree bpduguard enable']
 
 print('\n' + '-' * 30)
-print('interface %s' % interface)
-print('\n'.join(access_template) % vlan)
+print('interface {}'.format(interface))
+print('\n'.join(access_template).format(vlan))
 ```
 
 #VSLIDE
