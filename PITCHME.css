@@ -14,7 +14,7 @@
 }
 
 .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
-    font-family: Monaco, Arial, "Ubuntu Mono";
+    font-family: Consolas, Monaco, Arial, "Ubuntu Mono";
     text-align: center;
 }
 
