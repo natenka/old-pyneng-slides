@@ -1,17 +1,12 @@
 # Python для сетевых инженеров 
 
-
 #HSLIDE
 
-# Основы Python
-
-#HSLIDE
-
-## Контроль хода программы
+# Контроль хода программы
 
 #VSLIDE
 
-### if/elif/else
+## if/elif/else
 
 #VSLIDE
 
@@ -22,14 +17,15 @@
 ```python
 In [1]: a = 9
 
-In [2]: if a == 0:
-   ...:     print 'a равно 0'
+In [2]: if a == 10:
+   ...:     print('a равно 10')
    ...: elif a < 10:
-   ...:     print 'a меньше 10'
+   ...:     print('a меньше 10')
    ...: else:
-   ...:     print 'a больше 10'
+   ...:     print('a больше 10')
    ...:
 a меньше 10
+
 ```
 
 #VSLIDE
@@ -78,7 +74,7 @@ Out[11]: False
 In [12]: list_to_test = [1, 2, 3]
 
 In [13]: if list_to_test:
-   ....:     print "В списке есть объекты"
+   ....:     print("В списке есть объекты")
    ....:
 В списке есть объекты
 ```
@@ -86,7 +82,7 @@ In [13]: if list_to_test:
 Тот же результат можно было бы получить таким образом:
 ```python
 In [14]: if len(list_to_test) != 0:
-   ....:     print "В списке есть объекты"
+   ....:     print("В списке есть объекты")
    ....:
 В списке есть объекты
 ```
@@ -249,15 +245,11 @@ Out[31]: {}
 
 Важная особенность работы оператора ```or``` - операнды, которые находятся после истинного, не вычисляются:
 ```python
-In [32]: def print_str(string):
-   ....:     print string
-   ....:
+In [33]: '' or sorted([44,1,67])
+Out[33]: [1, 44, 67]
 
-In [33]: '' or print_str('test string')
-test string
-
-In [34]: '' or 'string1' or print_str('test string')
-Out[34]: 'string1'
+In [34]: '' or 'string' or sorted([44,1,67])
+Out[34]: 'string'
 ```
 
 
@@ -269,15 +261,15 @@ Out[34]: 'string1'
 ```python
 # -*- coding: utf-8 -*-
 
-username = raw_input('Введите имя пользователя: ' )
-password = raw_input('Введите пароль: ' )
+username = input('Введите имя пользователя: ' )
+password = input('Введите пароль: ' )
 
 if len(password) < 8:
-    print 'Пароль слишком короткий'
+    print('Пароль слишком короткий')
 elif username in password:
-    print 'Пароль содержит имя пользователя'
+    print('Пароль содержит имя пользователя')
 else:
-    print 'Пароль для пользователя %s установлен' % username
+    print('Пароль для пользователя {} установлен'.format(username))
 ```
 
 
@@ -323,8 +315,8 @@ $ python check_password.py
 * строка
 * список
 * словарь
-* функция ```range()``` или итератор ```xrange()```
-* любой другой итератор (например, ```sorted()```, ```enumerate()```)
+* итератор ```range()```
+* любой другой итератор (например, ```enumerate()```)
 
 #VSLIDE
 
@@ -332,7 +324,7 @@ $ python check_password.py
 
 ```python
 In [1]: for letter in 'Test string':
-   ...:     print letter
+   ...:     print(letter)
    ...:
 T
 e
@@ -352,8 +344,8 @@ g
 ### Пример цикла for
 
 ```python
-In [2]: for i in xrange(10):
-   ...:     print 'interface FastEthernet0/' + str(i)
+In [2]: for i in range(10):
+   ...:     print('interface FastEthernet0/{}'.format(i))
    ...:
 interface FastEthernet0/0
 interface FastEthernet0/1
@@ -374,8 +366,8 @@ interface FastEthernet0/9
 ```python
 In [3]: vlans = [10, 20, 30, 40, 100]
 In [4]: for vlan in vlans:
-   ...:     print 'vlan %d' % vlan
-   ...:     print ' name VLAN_%d' % vlan
+   ...:     print('vlan {}'.format(vlan))
+   ...:     print(' name VLAN_{}'.format(vlan))
    ...:
 vlan 10
  name VLAN_10
@@ -394,7 +386,7 @@ vlan 100
 
 ### Пример цикла for
 
-Когда цикл идет по словарю, то фактически он проходится по ключам:
+Когда цикл идет по словарю, он проходится по ключам:
 ```python
 In [5]: r1 = {
  'IOS': '15.4',
@@ -405,7 +397,7 @@ In [5]: r1 = {
  'vendor': 'Cisco'}
 
 In [6]: for k in r1:
-   ....:     print k
+   ....:     print(k)
    ....:
 vendor
 IP
@@ -423,7 +415,7 @@ model
 Если необходимо выводить пары ключ-значение в цикле:
 ```python
 In [7]: for key in r1:
-   ....:     print key + ' => ' + r1[key]
+   ....:     print(key + ' => ' + r1[key])
    ....:
 vendor => Cisco
 IP => 10.255.0.1
@@ -440,16 +432,11 @@ model => 4451
 В словаре есть специальный метод items, который позволяет проходится в цикле сразу по паре ключ, значение:
 ```python
 In [8]: r1.items()
-Out[8]:
-[('vendor', 'Cisco'),
- ('IP', '10.255.0.1'),
- ('hostname', 'london_r1'),
- ('IOS', '15.4'),
- ('location', '21 New Globe Walk'),
- ('model', '4451')]
+Out[8]: dict_items([('IOS', '15.4'), ('IP', '10.255.0.1'), ('hostname', 'london_r1'),
+('location', '21 New Globe Walk'), ('model', '4451'), ('vendor', 'Cisco')])
 
 In [9]: for key, value in r1.items():
-   ....:     print key + ' => ' + value
+   ....:     print(key + ' => ' + value)
    ....:
 vendor => Cisco
 IP => 10.255.0.1
@@ -468,9 +455,9 @@ In [7]: commands = ['switchport mode access', 'spanning-tree portfast', 'spannin
 In [8]: fast_int = ['0/1','0/3','0/4','0/7','0/9','0/10','0/11']
 
 In [9]: for intf in fast_int:
-   ...:     print 'interface FastEthernet ' + intf
+   ...:     print('interface FastEthernet {}'.format(intf))
    ...:     for command in commands:
-   ...:         print ' %s' % command
+   ...:         print(' {}'.format(command))
    ...:
 interface FastEthernet 0/1
  switchport mode access
@@ -498,18 +485,18 @@ access_template = ['switchport mode access',
                    'spanning-tree portfast',
                    'spanning-tree bpduguard enable']
 
-fast_int = {'access': { '0/12':'10',
-                        '0/14':'11',
-                        '0/16':'17',
-                        '0/17':'150'}}
+fast_int = {'access': { '0/12': 10,
+                        '0/14': 11,
+                        '0/16': 17,
+                        '0/17': 150 }}
 
 for intf in fast_int['access']:
-    print 'interface FastEthernet' + intf
+    print('interface FastEthernet' + intf)
     for command in access_template:
         if command.endswith('access vlan'):
-            print ' %s %s' % (command, fast_int['access'][intf])
+            print(' {} {}'.format( command, fast_int['access'][intf] ))
         else:
-            print ' %s' % command
+            print(' {}'.format( command ))
 ```
 
 #VSLIDE
@@ -550,7 +537,7 @@ interface FastEthernet0/16
 In [1]: list1 = ['str1', 'str2', 'str3']
 
 In [2]: for position, string in enumerate(list1):
-   ...:     print position, string
+   ...:     print(position, string)
    ...:
 0 str1
 1 str2
@@ -566,7 +553,7 @@ In [2]: for position, string in enumerate(list1):
 In [1]: list1 = ['str1', 'str2', 'str3']
 
 In [2]: for position, string in enumerate(list1, 100):
-   ...:     print position, string
+   ...:     print(position, string)
    ...:
 100 str1
 101 str2
@@ -595,7 +582,7 @@ In [2]: for position, string in enumerate(list1, 100):
 In [1]: a = 5
 
 In [2]: while a > 0:
-   ...:     print a
+   ...:     print(a)
    ...:     a -= 1 # Эта запись равнозначна a = a - 1
    ...:
 5
@@ -613,23 +600,22 @@ In [2]: while a > 0:
 ```python
 # -*- coding: utf-8 -*-
 
-username = raw_input('Введите имя пользователя: ' )
-password = raw_input('Введите пароль: ' )
+username = input('Введите имя пользователя: ' )
+password = input('Введите пароль: ' )
 
 pass_OK = False
 
 while not pass_OK:
     if len(password) < 8:
-        print 'Пароль слишком короткий\n'
-        password = raw_input('Введите пароль еще раз: ' )
+        print('Пароль слишком короткий\n')
+        password = input('Введите пароль еще раз: ' )
     elif username in password:
-        print 'Пароль содержит имя пользователя\n'
-        password = raw_input('Введите пароль еще раз: ' )
+        print('Пароль содержит имя пользователя\n')
+        password = input('Введите пароль еще раз: ' )
     else:
-        print 'Пароль для пользователя %s установлен' % username
+        print('Пароль для пользователя {} установлен'.format( username ))
         pass_OK = True
 ```
-
 
 #VSLIDE
 
@@ -670,7 +656,7 @@ __Оператор break__ позволяет досрочно прервать 
 ```python
 In [1]: for num in range(10):
    ...:     if num < 7:
-   ...:         print num
+   ...:         print(num)
    ...:     else:
    ...:         break
    ...:
@@ -695,7 +681,7 @@ In [3]: while i < 10:
    ...:     if i == 5:
    ...:         break
    ...:     else:
-   ...:         print i
+   ...:         print(i)
    ...:         i += 1
    ...:
 0
@@ -713,18 +699,18 @@ In [3]: while i < 10:
 ```python
 # -*- coding: utf-8 -*-
 
-username = raw_input('Введите имя пользователя: ' )
-password = raw_input('Введите пароль: ' )
+username = input('Введите имя пользователя: ' )
+password = input('Введите пароль: ' )
 
 while True:
     if len(password) < 8:
-        print 'Пароль слишком короткий\n'
-        password = raw_input('Введите пароль еще раз: ' )
+        print('Пароль слишком короткий\n')
+        password = input('Введите пароль еще раз: ' )
     elif username in password:
-        print 'Пароль содержит имя пользователя\n'
-        password = raw_input('Введите пароль еще раз: ' )
+        print('Пароль содержит имя пользователя\n')
+        password = input('Введите пароль еще раз: ' )
     else:
-        print 'Пароль для пользователя %s установлен' % username
+        print('Пароль для пользователя {} установлен'.format( username ))
         break
 ```
 
@@ -745,7 +731,7 @@ In [4]: for num in range(5):
    ...:     if num == 3:
    ...:         continue
    ...:     else:
-   ...:         print num
+   ...:         print(num)
    ...:
 0
 1
@@ -763,11 +749,11 @@ In [5]: i = 0
 In [6]: while i < 6:
    ....:     i += 1
    ....:     if i == 3:
-   ....:         print "Пропускаем 3"
+   ....:         print("Пропускаем 3")
    ....:         continue
-   ....:         print "Это никто не увидит"
+   ....:         print("Это никто не увидит")
    ....:     else:
-   ....:         print "Текущее значение: ", i
+   ....:         print("Текущее значение: ", i)
    ....:
 Текущее значение:  1
 Текущее значение:  2
@@ -791,7 +777,7 @@ In [6]: for num in range(5):
    ....:     if num < 3:
    ....:         pass
    ....:     else:
-   ....:         print num
+   ....:         print(num)
    ....:
 3
 4
@@ -810,11 +796,11 @@ In [6]: for num in range(5):
 ```python
 In [1]: 2/0
 -----------------------------------------------------
-ZeroDivisionError: integer division or modulo by zero
+ZeroDivisionError: division by zero
 
 In [2]: 'test' + 2
 -----------------------------------------------------
-TypeError: cannot concatenate 'str' and 'int' objects
+TypeError: must be str, not int
 ```
 
 В данном случае, возникло два исключения: __ZeroDivisionError__ и __TypeError__.
@@ -829,7 +815,7 @@ TypeError: cannot concatenate 'str' and 'int' objects
 In [3]: try:
    ...:     2/0
    ...: except ZeroDivisionError:
-   ...:     print "You can't divide by zero"
+   ...:     print("You can't divide by zero")
    ...:
 You can't divide by zero
 ```
@@ -853,9 +839,9 @@ You can't divide by zero
 In [4]: try:
    ...:     print "Let's divide some numbers"
    ...:     2/0
-   ...:     print 'Cool!'
+   ...:     print('Cool!')
    ...: except ZeroDivisionError:
-   ...:     print "You can't divide by zero"
+   ...:     print("You can't divide by zero")
    ...:
 Let's divide some numbers
 You can't divide by zero
@@ -870,13 +856,13 @@ You can't divide by zero
 # -*- coding: utf-8 -*-
 
 try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
-    print "Результат: ", int(a)/int(b)
+    a = input("Введите первое число: ")
+    b = input("Введите второе число: ")
+    print("Результат: ", int(a)/int(b))
 except ValueError:
-    print "Пожалуйста, вводите только числа"
+    print("Пожалуйста, вводите только числа")
 except ZeroDivisionError:
-    print "На ноль делить нельзя"
+    print("На ноль делить нельзя")
 ```
 
 #VSLIDE
@@ -910,11 +896,11 @@ $ python divide.py
 # -*- coding: utf-8 -*-
 
 try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
-    print "Результат: ", int(a)/int(b)
+    a = input("Введите первое число: ")
+    b = input("Введите второе число: ")
+    print("Результат: ", int(a)/int(b))
 except (ValueError, ZeroDivisionError):
-    print "Что-то пошло не так..."
+    print("Что-то пошло не так...")
 ```
 
 Проверка:
@@ -940,13 +926,13 @@ $ python divide_ver2.py
 # -*- coding: utf-8 -*-
 
 try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
+    a = input("Введите первое число: ")
+    b = input("Введите второе число: ")
     result = int(a)/int(b)
 except (ValueError, ZeroDivisionError):
-    print "Что-то пошло не так..."
+    print("Что-то пошло не так...")
 else:
-    print "Результат в квадрате: ", result**2
+    print("Результат в квадрате: ", result**2)
 ```
 
 #VSLIDE
@@ -980,15 +966,15 @@ $ python divide_ver3.py
 # -*- coding: utf-8 -*-
 
 try:
-    a = raw_input("Введите первое число: ")
-    b = raw_input("Введите второе число: ")
+    a = input("Введите первое число: ")
+    b = input("Введите второе число: ")
     result = int(a)/int(b)
 except (ValueError, ZeroDivisionError):
-    print "Что-то пошло не так..."
+    print("Что-то пошло не так...")
 else:
-    print "Результат в квадрате: ", result**2
+    print("Результат в квадрате: ", result**2)
 finally:
-    print "Вот и сказочке конец, а кто слушал - молодец."
+    print("Вот и сказочке конец, а кто слушал - молодец.")
 ```
 
 #VSLIDE
@@ -1130,7 +1116,7 @@ Out[6]: 'service timestamps debug datetime msec localtime show-timezone year\n'
 In [7]: f = open('r1.txt')
 
 In [8]: for line in f:
-   ...:     print line
+   ...:     print(line)
    ...:
 !
 
@@ -1238,7 +1224,7 @@ Out[14]:
 ```python
 In [15]: f = open('r1.txt')
 
-In [16]: print f.read()
+In [16]: print(f.read())
 !
 service timestamps debug datetime msec localtime show-timezone year
 service timestamps log datetime msec localtime show-timezone year
@@ -1257,7 +1243,7 @@ ip ssh version 2
 
 Если вызывать ещё раз метод ```read```, возвращается пустая строка:
 ```python
-In [17]: print f.read()
+In [17]: print(f.read())
 ```
 
 Но, с помощью метода ```seek```, можно перейти в начало файла (0 означает начало файла):
@@ -1267,7 +1253,7 @@ In [18]: f.seek(0)
 
 После того, как, с помощью ```seek```, курсор был переведен в начало файла, можно опять считывать содержимое:
 ```python
-In [19]: print f.read()
+In [19]: print(f.read())
 !
 service timestamps debug datetime msec localtime show-timezone year
 service timestamps log datetime msec localtime show-timezone year
@@ -1478,7 +1464,7 @@ In [1]: f = open('r1.txt', 'r')
 
 Теперь можно считать содержимое:
 ```python
-In [2]: print f.read()
+In [2]: print(f.read())
 !
 service timestamps debug datetime msec localtime show-timezone year
 service timestamps log datetime msec localtime show-timezone year
@@ -1516,7 +1502,7 @@ Out[5]: True
 
 Если попробовать прочитать файл, возникнет исключение:
 ```python
-In [6]: print f.read()
+In [6]: print(f.read())
 ------------------------------------------------------------------
 ValueError                       Traceback (most recent call last)
 <ipython-input-53-2c962247edc5> in <module>()
@@ -1560,7 +1546,7 @@ IOError: [Errno 2] No such file or directory: 'r3.txt'
 In [8]: try:
   ....:     f = open('r3.txt', 'r')
   ....: except IOError:
-  ....:     print 'No such file'
+  ....:     print('No such file')
   ....:
 No such file
 ```
@@ -1574,9 +1560,9 @@ No such file
 ```python
 In [9]: try:
   ....:     f = open('r1.txt', 'r')
-  ....:     print f.read()
+  ....:     print(f.read())
   ....: except IOError:
-  ....:     print 'No such file'
+  ....:     print('No such file')
   ....: finally:
   ....:     f.close()
   ....:
@@ -1606,7 +1592,7 @@ Out[10]: True
 ```python
 In [1]: with open('r1.txt', 'r') as f:
   ....:     for line in f:
-  ....:         print line
+  ....:         print(line)
   ....:
 !
 
@@ -1636,7 +1622,7 @@ ip ssh version 2
 ```python
 In [2]: with open('r1.txt', 'r') as f:
   ....:     for line in f:
-  ....:         print line.rstrip()
+  ....:         print(line.rstrip())
   ....:
 !
 service timestamps debug datetime msec localtime show-timezone year
@@ -1661,7 +1647,7 @@ Out[3]: True
 С конструкцией ```with``` можно использовать не только такой построчный вариант считывания, все методы, которые рассматривались до этого, также работают:
 ```python
 In [4]: with open('r1.txt', 'r') as f:
-  ....:     print f.read()
+  ....:     print(f.read())
   ....:
 !
 service timestamps debug datetime msec localtime show-timezone year
