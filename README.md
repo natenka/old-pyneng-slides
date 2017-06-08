@@ -23,5 +23,6 @@
 * [Основы Python](https://gitpitch.com/natenka/pyneng-slides/python3-basics):
   * Типы данных в Python
   * Создание базовых скриптов
+* [Контроль хода программы. Работа с файлами](https://gitpitch.com/natenka/pyneng-slides/python3-control-structures)
   * Контроль хода программы
   * Работа с файлами
