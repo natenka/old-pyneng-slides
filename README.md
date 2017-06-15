@@ -26,3 +26,4 @@
 * [Контроль хода программы. Работа с файлами](https://gitpitch.com/natenka/pyneng-slides/python3-control-structures)
   * Контроль хода программы
   * Работа с файлами
+* [Функции](https://gitpitch.com/natenka/pyneng-slides/python3-functions)
