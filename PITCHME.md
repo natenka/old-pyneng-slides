@@ -177,13 +177,14 @@ def generate_access_cfg(sw_dict):
         result.append('interface FastEthernet' + intf)
         for command in sw_int_templates.access_template:
             if command.endswith('access vlan'):
-                result.append(' %s %s' % (command, sw_dict['access'][intf]))
+                result.append(' {} {}'.format(command,
+                                              sw_dict['access'][intf]))
             else:
-                result.append(' %s' % command)
+                result.append(' {}'.format(command))
     return result
 
 
-print '\n'.join(generate_access_cfg(sw1_fast_int))
+print('\n'.join(generate_access_cfg(sw1_fast_int)))
 
 ```
 
@@ -252,9 +253,9 @@ from generate_sw_int_cfg import generate_access_cfg
 from sw_cfg_templates import basic_cfg, lines_cfg
 
 
-print basic_cfg
-print '\n'.join(generate_access_cfg(sw1_fast_int))
-print lines_cfg
+print(basic_cfg)
+print('\n'.join(generate_access_cfg(sw1_fast_int)))
+print(lines_cfg)
 ```
 
 В результате, должны отобразиться такие части конфигурации, по порядку:
@@ -349,13 +350,13 @@ def generate_access_cfg(sw_dict):
         result.append('interface FastEthernet' + intf)
         for command in sw_int_templates.access_template:
             if command.endswith('access vlan'):
-                result.append(' %s %s' % (command, sw_dict['access'][intf]))
+                result.append(' {} {}'.format( command, sw_dict['access'][intf] ))
             else:
-                result.append(' %s' % command)
+                result.append(' {}'.format( command ))
     return result
 
 if __name__ == "__main__":
-    print '\n'.join(generate_access_cfg(sw1_fast_int))
+    print('\n'.join(generate_access_cfg(sw1_fast_int)))
 
 ```
 
@@ -365,7 +366,7 @@ if __name__ == "__main__":
 
 ```python
 if __name__ == "__main__":
-    print '\n'.join(generate_access_cfg(sw1_fast_int))
+    print('\n'.join(generate_access_cfg(sw1_fast_int)))
 ```
 
 Переменная ```__name__``` это специальная переменная, которая выставляется равной ```"__main__"```, если если файл запускается как основная программа.
@@ -464,7 +465,7 @@ book.json           exercises.zip
 
 В переменной result теперь содержится код возврата (код 0 означает, что программа выполнилась успешно):
 ```python
-In [3]: print result
+In [3]: print(result)
 0
 ```
 
@@ -573,9 +574,10 @@ import subprocess
 reply = subprocess.call(['ping', '-c', '3', '-n', '8.8.8.8'])
 
 if reply == 0:
-    print "Alive"
+    print("Alive")
 else:
-    print "Unreachable"
+    print("Unreachable")
+
 ```
 
 #VSLIDE
@@ -610,9 +612,10 @@ DNULL = open(os.devnull, 'w')
 reply = subprocess.call(['ping', '-c', '3', '-n', '8.8.8.8'], stdout=DNULL)
 
 if reply == 0:
-    print "Alive"
+    print("Alive")
 else:
-    print "Unreachable"
+    print("Unreachable")
+
 ```
 
 Теперь результат выполнения будет таким:
@@ -640,8 +643,9 @@ import subprocess
 
 reply = subprocess.check_output(['ping', '-c', '3', '-n', '8.8.8.8'])
 
-print "Result:"
-print reply
+print("Result:")
+print(reply.decode('utf-8'))
+
 ```
 
 #VSLIDE
@@ -667,13 +671,16 @@ round-trip min/avg/max/stddev = 49.785/52.696/57.231/3.250 ms
 Если выполнить команду, которая вызовет ошибку и, соответственно, код возрата будет не 0 (файл subprocess_check_output_catch_exception.py):
 ```python
 $ python subprocess_check_output_catch_exception.py
-ping: cannot resolve a: Unknown host
+ping: unknown host a
 Traceback (most recent call last):
   File "subprocess_check_output_catch_exception.py", line 3, in <module>
     reply = subprocess.check_output(['ping', '-c', '3', '-n', 'a'])
-  File "/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/subprocess.py", line 573, in check_output
-    raise CalledProcessError(retcode, cmd, output=output)
-subprocess.CalledProcessError: Command '['ping', '-c', '3', '-n', 'a']' returned non-zero exit status 68
+  File "/usr/local/lib/python3.6/subprocess.py", line 336, in check_output
+    **kwargs).stdout
+  File "/usr/local/lib/python3.6/subprocess.py", line 418, in run
+    output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['ping', '-c', '3', '-n', 'a']' returned non-zero exit status 2.
+
 ```
 
 #VSLIDE
@@ -688,8 +695,9 @@ import subprocess
 try:
     reply = subprocess.check_output(['ping', '-c', '3', '-n', 'a'])
 except subprocess.CalledProcessError as e:
-    print "Error occurred"
-    print "Return code:", e.returncode
+    print("Error occurred")
+    print("Return code:", e.returncode)
+
 ```
 
 #VSLIDE
@@ -698,9 +706,10 @@ except subprocess.CalledProcessError as e:
 Результат выполнения:
 ```
 $ python subprocess_check_output_catch_exception.py
-ping: cannot resolve a: Unknown host
+ping: unknown host a
 Error occurred
-Return code: 68
+Return code: 2
+
 ```
 
 Теперь программа завершилась корректно и вывела сообщение об ошибке и код возврата.
@@ -729,13 +738,14 @@ def ping_ip(ip_address):
         try:
             output = subprocess.check_output(['ping', '-c', '3', '-n', ip_address],
                                              stderr=temp)
-            return 0, output
+            return 0, output.decode('utf-8')
         except subprocess.CalledProcessError as e:
             temp.seek(0)
-            return e.returncode, temp.read()
+            return e.returncode, temp.read().decode('utf-8')
 
-print ping_ip('8.8.8.8')
-print ping_ip('a')
+print(ping_ip('8.8.8.8'))
+print(ping_ip('a'))
+
 ```
 
 #VSLIDE
@@ -745,9 +755,9 @@ print ping_ip('a')
 Результат выполнения будет таким:
 ```
 $ python subprocess_ping_function.py
-(0, 'PING 8.8.8.8 (8.8.8.8): 56 data bytes\n64 bytes from 8.8.8.8: icmp_seq=0 ttl=48 time=46.106 ms\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=48 time=46.114 ms\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=48 time=47.390 ms\n\n--- 8.8.8.8 ping statistics ---\n3 packets transmitted, 3 packets received, 0.0% packet loss\nround-trip min/avg/max/stddev = 46.106/46.537/47.390/0.603 ms\n')
+(0, 'PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=53.0 ms\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=57.5 ms\n64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=54.1 ms\n\n--- 8.8.8.8 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 2004ms\nrtt min/avg/max/mdev = 53.060/54.906/57.546/1.934 ms\n')
+(2, 'ping: unknown host a\n')
 
-(68, 'ping: cannot resolve a: Unknown host\n')
 ```
 
 #VSLIDE
@@ -770,8 +780,6 @@ $ python subprocess_ping_function.py
 
 Модуль ```os``` позволяет работать с файловой системой, с окружением, управлять процессами.
 
-В курсе рассматриваются лишь несколько полезных возможностей.
-За более полным описанием возможностей модуля, вы можете обратиться к [документации](https://docs.python.org/2/library/os.html) или [статье на сайте PyMOTW](https://pymotw.com/2/os/index.html).
 
 #VSLIDE
 
@@ -796,11 +804,12 @@ total 0
 ```python
 In [4]: os.mkdir('test')
 ---------------------------------------------------------------------------
-OSError                                   Traceback (most recent call last)
+FileExistsError                           Traceback (most recent call last)
 <ipython-input-4-cbf3b897c095> in <module>()
 ----> 1 os.mkdir('test')
 
-OSError: [Errno 17] File exists: 'test'
+FileExistsError: [Errno 17] File exists: 'test'
+
 ```
 
 В таком случае, пригодится проверка ```os.path.exists```:
@@ -881,7 +890,7 @@ import subprocess
 from tempfile import TemporaryFile
 import argparse
 
-def ping_ip(ip_address, count=3):
+def ping_ip(ip_address, count):
     """
     Ping IP address and return tuple:
     On success: (return code = 0, command output)
@@ -891,11 +900,13 @@ def ping_ip(ip_address, count=3):
         try:
             output = subprocess.check_output(['ping', '-c', str(count), '-n', ip_address],
                                              stderr=temp)
-            return 0, output
+            return 0, output.decode('utf-8')
         except subprocess.CalledProcessError as e:
             temp.seek(0)
-            return e.returncode, temp.read()
+            return e.returncode, temp.read().decode('utf-8')
+
 ```
+
 #VSLIDE
 
 ### Модуль argparse
@@ -909,10 +920,11 @@ parser.add_argument('-a', action="store", dest="ip")
 parser.add_argument('-c', action="store", dest="count", default=2, type=int)
 
 args = parser.parse_args()
-print args
+print(args)
 
 rc, message = ping_ip( args.ip, args.count )
-print message
+print(message)
+
 ```
 
 #VSLIDE
@@ -1000,13 +1012,15 @@ Traceback (most recent call last):
     rc, message = ping_ip( args.ip, args.count )
   File "ping_function.py", line 16, in ping_ip
     stderr=temp)
-  File "/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/subprocess.py", line 566, in check_output
-    process = Popen(stdout=PIPE, *popenargs, **kwargs)
-  File "/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/subprocess.py", line 710, in __init__
-    errread, errwrite)
-  File "/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/python2.7/subprocess.py", line 1335, in _execute_child
-    raise child_exception
-TypeError: execv() arg 2 must contain only strings
+  File "/usr/local/lib/python3.6/subprocess.py", line 336, in check_output
+    **kwargs).stdout
+  File "/usr/local/lib/python3.6/subprocess.py", line 403, in run
+    with Popen(*popenargs, **kwargs) as process:
+  File "/usr/local/lib/python3.6/subprocess.py", line 707, in __init__
+    restore_signals, start_new_session)
+  File "/usr/local/lib/python3.6/subprocess.py", line 1260, in _execute_child
+    restore_signals, start_new_session, preexec_fn)
+TypeError: expected str, bytes or os.PathLike object, not NoneType
 
 ```
 
@@ -1039,7 +1053,8 @@ parser.add_argument('-a', action="store", dest="ip", required=True)
 ```
 $ python ping_function.py
 usage: ping_function.py [-h] -a IP [-c COUNT]
-ping_function.py: error: argument -a is required
+ping_function.py: error: the following arguments are required: -a
+
 ```
 
 Теперь отображается понятное сообщение, что надо указать обязательный аргумент.
@@ -1078,7 +1093,6 @@ from tempfile import TemporaryFile
 
 import argparse
 
-
 def ping_ip(ip_address, count=3):
     """
     Ping IP address and return tuple:
@@ -1089,10 +1103,11 @@ def ping_ip(ip_address, count=3):
         try:
             output = subprocess.check_output(['ping', '-c', str(count), '-n', ip_address],
                                              stderr=temp)
-            return 0, output
+            return 0, output.decode('utf-8')
         except subprocess.CalledProcessError as e:
             temp.seek(0)
-            return e.returncode, temp.read()
+            return e.returncode, temp.read().decode('utf-8')
+
 ```
 #VSLIDE
 
@@ -1107,10 +1122,11 @@ parser.add_argument('-c', action="store", dest="count", default=2, type=int,
                     help="Number of packets")
 
 args = parser.parse_args()
-print args
+print(args)
 
 rc, message = ping_ip( args.host, args.count )
-print message
+print(message)
+
 ```
 
 #VSLIDE
@@ -1173,23 +1189,27 @@ DFLT_DB_NAME = 'dhcp_snooping.db'
 DFLT_DB_SCHEMA = 'dhcp_snooping_schema.sql'
 
 def create(args):
-    print "Creating DB %s with DB schema %s" % (args.name, args.schema)
+    print("Creating DB {} with DB schema {}".format((args.name, args.schema)))
+
 
 def add(args):
     if args.sw_true:
-        print "Adding switch data to database"
+        print("Adding switch data to database")
     else:
-        print "Reading info from file(s) \n%s" % ', '.join( args.filename )
-        print "\nAdding data to db %s" % args.db_file
+        print("Reading info from file(s) \n{}".format(', '.join(args.filename)))
+        print("\nAdding data to db {}".format(args.db_file))
+
 
 def get(args):
     if args.key and args.value:
-        print "Geting data from DB: %s" % args.db_file
-        print "Request data for host(s) with %s %s" % (args.key, args.value)
+        print("Geting data from DB: {}".format(args.db_file))
+        print("Request data for host(s) with {} {}".format((args.key, args.value)))
     elif args.key or args.value:
-        print "Please give two or zero args\n"
+        print("Please give two or zero args\n")
+        print(show_subparser_help('get'))
     else:
-        print "Showing %s content..." % args.db_file
+        print("Showing {} content...".format(args.db_file))
+
 ```
 
 #VSLIDE
@@ -1289,7 +1309,8 @@ create_parser.set_defaults( func=create )
 И, внутри функции, можно обращаться к нужным:
 ```python
 def create(args):
-    print "Creating DB %s with DB schema %s" % (args.name, args.schema)
+    print("Creating DB {} with DB schema {}".format((args.name, args.schema)))
+
 ```
 
 #VSLIDE
