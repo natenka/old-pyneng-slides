@@ -509,27 +509,6 @@ Out[2]:
  '!']
 ```
 
-#VSLIDE
-
-Если при вызове функции поменять аргументы местами, скорее всего, возникнет ошибка, в зависимости от конкретной функции.
-
-В случае с функцией cfg_to_list, получится такой результат:
-```python
-In [3]: cfg_to_list(False, 'r1.txt')
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-18-e6da7e2657eb> in <module>()
-----> 1 cfg_to_list(False, 'r1.txt')
-
-<ipython-input-15-21a013e5e92c> in cfg_to_list(cfg_file, delete_exclamation)
-      1 def cfg_to_list(cfg_file, delete_exclamation):
-      2     result = []
-----> 3     with open( cfg_file ) as f:
-      4         for line in f:
-      5             if delete_exclamation and line.startswith('!'):
-
-TypeError: coercing to Unicode: need string or buffer, bool found
-```
 
 #VSLIDE
 
@@ -561,9 +540,10 @@ __Сначала должны идти позиционные аргументы
 Если сделать наоборот, возникнет ошибка:
 ```python
 In [5]: cfg_to_list(delete_exclamation=False, 'r1.txt')
-  File "<ipython-input-19-5efdee7ce6dd>", line 1
+  File "<ipython-input-3-8f3a3aa16a22>", line 1
     cfg_to_list(delete_exclamation=False, 'r1.txt')
-SyntaxError: non-keyword arg after keyword arg
+                                         ^
+SyntaxError: positional argument follows keyword argument
 
 ```
 
@@ -685,9 +665,11 @@ In [11]: sum_arg(10,b=10,c=20,d=30)
 Out[11]: 70
 
 In [12]: sum_arg(b=10,c=20,d=30,10)
-  File "<ipython-input-6-71c121dc2cf7>", line 1
+  File "<ipython-input-14-71c121dc2cf7>", line 1
     sum_arg(b=10,c=20,d=30,10)
-SyntaxError: non-keyword arg after keyword arg
+                          ^
+SyntaxError: positional argument follows keyword argument
+
 ```
 
 
@@ -1049,6 +1031,22 @@ In [8]: sorted(list_of_words, key=len, reverse=True)
 Out[8]: ['list', 'dict', 'one', 'two', '']
 ```
 
+#VSLIDE
+### Функция sorted
+
+```
+In [18]: from operator import itemgetter
+
+In [19]: list_of_tuples = [
+    ...:  ('IT_VLAN', 320),
+    ...:  ('Mngmt_VLAN', 99),
+    ...:  ('User_VLAN', 1010),
+    ...:  ('DB_VLAN', 11)]
+
+In [20]: sorted(list_of_tuples, key=itemgetter(1))
+Out[20]: [('DB_VLAN', 11), ('Mngmt_VLAN', 99), ('IT_VLAN', 320), ('User_VLAN', 1010)]```
+
+
 #HSLIDE
 ## Анонимная функция lambda
 
@@ -1097,11 +1095,12 @@ Out[5]: 6
 
 Сортировка элементов с помощью lambda:
 ```
-list_of_lists = [['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
-                 ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
-                 ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
-                 ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
-                 ['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
+list_of_lists = [
+['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
+['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
+['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
+['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
+['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
 
 In [6]: sorted(list_of_lists)
 Out[6]:
@@ -1128,8 +1127,7 @@ Out[7]:
 
 Функция zip():
 * на вход функции передаются последовательности
-* zip() возвращает список кортежей, каждый из которых состоит из элементов
- * например, десятый кортеж будет содержать десятый элемент каждой из переданных последовательностей
+* zip() возвращает итератор с кортежами, в котором n-ый кортеж состоит из n-ых элементов последовательностей, которые были переданы как аргументы
  * если на вход были переданы последовательности разной длинны, то все они будут отрезаны по самой короткой последовательности
 * последовательность элементов соблюдается
 
@@ -1141,7 +1139,7 @@ In [1]: a = [1,2,3]
 
 In [2]: b = [100,200,300]
 
-In [3]: zip(a,b)
+In [3]: list(zip(a,b))
 Out[3]: [(1, 100), (2, 200), (3, 300)]
 ```
 
@@ -1151,7 +1149,7 @@ In [4]: a = [1,2,3,4,5]
 In [5]: b = [10,20,30,40,50]
 In [6]: c = [100,200,300]
 
-In [7]: zip(a,b,c)
+In [7]: list(zip(a,b,c))
 Out[7]: [(1, 10, 100), (2, 20, 200), (3, 30, 300)]
 ```
 
@@ -1162,7 +1160,7 @@ Out[7]: [(1, 10, 100), (2, 20, 200), (3, 30, 300)]
 In [8]: d_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
 In [8]: d_values = ['london_r1', '21 New Globe Walk', 'Cisco', '4451', '15.4', '10.255.0.1']
 
-In [9]: zip(d_keys,d_values)
+In [9]: list(zip(d_keys,d_values))
 Out[9]: 
 [('hostname', 'london_r1'),
  ('location', '21 New Globe Walk'),
@@ -1231,34 +1229,105 @@ Out[14]:
 
 Функция map() применяет указанную функцию к каждому элементу последовательности и возвращает список результатов.
 ```python
-In [41]: a = ['aaa','bbb','ccc']
+In [1]: list_of_words = ['one', 'two', 'list', '', 'dict']
 
-In [42]: def to_upper(s):
-   ....:     return s.upper()
-   ....: 
+In [2]: map(str.upper, list_of_words)
+Out[2]: <map at 0xb45eb7ec>
 
-In [43]: map(to_upper, a)
-Out[43]: ['AAA', 'BBB', 'CCC']
+In [3]: list(map(str.upper, list_of_words))
+Out[3]: ['ONE', 'TWO', 'LIST', '', 'DICT']
 ```
 
 #VSLIDE
 ### Функция map()
 
-Вместе с map() удобно использовать lambda:
+Конвертация в числа:
 ```python
-In [44]: map(lambda s: s.upper(), a)
-Out[44]: ['AAA', 'BBB', 'CCC']
+In [3]: list_of_str = ['1', '2', '5', '10']
+
+In [4]: list(map(int, list_of_str))
+Out[4]: [1, 2, 5, 10]
 ```
+
+#VSLIDE
+### Функция map()
+
+Вместе с map удобно использовать lambda:
+```python
+In [5]: vlans = [100, 110, 150, 200, 201, 202]
+
+In [6]: list(map(lambda x: 'vlan {}'.format(x), vlans))
+Out[6]: ['vlan 100', 'vlan 110', 'vlan 150', 'vlan 200', 'vlan 201', 'vlan 202']
+```
+
+
+#VSLIDE
+### Функция map()
 
 Если функция, которую использует map(), ожидает два аргумента, то передаются два списка:
 ```python
-In [45]: a = ['a', 'b', 'c', 'd']
+In [7]: nums = [1, 2, 3, 4, 5]
 
-In [46]: b = [1, 2, 3, 4]
+In [8]: nums2 = [100, 200, 300, 400, 500]
 
-In [47]: map(lambda x,y: x*y, a, b)
-Out[47]: ['a', 'bb', 'ccc', 'dddd']
+In [9]: list(map(lambda x, y: x*y, nums, nums2))
+Out[9]: [100, 400, 900, 1600, 2500]
 ```
+
+#VSLIDE
+### map vs list comprehensions
+
+Как правило, вместо map можно использовать list comprehension.
+Чаще всего, вариант с list comprehension более понятный.
+А в некоторых случаях, даже быстрее.
+
+#VSLIDE
+### map vs list comprehensions
+
+Перевести все строки в верхний регистр:
+```python
+In [48]: list_of_words = ['one', 'two', 'list', '', 'dict']
+
+In [49]: [ str.upper(word) for word in list_of_words ]
+Out[49]: ['ONE', 'TWO', 'LIST', '', 'DICT']
+```
+
+#VSLIDE
+### map vs list comprehensions
+
+Конвертация в числа:
+```python
+In [50]: list_of_str = ['1', '2', '5', '10']
+
+In [51]: [ int(i) for i in list_of_str ]
+Out[51]: [1, 2, 5, 10]
+
+```
+
+#VSLIDE
+### map vs list comprehensions
+
+Форматирование строк:
+```python
+In [52]:  vlans = [100, 110, 150, 200, 201, 202]
+
+In [53]: [ 'vlan {}'.format(x) for x in vlans ]
+Out[53]: ['vlan 100', 'vlan 110', 'vlan 150', 'vlan 200', 'vlan 201', 'vlan 202']
+```
+
+#VSLIDE
+### map vs list comprehensions
+
+Для получения пар элементов, используется zip:
+```python
+In [54]: nums = [1, 2, 3, 4, 5]
+
+In [55]: nums2 = [100, 200, 300, 400, 500]
+
+In [56]: [ x*y for x, y in zip(nums,nums2) ]
+Out[56]: [100, 400, 900, 1600, 2500]
+```
+
 
 #HSLIDE
 ## Функция filter()
@@ -1268,15 +1337,29 @@ Out[47]: ['a', 'bb', 'ccc', 'dddd']
 
 Функция filter() применяет функцию ко всем объектам списка, и возвращает те объекты, для которых функция вернула True.
 
+Например, вернуть только те строки, в которых находятся числа:
+```python
+In [1]: list_of_strings = ['one', 'two', 'list', '', 'dict', '100', '1', '50']
+
+In [2]: filter(str.isdigit, list_of_strings)
+Out[2]: <filter at 0xb45eb1cc>
+
+In [3]: list(filter(str.isdigit, list_of_strings))
+Out[3]: ['100', '1', '50']
+```
+
+#VSLIDE
+### Функция filter()
+
 Например, из списка чисел оставить только нечетные:
 ```python
-In [48]: filter(lambda x: x%2, [10, 111, 102, 213, 314, 515])
+In [48]: list(filter(lambda x: x%2, [10, 111, 102, 213, 314, 515]))
 Out[48]: [111, 213, 515]
 ```
 
 Аналогично, только четные:
 ```python
-In [49]: filter(lambda x: not x%2, [10, 111, 102, 213, 314, 515])
+In [49]: list(filter(lambda x: not x%2, [10, 111, 102, 213, 314, 515]))
 Out[49]: [10, 102, 314]
 ```
 
@@ -1286,14 +1369,50 @@ Out[49]: [10, 102, 314]
 ```python
 In [50]: list_of_words = ['one', 'two', 'list', '', 'dict']
 
-In [51]: filter(lambda x: len(x) > 2, list_of_words)
+In [51]: list(filter(lambda x: len(x) > 2, list_of_words))
 Out[51]: ['one', 'two', 'list', 'dict']
 
 
 In [52]: list_of_strings = ['one', 'two', 'list', '', 'dict', '100', '1', '50']
 
-In [53]: filter(lambda x: x.isdigit(), list_of_strings)
+In [53]: list(filter(lambda x: x.isdigit(), list_of_strings))
 Out[53]: ['100', '1', '50']
+```
+
+#VSLIDE
+### filter vs list comprehensions
+
+Вернуть только те строки, в которых находятся числа:
+```python
+In [7]: list_of_strings = ['one', 'two', 'list', '', 'dict', '100', '1', '50']
+
+In [8]: [ s for s in list_of_strings if s.isdigit() ]
+Out[8]: ['100', '1', '50']
+```
+
+#VSLIDE
+### filter vs list comprehensions
+
+Нечетные/четные числа:
+```python
+In [9]: nums = [10, 111, 102, 213, 314, 515]
+
+In [10]: [ n for n in nums if n % 2 ]
+Out[10]: [111, 213, 515]
+
+In [11]: [ n for n in nums if not n % 2 ]
+Out[11]: [10, 102, 314]
+```
+
+#VSLIDE
+### filter vs list comprehensions
+
+Из списка слов оставить только те, у которых количество букв больше двух:
+```python
+In [12]: list_of_words = ['one', 'two', 'list', '', 'dict']
+
+In [13]: [ word for word in list_of_words if len(word) > 2 ]
+Out[13]: ['one', 'two', 'list', 'dict']
 ```
 
 #HSLIDE
