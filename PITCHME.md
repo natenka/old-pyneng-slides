@@ -1598,156 +1598,44 @@ Adding data to db dhcp_snooping.db
 
 Пример структуры пакета:
 ```
-$ tree ~/.local/lib/python2.7/site-packages/my_app
+$ tree my_scripts/
+my_scripts/
 ├── __init__.py
-├── cfg.py
-└── switches
+├── configs
+│   ├── __init__.py
+│   └── cisco.py
+├── connect.py
+└── parse
     ├── __init__.py
-    ├── access.py
-    └── sw_cfg_templates.py
+    ├── cisco.py
+    └── juniper.py
+
 ```
 
-#VSLIDE
-
-### Python package
-
-Для того чтобы можно было импортировать пакет, его необходимо разместить в одном из каталогов, в котором Python ищет модули или добавить новый путь:
-```
-In [1]: import sys
-
-In [2]: sys.path
-Out[2]: 
-['',
- '/usr/local/bin',
- '/usr/lib/python2.7',
- '/usr/lib/python2.7/plat-i386-linux-gnu',
- '/usr/lib/python2.7/lib-tk',
- '/usr/lib/python2.7/lib-old',
- '/usr/lib/python2.7/lib-dynload',
- '/usr/local/lib/python2.7/dist-packages',
- '/usr/lib/python2.7/dist-packages',
- '/usr/lib/python2.7/dist-packages/gst-0.10',
- '/usr/lib/python2.7/dist-packages/gtk-2.0',
- '/usr/lib/pymodules/python2.7',
- '/usr/local/lib/python2.7/dist-packages/IPython/extensions',
- '/home/nata/.ipython']
-```
-
-
-#VSLIDE
-
-### Python package
-
-Для своих пакетов можно использовать каталог:
-```
-$ python -m site --user-site
-/home/nata/.local/lib/python2.7/site-packages
-```
-
-После того как каталог будет создан, он автоматически будет добавлен в пути поиска модулей:
-```
-$ mkdir -p /home/nata/.local/lib/python2.7/site-packages
-```
+Файлы ```__init__.py``` пустые.
 
 #VSLIDE
 ### Python package
 
-```
-In [1]: import sys
-
-In [2]: sys.path
-Out[2]: 
-['',
- '/usr/local/bin',
- '/usr/lib/python2.7',
- '/usr/lib/python2.7/plat-i386-linux-gnu',
- '/usr/lib/python2.7/lib-tk',
- '/usr/lib/python2.7/lib-old',
- '/usr/lib/python2.7/lib-dynload',
- '/home/nata/.local/lib/python2.7/site-packages',
- '/usr/local/lib/python2.7/dist-packages',
- '/usr/lib/python2.7/dist-packages',
- '/usr/lib/python2.7/dist-packages/gst-0.10',
- '/usr/lib/python2.7/dist-packages/gtk-2.0',
- '/usr/lib/pymodules/python2.7',
- '/usr/local/lib/python2.7/dist-packages/IPython/extensions',
- '/home/nata/.ipython']
-```
-
-#VSLIDE
-
-### Python package
-
-Структура пакета my_app:
-```
-$ tree ~/.local/lib/python2.7/site-packages/my_app
-├── __init__.py
-├── cfg.py
-└── switches
-    ├── __init__.py
-    ├── access.py
-    └── sw_cfg_templates.py
-```
-
-Файлы __init__.py пустые.
-
-#VSLIDE
-
-### Python package
-
-Файл cfg.py:
+Файл connect.py:
 ```python
-def config_to_list(cfg_file, delete_excl=True,
-                   delete_empty=True, strip_end=True):
-    result = []
-    with open( cfg_file ) as f:
-        for line in f:
-            if strip_end:
-                line = line.rstrip()
-            if delete_empty and not line:
-                pass
-            elif delete_excl and line.startswith('!'):
-                pass
-            else:
-                result.append(line)
-    return result
+print('Import connect.py')
 
-def clear_cfg_and_write_to_file(cfg, to_file, **kwargs):
-    cfg_as_list = config_to_list(cfg, **kwargs)
-    with open(to_file, 'w') as f:
-        f.write('\n'.join(cfg_as_list))
+def connect_ssh(ip):
+    print('Connect SSH to {}'.format(ip))
+
+
+def connect_telnet(ip):
+    print('Connect Telnet to {}'.format(ip))
 ```
 
 #VSLIDE
-
 ### Python package
 
-Файл switches/access.py:
+Файл configs/cisco.py:
 ```python
-access_template = ['switchport mode access',
-                   'switchport access vlan',
-                   'spanning-tree portfast',
-                   'spanning-tree bpduguard enable']
+print('Import configs/cisco.py')
 
-
-def generate_access_cfg(sw_dict):
-    result = []
-    for intf in sw_dict['access']:
-        result.append('interface FastEthernet %s' % intf)
-        for command in sw_int_templates.access_template:
-            if command.endswith('access vlan'):
-                result.append(' %s %s' % (command, sw_dict['access'][intf]))
-            else:
-                result.append(' %s' % command)
-    return result
-```
-
-#VSLIDE
-
-### Python package
-
-Файл switches/sw_cfg_templates.py:
-```python
 basic_cfg = """
 service timestamps debug datetime msec localtime show-timezone year
 service timestamps log datetime msec localtime show-timezone year
@@ -1772,60 +1660,216 @@ line vty 0 4
 ```
 
 #VSLIDE
+### Python package
 
+Файл parse/cisco.py:
+```python
+print('Import parse/cisco.py')
+
+def parse_with_re(command):
+    print('Parse command {} with regex'.format(command))
+
+
+def parse_with_textfsm(command):
+    print('Parse command {} with texfsm'.format(command))
+```
+
+#VSLIDE
+### Python package
+
+Файл parse/juniper.py:
+```python
+print('Import parse/juniper.py')
+
+def parse_with_re(command, regex):
+    print('Parse command {} with regex {}'.format(command,
+                                                  regex))
+
+
+def parse_with_textfsm(command, template):
+    print('Parse command {} with texfsm {}'.format(command,
+                                                   template))
+```
+
+#VSLIDE
 ### Python package
 
 Импорт модулей/функций из пакета:
 ```python
-In [5]: import my_app.cfg
+In [1]: import my_scripts.connect
+Import connect.py
 
-In [6]: dir(my_app.cfg)
-Out[6]: 
+In [2]: dir(my_scripts.connect)
+Out[2]:
 ['__builtins__',
+ '__cached__',
  '__doc__',
  '__file__',
+ '__loader__',
  '__name__',
  '__package__',
- 'clear_cfg_and_write_to_file',
- 'config_to_list']
+ '__spec__',
+ 'connect_ssh',
+ 'connect_telnet']
+
+```
+
+#VSLIDE
+### Python package
+
+```python
+In [3]: my_scripts.connect.connect_ssh('10.1.1.1')
+Connect SSH to 10.1.1.1
+
+In [4]: my_scripts.connect.connect_telnet('10.1.1.1')
+Connect Telnet to 10.1.1.1
+
+```
+
+#VSLIDE
+### Python package
+
+```python
+In [5]: import my_scripts.parse.cisco as parse_cisco
+Import parse/cisco.py
+
+In [6]: parse_cisco.parse_with_re
+Out[6]: <function my_scripts.parse.cisco.parse_with_re>
+
+```
+
+#VSLIDE
+### Python package
+
+```python
+In [7]: import my_scripts.configs.cisco as cfg_cisco
+Import configs/cisco.py
+
+In [8]: cfg_cisco.basic_cfg
+Out[8]: '\nservice timestamps debug datetime msec localtime show-timezone year\nservice timestamps log datetime msec localtime show-timezone year\nservice password-encryption\nservice sequence-numbers\n!\nno ip domain lookup\n!\n'
+
+```
+
+#VSLIDE
+### Python package
+
+Можно упростить импорт, настроив ```__init__.py```:
+```python
+from .connect import *
+from .parse import cisco
+from .parse import juniper as parse_juniper
+from .configs.cisco import *
+```
+
+#VSLIDE
+### Python package
+
+Теперь, если выполнить import my_scripts:
+```python
+In [1]: import my_scripts
+Import connect.py
+Import parse/cisco.py
+Import parse/juniper.py
+Import configs/cisco.py
+
+```
+
+#VSLIDE
+### Python package
+
+```python
+In [4]: dir(my_scripts)
+Out[4]:
+[
+ 'basic_cfg',
+ 'cisco',
+ 'configs',
+ 'connect',
+ 'connect_ssh',
+ 'connect_telnet',
+ 'lines_cfg',
+ 'parse',
+ 'parse_juniper']
+```
+
+#VSLIDE
+
+### Python package (глобально)
+
+Для того чтобы можно было импортировать пакет, его необходимо разместить в одном из каталогов, в котором Python ищет модули или добавить новый путь:
+```
+In [1]: import sys
+
+In [2]: sys.path
+Out[2]: 
+['',
+ '/home/vagrant/venv/py3_convert/bin',
+ '/home/vagrant/venv/py3_convert/lib/python36.zip',
+ '/home/vagrant/venv/py3_convert/lib/python3.6',
+ '/home/vagrant/venv/py3_convert/lib/python3.6/lib-dynload',
+ '/usr/local/lib/python3.6',
+ '/home/vagrant/venv/py3_convert/lib/python3.6/site-packages',
+ '/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/IPython/extensions',
+ '/home/vagrant/.ipython']
 ```
 
 
 #VSLIDE
 
-### Python package
+### Python package (глобально)
 
+Для своих пакетов можно использовать каталог:
 ```
-In [5]: import my_app.cfg
+$ python3.6 -m site --user-site
+/home/vagrant/.local/lib/python3.6/site-packages
+```
 
-In [6]: dir(my_app.cfg)
-Out[6]: 
-['__builtins__',
- '__doc__',
- '__file__',
- '__name__',
- '__package__',
- 'clear_cfg_and_write_to_file',
- 'config_to_list']
-
-In [7]: my_app.cfg.config_to_list
-Out[7]: <function my_app.cfg.config_to_list>
+После того как каталог будет создан, он автоматически будет добавлен в пути поиска модулей:
+```
+$ mkdir -p /home/vagrant/.local/lib/python3.6/site-packages
 ```
 
 #VSLIDE
-
-### Python package
+### Python package (глобально)
 
 ```
-In [13]: import my_app.switches.access as sw_access
+In [1]: import sys
 
-In [14]: sw_access.access_template
-Out[14]: 
-['switchport mode access',
- 'switchport access vlan',
- 'spanning-tree portfast',
- 'spanning-tree bpduguard enable']
+In [2]: sys.path
+Out[2]: 
+['',
+ '/usr/local/bin',
+ '/usr/local/lib/python36.zip',
+ '/usr/local/lib/python3.6',
+ '/usr/local/lib/python3.6/lib-dynload',
+ '/home/vagrant/.local/lib/python3.6/site-packages',
+ '/usr/local/lib/python3.6/site-packages',
+ '/usr/local/lib/python3.6/site-packages/IPython/extensions',
+ '/home/vagrant/.ipython']
 
-In [15]: sw_access.generate_access_cfg
-Out[15]: <function my_app.switches.access.generate_access_cfg>
 ```
+
+#VSLIDE
+### Python package (в виртуальном окружении)
+
+Для того чтобы можно было импортировать пакет, его необходимо разместить в одном из каталогов, в котором Python ищет модули или добавить новый путь:
+```
+['',
+ '/home/vagrant/venv/py3_convert/bin',
+ '/home/vagrant/venv/py3_convert/lib/python36.zip',
+ '/home/vagrant/venv/py3_convert/lib/python3.6',
+ '/home/vagrant/venv/py3_convert/lib/python3.6/lib-dynload',
+ '/usr/local/lib/python3.6',
+ '/home/vagrant/venv/py3_convert/lib/python3.6/site-packages',
+ '/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/IPython/extensions',
+ '/home/vagrant/.ipython']
+```
+
+#VSLIDE
+### Python package (в виртуальном окружении)
+
+В виртуальном окружении можно размещать пакеты в пути:
+```
+/home/vagrant/venv/py3_convert/lib/python3.6/site-packages
+```
+
