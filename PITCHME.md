@@ -438,337 +438,243 @@ line vty 0 4
 И, в зависимости от ситуации, получать вывод или только проверять, что команда выполнилась без ошибок.
 
 #VSLIDE
-### Функция subprocess.call()
+### Функция subprocess.run()
 
-Функция ```call()```:
-* позволяет выполнить команду
- * при этом, она ожидает завершения команды.
-* функция возращает код возврата
-
-
-#VSLIDE
-### Функция subprocess.call()
-
-Пример выполнения команды ```ls```:
+Функция subprocess.run() - основной способ работы с модулем subprocess.
+Самый простой вариант использования функции, запуск её таким образом:
 ```python
 In [1]: import subprocess
 
-In [2]: result = subprocess.call('ls')
-LICENSE.md          course_presentations        faq.md
-README.md           course_presentations.zip    howto.md
-SUMMARY.md          cover.jpg           images
-ToDo.md             examples            resources
-about.md            examples.zip            schedule.md
-book                exercises
-book.json           exercises.zip
+In [2]: result = subprocess.run('ls')
+ipython_as_mngmt_console.md  README.md         version_control.md
+module_search.md             useful_functions
+naming_conventions           useful_modules
 ```
 
-В переменной result теперь содержится код возврата (код 0 означает, что программа выполнилась успешно):
+#VSLIDE
+### Функция subprocess.run()
+
+В переменной result теперь содержится специальный объект CompletedProcess. Из этого объекта можно получить информацию о выполнении процесса, например, о коде возврата:
 ```python
-In [3]: print(result)
+In [3]: result
+Out[3]: CompletedProcess(args='ls', returncode=0)
+
+In [4]: result.returncode
+Out[4]: 0
+```
+
+#VSLIDE
+### Функция subprocess.run()
+
+Если необходимо вызвать команду с аргументами, её нужно передавать таким образом (как список):
+```python
+In [5]: result = subprocess.run(['ls', '-ls'])
+total 28
+4 -rw-r--r-- 1 vagrant vagrant   56 Jun  7 19:35 ipython_as_mngmt_console.md
+4 -rw-r--r-- 1 vagrant vagrant 1638 Jun  7 19:35 module_search.md
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun  7 19:35 naming_conventions
+4 -rw-r--r-- 1 vagrant vagrant  277 Jun  7 19:35 README.md
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 16 05:11 useful_functions
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 17 16:28 useful_modules
+4 -rw-r--r-- 1 vagrant vagrant   49 Jun  7 19:35 version_control.md
+```
+
+#VSLIDE
+### Функция subprocess.run()
+
+При попытке выполнить команду с использованием wildcard выражений, например, использовать *, возникнет ошибка:
+```python
+In [6]: result = subprocess.run(['ls', '-ls', '*md'])
+ls: cannot access *md: No such file or directory
+```
+
+#VSLIDE
+### Модуль subprocess
+
+Чтобы вызывать команды, в которых используются wildcard выражения, нужно добавлять аргумент shell и вызывать команду таким образом:
+```python
+In [7]: result = subprocess.run('ls -ls *md', shell=True)
+4 -rw-r--r-- 1 vagrant vagrant   56 Jun  7 19:35 ipython_as_mngmt_console.md
+4 -rw-r--r-- 1 vagrant vagrant 1638 Jun  7 19:35 module_search.md
+4 -rw-r--r-- 1 vagrant vagrant  277 Jun  7 19:35 README.md
+4 -rw-r--r-- 1 vagrant vagrant   49 Jun  7 19:35 version_control.md
+```
+
+#VSLIDE
+### Модуль subprocess
+
+Ещё одна особенность функции run() - она ожидает завершения выполнения команды. Если попробовать, например, запустить команду ping, то этот аспект будет заметен:
+```python
+In [8]: result = subprocess.run(['ping', '-c', '3', '-n', '8.8.8.8'])
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=55.1 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=54.7 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=54.4 ms
+
+--- 8.8.8.8 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 54.498/54.798/55.116/0.252 ms
+```
+
+#VSLIDE
+### Получение результата выполнения команды
+
+По умолчанию, функция run возвращает результат выполнения команды на стандартный поток вывода.
+
+Если нужно получить результат выполнения команды, надо добавить аргумент stdout и указать ему значение subprocess.PIPE:
+```python
+In [9]: result = subprocess.run(['ls', '-ls'], stdout=subprocess.PIPE)
+```
+
+#VSLIDE
+### Получение результата выполнения команды
+
+Теперь можно получить результат выполнения команды таким образом:+
+```python
+In [10]: print(result.stdout)
+b'total 28\n4 -rw-r--r-- 1 vagrant vagrant   56 Jun  7 19:35 ipython_as_mngmt_console.md\n4 -rw-r--r-- 1 vagrant vagrant 1638 Jun  7 19:35 module_search.md\n4 drwxr-xr-x 2 vagrant vagrant 4096 Jun  7 19:35 naming_conventions\n4 -rw-r--r-- 1 vagrant vagrant  277 Jun  7 19:35 README.md\n4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 16 05:11 useful_functions\n4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 17 16:30 useful_modules\n4 -rw-r--r-- 1 vagrant vagrant   49 Jun  7 19:35 version_control.md\n'
+```
+
+#VSLIDE
+### Перевод результата в unicode
+
+Вариант с decode:
+```python
+In [11]: print(result.stdout.decode('utf-8'))
+total 28
+4 -rw-r--r-- 1 vagrant vagrant   56 Jun  7 19:35 ipython_as_mngmt_console.md
+4 -rw-r--r-- 1 vagrant vagrant 1638 Jun  7 19:35 module_search.md
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun  7 19:35 naming_conventions
+4 -rw-r--r-- 1 vagrant vagrant  277 Jun  7 19:35 README.md
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 16 05:11 useful_functions
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 17 16:30 useful_modules
+4 -rw-r--r-- 1 vagrant vagrant   49 Jun  7 19:35 version_control.md
+```
+
+#VSLIDE
+### Перевод результата в unicode
+
+Вариант с encoding:
+```python
+In [12]: result = subprocess.run(['ls', '-ls'], stdout=subprocess.PIPE, encoding='utf-8')
+
+In [13]: print(result.stdout)
+total 28
+4 -rw-r--r-- 1 vagrant vagrant   56 Jun  7 19:35 ipython_as_mngmt_console.md
+4 -rw-r--r-- 1 vagrant vagrant 1638 Jun  7 19:35 module_search.md
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun  7 19:35 naming_conventions
+4 -rw-r--r-- 1 vagrant vagrant  277 Jun  7 19:35 README.md
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 16 05:11 useful_functions
+4 drwxr-xr-x 2 vagrant vagrant 4096 Jun 17 16:31 useful_modules
+4 -rw-r--r-- 1 vagrant vagrant   49 Jun  7 19:35 version_control.md
+```
+
+#VSLIDE
+### Отключение вывода
+
+Иногда достаточно получения кода возврата и нужно отключить вывод результата выполнения на стандартный поток вывода и при этом сам результат не нужен.
+Это можно сделать передав функции run аргумент stdout со значением subprocess.DEVNULL
+
+```python
+In [14]: result = subprocess.run(['ls', '-ls'], stdout=subprocess.DEVNULL)
+
+In [15]: print(result.stdout)
+None
+
+In [16]: print(result.returncode)
 0
 ```
 
 #VSLIDE
-### Функция subprocess.call()
+### Работа со стандартным потоком ошибок
 
-Если необходимо вызвать команду с аргументами, её нужно передавать таким образом (как список):
-```
-In [4]: result = subprocess.call(['ls', '-ls'])
-total 3624
-   8 -rw-r--r--   1 nata  nata      372 Dec 10 21:34 LICENSE.md
-  16 -rw-r--r--   1 nata  nata     4528 Jan 12 09:16 README.md
-  32 -rw-r--r--   1 nata  nata    12480 Jan 23 11:15 SUMMARY.md
-   8 -rw-r--r--   1 nata  nata     2196 Jan 23 09:16 ToDo.md
-   8 -rw-r--r--   1 nata  nata       70 Dec 10 21:34 about.md
-   0 drwxr-xr-x  19 nata  nata      646 Jan 23 11:05 book
-   8 -rw-r--r--   1 nata  nata      355 Jan 12 09:16 book.json
-   0 drwxr-xr-x  16 nata  nata      544 Dec 10 21:34 course_presentations
-2176 -rw-r--r--   1 nata  nata  1111234 Dec 10 21:34 course_presentations.zip
- 528 -rw-r--r--@  1 nata  nata   267824 Dec 11 08:25 cover.jpg
-   0 drwxr-xr-x  20 nata  nata      680 Jan 23 13:05 examples
- 360 -rw-r--r--   1 nata  nata   181075 Jan 21 14:10 examples.zip
-   0 drwxr-xr-x  19 nata  nata      646 Jan 17 10:24 exercises
- 416 -rw-r--r--   1 nata  nata   210621 Jan 21 14:10 exercises.zip
-  32 -rw-r--r--   1 nata  nata    14684 Jan 18 05:33 faq.md
-  16 -rw-r--r--   1 nata  nata     7043 Jan 17 10:28 howto.md
-   0 drwxr-xr-x   4 nata  nata      136 Jan 14 11:01 images
-   0 drwxr-xr-x  10 nata  nata      340 Jan 17 08:44 resources
-  16 -rw-r--r--@  1 nata  nata     6219 Jan 17 11:37 schedule.md
-```
-
-#VSLIDE
-### Функция subprocess.call()
-
-Все файлы, с расширением md:
+Если команда была выполнена с ошибкой или не отработала корректно, вывод команды попадет на стандартный поток ошибок.
+Получить этот вывод можно так же, как и стандартный поток вывода:
 ```python
-In [5]: result = subprocess.call(['ls', '-ls', '*md'])
-ls: *md: No such file or directory
+In [17]: result = subprocess.run(['ping', '-c', '3', '-n', 'a'], stderr=subprocess.PIPE, encoding='utf-8')
+
 ```
 
-Чтобы вызывать команды, в которых используются регулярные выражения, нужно добавлять параметр shell:
+#VSLIDE
+### Работа со стандартным потоком ошибок
+
+Теперь в result.stdout пустая строка, а в result.stderr находится стандартный поток вывода:
 ```python
-In [6]: result = subprocess.call(['ls', '-ls', '*md'], shell=True)
-LICENSE.md          course_presentations        faq.md
-README.md           course_presentations.zip    howto.md
-SUMMARY.md          cover.jpg           images
-ToDo.md             examples            resources
-about.md            examples.zip            schedule.md
-book                exercises
-book.json           exercises.zip
+In [18]: print(result.stdout)
+None
+
+In [19]: print(result.stderr)
+ping: unknown host a
+
+In [20]: print(result.returncode)
+2
 ```
 
 #VSLIDE
-### Функция subprocess.call()
+### Примеры использования модуля
 
-Если устанавлен аргумент ```shell=True```, указанная команда выполняется через shell.
-В таком случае, команду можно указывать так:
-```python
-In [7]: result = subprocess.call('ls -ls *md', shell=True)
- 8 -rw-r--r--  1 nata  nata    372 Dec 10 21:34 LICENSE.md
-16 -rw-r--r--  1 nata  nata   4528 Jan 12 09:16 README.md
-32 -rw-r--r--  1 nata  nata  12480 Jan 23 11:15 SUMMARY.md
- 8 -rw-r--r--  1 nata  nata   2196 Jan 23 09:16 ToDo.md
- 8 -rw-r--r--  1 nata  nata     70 Dec 10 21:34 about.md
-32 -rw-r--r--  1 nata  nata  14684 Jan 18 05:33 faq.md
-16 -rw-r--r--  1 nata  nata   7043 Jan 17 10:28 howto.md
-16 -rw-r--r--@ 1 nata  nata   6219 Jan 17 11:37 schedule.md
-```
-
-#VSLIDE
-### Функция subprocess.call()
-
-Ещё одна особенность функции ```call()``` - она ожидает завершения выполнения команды.
-Если попробовать, например, запустить команду ping, то этот аспект будет заметен:
-```python
-In [8]: reply = subprocess.call(['ping', '-c', '3', '-n', '8.8.8.8'])
-PING 8.8.8.8 (8.8.8.8): 56 data bytes
-64 bytes from 8.8.8.8: icmp_seq=0 ttl=48 time=49.868 ms
-64 bytes from 8.8.8.8: icmp_seq=1 ttl=48 time=49.243 ms
-64 bytes from 8.8.8.8: icmp_seq=2 ttl=48 time=50.029 ms
-
---- 8.8.8.8 ping statistics ---
-3 packets transmitted, 3 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 49.243/49.713/50.029/0.339 ms
-```
-
-Особенно, если попробовать пингануть какой-то недоступный IP-адрес.
-
-#VSLIDE
-### Функция subprocess.call()
-
-Функция ```call()``` подходит, если нужно:
-* подождать выполнения программы, прежде чем выполнять следующие шаги
-* нужно получить только код выполнения и не нужен вывод
-
-
-#VSLIDE
-### Функция subprocess.call()
-
-Ещё один аспект работы функции ```call()```, она выводит результат выполнения команды, на стандартный поток вывода.
-
-Файл subprocess_call.py:
+Пример использования модуля subprocess (файл subprocess_basic_run.py):+
 ```python
 import subprocess
 
-reply = subprocess.call(['ping', '-c', '3', '-n', '8.8.8.8'])
+reply = subprocess.run(['ping', '-c', '3', '-n', '8.8.8.8'])
 
-if reply == 0:
+if reply.returncode == 0:
     print("Alive")
 else:
     print("Unreachable")
-
 ```
 
 #VSLIDE
-### Функция subprocess.call()
+### Примеры использования модуля
 
 Результат выполнения будет таким:
-```
-$ python subprocess_call.py
-PING 8.8.8.8 (8.8.8.8): 56 data bytes
-64 bytes from 8.8.8.8: icmp_seq=0 ttl=48 time=49.930 ms
-64 bytes from 8.8.8.8: icmp_seq=1 ttl=48 time=48.981 ms
-64 bytes from 8.8.8.8: icmp_seq=2 ttl=48 time=48.360 ms
+```python
+$ python subprocess_basic_run.py
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=54.0 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=54.4 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=53.9 ms
 
 --- 8.8.8.8 ping statistics ---
-3 packets transmitted, 3 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 48.360/49.090/49.930/0.646 ms
-Alive
-```
-
-То есть, результат выполнения команды, выводится на стандартный поток вывода.
-
-#VSLIDE
-### Функция subprocess.call()
-
-Если нужно это отключить и не выводить результат выполнения, надо перенаправить stdout в devnull (файл subprocess_call_devnull.py):
-```python
-import subprocess
-import os
-
-DNULL = open(os.devnull, 'w')
-
-reply = subprocess.call(['ping', '-c', '3', '-n', '8.8.8.8'], stdout=DNULL)
-
-if reply == 0:
-    print("Alive")
-else:
-    print("Unreachable")
-
-```
-
-Теперь результат выполнения будет таким:
-```
-$ python subprocess_call_devnull.py
+3 packets transmitted, 3 received, 0% packet loss, time 2005ms
+rtt min/avg/max/mdev = 53.962/54.145/54.461/0.293 ms
 Alive
 ```
 
 #VSLIDE
-### Функция subprocess.check_output()
+### Примеры использования модуля
 
-
-Функция ```check_output()```:
-* позволяет выполнить команду
- * при этом, она ожидает завершения команды.
-* если команда отработала корректно (код возврата 0), функция возращает результат выполнения команды
-* если возникла ошибка, при выполнении команды, функция генерирует исключение
-
-#VSLIDE
-### Функция subprocess.check_output()
-
-Пример использования функции ```check_output()``` (файл subprocess_check_output.py):
+Попробуем собрать всё в финальную функцию, которая будет проверять доступность IP-адреса (файл subprocess_ping_function.py):
 ```python
 import subprocess
-
-reply = subprocess.check_output(['ping', '-c', '3', '-n', '8.8.8.8'])
-
-print("Result:")
-print(reply.decode('utf-8'))
-
-```
-
-#VSLIDE
-### Функция subprocess.check_output()
-
-Результат выполнения (если убрать строку ```print reply```, на стандартный поток вывода ничего не будет выведено):
-```
-$ python subprocess_check_output.py
-Result:
-PING 8.8.8.8 (8.8.8.8): 56 data bytes
-64 bytes from 8.8.8.8: icmp_seq=0 ttl=48 time=49.785 ms
-64 bytes from 8.8.8.8: icmp_seq=1 ttl=48 time=57.231 ms
-64 bytes from 8.8.8.8: icmp_seq=2 ttl=48 time=51.071 ms
-
---- 8.8.8.8 ping statistics ---
-3 packets transmitted, 3 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 49.785/52.696/57.231/3.250 ms
-```
-
-#VSLIDE
-### Функция subprocess.check_output()
-
-Если выполнить команду, которая вызовет ошибку и, соответственно, код возрата будет не 0 (файл subprocess_check_output_catch_exception.py):
-```python
-$ python subprocess_check_output_catch_exception.py
-ping: unknown host a
-Traceback (most recent call last):
-  File "subprocess_check_output_catch_exception.py", line 3, in <module>
-    reply = subprocess.check_output(['ping', '-c', '3', '-n', 'a'])
-  File "/usr/local/lib/python3.6/subprocess.py", line 336, in check_output
-    **kwargs).stdout
-  File "/usr/local/lib/python3.6/subprocess.py", line 418, in run
-    output=stdout, stderr=stderr)
-subprocess.CalledProcessError: Command '['ping', '-c', '3', '-n', 'a']' returned non-zero exit status 2.
-
-```
-
-#VSLIDE
-### Функция subprocess.check_output()
-
-Функция ```check_output()``` всегда будет возвращать исключение ```CalledProcessError```, когда код возврата не равен 0.
-
-Это значит, что в скрипте можно написать выражение try/except, с помощью которого будет выполняться проверка корректно ли отработала команда (дополняем файл subprocess_check_output_catch_exception.py):
-```python
-import subprocess
-
-try:
-    reply = subprocess.check_output(['ping', '-c', '3', '-n', 'a'])
-except subprocess.CalledProcessError as e:
-    print("Error occurred")
-    print("Return code:", e.returncode)
-
-```
-
-#VSLIDE
-### Функция subprocess.check_output()
-
-Результат выполнения:
-```
-$ python subprocess_check_output_catch_exception.py
-ping: unknown host a
-Error occurred
-Return code: 2
-
-```
-
-Теперь программа завершилась корректно и вывела сообщение об ошибке и код возврата.
-И, хотя сообщение об ошибке, не выводилось, оно попало на стандартный поток вывода.
-
-#VSLIDE
-### Функция subprocess.check_output()
-
-Попробуем собрать всё в финальную функцию и добавим перехват сообщения об ошибке:
-```python
-import subprocess
-from tempfile import TemporaryFile
 
 
 def ping_ip(ip_address):
-    """
-    Ping IP address and return tuple:
-    On success:
-        * return code = 0
-        * command output
-    On failure:
-        * return code
-        * error output (stderr)
-    """
-    with TemporaryFile() as temp:
-        try:
-            output = subprocess.check_output(['ping', '-c', '3', '-n', ip_address],
-                                             stderr=temp)
-            return 0, output.decode('utf-8')
-        except subprocess.CalledProcessError as e:
-            temp.seek(0)
-            return e.returncode, temp.read().decode('utf-8')
+    reply = subprocess.run(['ping', '-c', '3', '-n', ip_address],
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           encoding='utf-8')
+    if reply.returncode == 0:
+        return True, reply.stdout
+    else:
+        return False, reply.stderr
 
 print(ping_ip('8.8.8.8'))
 print(ping_ip('a'))
-
 ```
 
 #VSLIDE
-### Функция subprocess.check_output()
-
+### Примеры использования модуля
 
 Результат выполнения будет таким:
-```
+```python
 $ python subprocess_ping_function.py
-(0, 'PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=53.0 ms\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=57.5 ms\n64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=54.1 ms\n\n--- 8.8.8.8 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 2004ms\nrtt min/avg/max/mdev = 53.060/54.906/57.546/1.934 ms\n')
-(2, 'ping: unknown host a\n')
-
+(True, 'PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=63.8 ms\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=55.6 ms\n64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=55.9 ms\n\n--- 8.8.8.8 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 2003ms\nrtt min/avg/max/mdev = 55.643/58.492/63.852/3.802 ms\n')
+(False, 'ping: unknown host a\n')
 ```
 
-#VSLIDE
-### Модуль tempfile
 
-Модуль tempfile входит в стандартную библиотеку Python и используется тут для того, чтобы сохранить сообщение об ошибке.
-Функция TemporaryFile создает временный файл и удаляет его автоматически, после того, как файл закрывается.
-
-На основе этой функции, можно сделать функцию, которая будет проверять список IP-адресов и возвращать, в результате выполнения, два списка: доступные и недоступные адреса.
-
-Если количество IP-адресов, которые нужно проверить, большое, можно использовать модуль multiprocessing, чтобы ускорить проверку.
 
 #HSLIDE
 
