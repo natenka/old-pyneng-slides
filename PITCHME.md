@@ -52,10 +52,10 @@ In [1]: import re
 
 In [2]: line = '00:09:BB:3D:D6:58   10.1.10.2    86250   dhcp-snooping   10    FastEthernet0/1'
 
-In [3]: print re.search('dhcp', line)
-<_sre.SRE_Match object at 0x10edeb9f0>
+In [3]: print(re.search('dhcp', line))
+<_sre.SRE_Match object; span=(41, 45), match='dhcp'>
 
-In [4]: print re.search('dhcpd', line)
+In [4]: print(re.search('dhcpd', line))
 None
 ```
 
@@ -69,10 +69,11 @@ None
 In [5]: match = re.search('dhcp', line)
 
 In [6]: match.span()
-Out[6]: (49, 53)
+Out[6]: (41, 45)
 
-In [7]: line[49:53]
+In [7]: line[41:45]
 Out[7]: 'dhcp'
+
 ```
 
 #VSLIDE
@@ -110,7 +111,7 @@ In [20]: line2 = 'test dhcp, test2 dhcp2'
 
 In [21]: match = re.findall('dhcp', line2)
 
-In [22]: print match
+In [22]: print(match)
 ['dhcp', 'dhcp']
 ```
 
@@ -128,11 +129,11 @@ In [23]: line2 = 'test dhcp, test2 dhcp2'
 
 In [24]: match = re.finditer('dhcp', line2)
 
-In [25]: print match
+In [25]: print(match)
 <callable-iterator object at 0x10efd2cd0>
 
 In [26]: for i in match:
-   ....:     print i.span()
+   ....:     print(i.span())
    ....:     
 (5, 9)
 (17, 21)
@@ -157,7 +158,7 @@ In [30]: match = re.finditer('dhcp', line2)
 In [31]: for i in match:
    ....:     b = i.start()
    ....:     e = i.end()
-   ....:     print line2[b:e]
+   ....:     print(line2[b:e])
    ....:     
 dhcp
 dhcp
@@ -180,7 +181,7 @@ In [34]: match = regex.finditer(line2)
 In [35]: for i in match:
    ....:     b = i.start()
    ....:     e = i.end()
-   ....:     print line2[b:e]
+   ....:     print(line2[b:e])
    ....:     
 dhcp
 dhcp
@@ -213,6 +214,11 @@ dhcp
 * ```regex?``` - ноль или одно повторение предшествующего элемента
 * ```regex{n}``` - ровно n повторений предшествующего элемента
 * ```regex{n,m}``` - от n до m повторений предшествующего элемента
+in [6]: match.span()
+Out[6]: (49, 53)
+
+In [7]: line[49:53]
+Out[7]: 'dhcp'
 * ```regex{n, }``` - n или более повторений предшествующего элемента
 
 #VSLIDE
@@ -238,7 +244,7 @@ In [2]: line = "FastEthernet0/1            10.0.12.1       YES manual up        
 
 Точка обозначает любой символ, поэтому в строке line найдено 3 совпадения с регулярным выражением ```.0```:
 ```python
-In [3]: print re.findall('.0', line)
+In [3]: prine(re.findall('.0', line))
 ['t0', '10', '.0']
 ```
 
@@ -247,13 +253,13 @@ In [3]: print re.findall('.0', line)
 
 Символ ```^``` означает начало строки. Выражению ```^F``` соотвествует только одна подстрока:
 ```python
-In [4]: print re.findall('^F', line)
+In [4]: print(re.findall('^F', line))
 ['F']
 ```
 
 Выражению ```^.a``` соответствует подстрока 'Fa':
 ```python
-In [5]: print re.findall('^.a', line)
+In [5]: print(re.findall('^.a', line))
 ['Fa']
 ```
 
@@ -262,10 +268,10 @@ In [5]: print re.findall('^.a', line)
 
 Символ ```$``` обозначает конец строки:
 ```python
-In [6]: print re.findall('up$', line)
+In [6]: print(re.findall('up$', line))
 ['up']
 
-In [7]: print re.findall('up', line)
+In [7]: print(re.findall('up', line))
 ['up', 'up']
 ```
 
@@ -275,10 +281,10 @@ In [7]: print re.findall('up', line)
 Символы, которые перечислены в квадратных скобках, означают, что любой из этим символов будет совпадением.
 Таким образом можно описывать разные регистры:
 ```python
-In [8]: print re.findall('[Ff]ast', line)
+In [8]: print(re.findall('[Ff]ast', line))
 ['Fast']
 
-In [9]: print re.findall('[Ff]ast[Ee]thernet', line)
+In [9]: print(re.findall('[Ff]ast[Ee]thernet', line))
 ['FastEthernet']
 ```
 
@@ -287,13 +293,13 @@ In [9]: print re.findall('[Ff]ast[Ee]thernet', line)
 
 Если после открывающейся квадратной скобки, указан символ ```^```, совпадением будет любой символ, кроме указанных в скобках (в данном случае, всё, кроме букв и пробела):
 ```python
-In [10]: print re.findall('[^a-zA-Z ]', line)
+In [10]: print(re.findall('[^a-zA-Z ]', line))
 ['0', '/', '1', '1', '0', '.', '0', '.', '1', '2', '.', '1']
 ```
 
 Вертикальная черта работает как 'или':
 ```python
-In [11]: print re.findall('up|down', line)
+In [11]: print(re.findall('up|down', line))
 ['up', 'up']
 ```
 
@@ -512,12 +518,12 @@ with open('dhcp_snooping.txt') as data:
         if line[0].isdigit():
             result.append(regex.search(line).groupdict())
 
-print "К коммутатору подключено %d устройства" % len(result)
+print("К коммутатору подключено {} устройства".format(len(result)))
 
 for num, comp in enumerate(result, 1):
-    print "Параметры устройства %s:" % num
+    print("Параметры устройства {}:".format(num))
     for key in comp:
-        print "\t%s:\t%s" % (key,comp[key])
+        print("{:10}: {:10}".format(key,comp[key]))
 ```
 
 #VSLIDE
