@@ -389,6 +389,22 @@ Out[12]: '10.0.12.1'
 
 ### Нумерованные группы
 
+Начиная с версии Python 3.6, к группам можно обращаться таким образом:
+```python
+In [13]: match[0]
+Out[13]: 'FastEthernet0/1            10.0.12.1       YES manual up                    up'
+
+In [14]: match[1]
+Out[14]: 'FastEthernet0/1'
+
+In [15]: match[2]
+Out[15]: '10.0.12.1'
+```
+
+#VSLIDE
+
+### Нумерованные группы
+
 Для вывода всех подстрок, которые соответствуют указанным группам, используется метод groups:
 ```python
 In [13]: match.groups()
@@ -552,5 +568,231 @@ $ python parse_dhcp_snooping.py
 	ip:	10.1.10.6
 	mac:	00:09:BC:3F:A6:50
 	vlan:	10
+```
+
+#HSLIDE
+## Дополнительные возможности регулярных выражений
+
+#HSLIDE
+### re.split
+
+#VSLIDE
+### re.split
+
+Функция split работает аналогично методу split в строках.
+Но в функции re.split, можно использовать регулярные выражения, а значит разделять строку на части по более сложным условиям.
+
+```python
+In [1]: ospf_route = 'O        10.0.24.0/24 [110/41] via 10.0.13.3, 3d18h, FastEthernet0/0'
+
+In [2]: re.split(' +', ospf_route)
+Out[2]:
+['O',
+ '10.0.24.0/24',
+ '[110/41]',
+ 'via',
+ '10.0.13.3,',
+ '3d18h,',
+ 'FastEthernet0/0']
+```
+
+#VSLIDE
+### re.split
+
+Аналогичным образом можно избавиться и от запятых:
+
+```python
+In [3]: re.split('[ ,]+', ospf_route)
+Out[3]:
+['O',
+ '10.0.24.0/24',
+ '[110/41]',
+ 'via',
+ '10.0.13.3',
+ '3d18h',
+ 'FastEthernet0/0']
+```
+
+#VSLIDE
+### re.split
+
+И, если нужно, от квадратных скобок:
+
+```python
+In [4]: re.split('[ ,\[\]]+', ospf_route)
+Out[4]: ['O', '10.0.24.0/24', '110/41', 'via', '10.0.13.3', '3d18h', 'FastEthernet0/0']
+```
+
+#VSLIDE
+### re.split
+
+
+Если указать то же выражение с помощью круглых скобок, в итоговый список попадут и разделители.
+
+```python
+In [5]: re.split('(via|[ ,\[\]])+', ospf_route)
+Out[5]:
+['O',
+ ' ',
+ '10.0.24.0/24',
+ '[',
+ '110/41',
+ ' ',
+ '10.0.13.3',
+ ' ',
+ '3d18h',
+ ' ',
+ 'FastEthernet0/0']
+```
+
+#VSLIDE
+### re.split
+
+Для отключения такого поведения, надо сделать группу noncapture.
+То есть, отключить запоминание элементов группы:
+
+```python
+In [6]: re.split('(?:via|[ ,\[\]])+', ospf_route)
+Out[6]: ['O', '10.0.24.0/24', '110/41', '10.0.13.3', '3d18h', 'FastEthernet0/0']
+```
+
+#HSLIDE
+### re.sub
+
+#VSLIDE
+### re.sub
+
+Функция re.sub работает аналогично методу replace в строках.
+Но в функции re.sub, можно использовать регулярные выражения, а значит делать замены по более сложным условиям.
+
+```python
+In [7]: ospf_route = 'O        10.0.24.0/24 [110/41] via 10.0.13.3, 3d18h, FastEthernet0/0'
+
+In [8]: re.sub('(via|[,\[\]])', ' ', ospf_route)
+Out[8]: 'O        10.0.24.0/24  110/41    10.0.13.3  3d18h  FastEthernet0/0'
+```
+
+#VSLIDE
+### re.sub
+
+С помощью re.sub можно трансформировать строку.
+```python
+In [9]: mac_table = '''
+   ...:  100    aabb.cc10.7000    DYNAMIC     Gi0/1
+   ...:  200    aabb.cc20.7000    DYNAMIC     Gi0/2
+   ...:  300    aabb.cc30.7000    DYNAMIC     Gi0/3
+   ...:  100    aabb.cc40.7000    DYNAMIC     Gi0/4
+   ...:  500    aabb.cc50.7000    DYNAMIC     Gi0/5
+   ...:  200    aabb.cc60.7000    DYNAMIC     Gi0/6
+   ...:  300    aabb.cc70.7000    DYNAMIC     Gi0/7
+   ...: '''
+```
+
+#VSLIDE
+### re.sub
+
+```python
+In [10]: print(re.sub(' *(\d+) +([a-f,0-9]+)\.([a-f,0-9]+)\.([a-f,0-9]+) +\w+ +(\S+)', r'\1 \2:\3:\4 \5', mac_table))
+
+100 aabb:cc10:7000 Gi0/1
+200 aabb:cc20:7000 Gi0/2
+300 aabb:cc30:7000 Gi0/3
+100 aabb:cc40:7000 Gi0/4
+500 aabb:cc50:7000 Gi0/5
+200 aabb:cc60:7000 Gi0/6
+300 aabb:cc70:7000 Gi0/7
+```
+
+#HSLIDE
+### re.DOTALL
+
+#VSLIDE
+### re.DOTALL
+
+С помощью регулярных выражений можно работать и с многострочной строкой.
+
+Например, из строки table надо получить только строки с соответствиями VLAN-MAC-interface:
+```python
+In [11]: table = '''
+    ...: sw1#sh mac address-table
+    ...:           Mac Address Table
+    ...: -------------------------------------------
+    ...:
+    ...: Vlan    Mac Address       Type        Ports
+    ...: ----    -----------       --------    -----
+    ...:  100    aabb.cc10.7000    DYNAMIC     Gi0/1
+    ...:  200    aabb.cc20.7000    DYNAMIC     Gi0/2
+    ...:  300    aabb.cc30.7000    DYNAMIC     Gi0/3
+    ...:  100    aabb.cc40.7000    DYNAMIC     Gi0/4
+    ...:  500    aabb.cc50.7000    DYNAMIC     Gi0/5
+    ...:  200    aabb.cc60.7000    DYNAMIC     Gi0/6
+    ...:  300    aabb.cc70.7000    DYNAMIC     Gi0/7
+    ...: '''
+```
+
+#VSLIDE
+### re.DOTALL
+
+В этом выражении описана строка с MAC-адресом:
+
+```python
+In [12]: m = re.search(' *\d+ +[a-f,0-9,\.]+ +\w+ +\S+', table)
+'''
+
+В результат попадет первая строка с MAC-адресом:
+'''
+In [13]: m.group()
+Out[13]: ' 100    aabb.cc80.7000    DYNAMIC     Gi0/1'
+```
+
+#VSLIDE
+### re.DOTALL
+
+Учитывая то, что по умолчанию регулярные выражения жадные, можно получить все соответствия таким образом:
+
+```python
+In [14]: m = re.search('( *\d+ +[a-f,0-9,\.]+ +\w+ +\S+\n)+', table)
+
+In [15]: print(m.group())
+ 100    aabb.cc10.7000    DYNAMIC     Gi0/1
+ 200    aabb.cc20.7000    DYNAMIC     Gi0/2
+ 300    aabb.cc30.7000    DYNAMIC     Gi0/3
+ 100    aabb.cc40.7000    DYNAMIC     Gi0/4
+ 500    aabb.cc50.7000    DYNAMIC     Gi0/5
+ 200    aabb.cc60.7000    DYNAMIC     Gi0/6
+ 300    aabb.cc70.7000    DYNAMIC     Gi0/7
+```
+
+
+#VSLIDE
+### re.DOTALL
+
+В данном случае надо получить все строки, начиная с первого соответствия VLAN-MAC-интерфейс.
+
+```python
+In [16]: m = re.search(' *\d+ +[a-f,0-9,\.]+ +\w+ +\S+.*', table)
+
+In [17]: print(m.group())
+ 100    aabb.cc10.7000    DYNAMIC     Gi0/1
+```
+
+
+#VSLIDE
+### re.DOTALL
+
+Пока что, в результате только одна строка, так как по умолчанию точка не включает в себя перевод строки.
+Но, если добавить специальный флаг, re.DOTALL, точка будет включать и перевод строки и в результат попадут все соответствия:
+
+```python
+In [18]: m = re.search(' *\d+ +[a-f,0-9,\.]+ +\w+ +\S+.*', table, re.DOTALL)
+
+In [19]: print(m.group())
+ 100    aabb.cc10.7000    DYNAMIC     Gi0/1
+ 200    aabb.cc20.7000    DYNAMIC     Gi0/2
+ 300    aabb.cc30.7000    DYNAMIC     Gi0/3
+ 100    aabb.cc40.7000    DYNAMIC     Gi0/4
+ 500    aabb.cc50.7000    DYNAMIC     Gi0/5
+ 200    aabb.cc60.7000    DYNAMIC     Gi0/6
+ 300    aabb.cc70.7000    DYNAMIC     Gi0/7
 ```
 
