@@ -737,10 +737,10 @@ In [11]: table = '''
 
 ```python
 In [12]: m = re.search(' *\d+ +[a-f,0-9,\.]+ +\w+ +\S+', table)
-'''
+```
 
 В результат попадет первая строка с MAC-адресом:
-'''
+```python
 In [13]: m.group()
 Out[13]: ' 100    aabb.cc80.7000    DYNAMIC     Gi0/1'
 ```
