@@ -357,7 +357,7 @@ Out[7]: '<text line>'
 Пример использования групп:
 ```python
 In [8]: line = "FastEthernet0/1            10.0.12.1       YES manual up                    up"
-In [9]: match = re.search('(\S+?)\s+([\w\.]+?)\s+.*', line)
+In [9]: match = re.search('(\S+?)\s+([\w.]+?)\s+.*', line)
 ```
 
 В данном примере указаны две группы:
@@ -424,7 +424,7 @@ Out[13]: ('FastEthernet0/1', '10.0.12.1')
 ```python
 In [14]: line = "FastEthernet0/1            10.0.12.1       YES manual up                    up"
 
-In [15]: match = re.search('(?P<intf>\S+?)\s+(?P<address>[\w\.]+?)\s+.*', line)
+In [15]: match = re.search('(?P<intf>\S+?)\s+(?P<address>[\w.]+?)\s+.*', line)
 ```
 
 Теперь к этим группам можно обращаться по имени:
@@ -448,7 +448,7 @@ Out[17]: {'address': '10.0.12.1', 'intf': 'FastEthernet0/1'}
 
 И, в таком случае, можно добавить группы в регулярное выражение и полагаться на их имя, а не на порядок:
 ```python
-In [18]: match = re.search('(?P<intf>\S+?)\s+(?P<address>[\w\.]+?)\s+(?P<status>up|down|administratively down)\s+(?P<protocol>up|down)', line)
+In [18]: match = re.search('(?P<intf>\S+?)\s+(?P<address>[\w.]+?)\s+(?P<status>up|down|administratively down)\s+(?P<protocol>up|down)', line)
 
 In [19]: match.groupdict()
 Out[19]: {'address': 'manual', 'intf': 'YES', 'protocol': 'up', 'status': 'up'}
@@ -687,7 +687,7 @@ In [9]: mac_table = '''
 ### re.sub
 
 ```python
-In [10]: print(re.sub(' *(\d+) +([a-f,0-9]+)\.([a-f,0-9]+)\.([a-f,0-9]+) +\w+ +(\S+)', r'\1 \2:\3:\4 \5', mac_table))
+In [10]: print(re.sub(' *(\d+) +([a-f0-9]+)\.([a-f0-9]+)\.([a-f0-9]+) +\w+ +(\S+)', r'\1 \2:\3:\4 \5', mac_table))
 
 100 aabb:cc10:7000 Gi0/1
 200 aabb:cc20:7000 Gi0/2
@@ -731,7 +731,7 @@ In [11]: table = '''
 В этом выражении описана строка с MAC-адресом:
 
 ```python
-In [12]: m = re.search(' *\d+ +[a-f,0-9,\.]+ +\w+ +\S+', table)
+In [12]: m = re.search(' *\d+ +[a-f0-9.]+ +\w+ +\S+', table)
 ```
 
 В результат попадет первая строка с MAC-адресом:
@@ -746,7 +746,7 @@ Out[13]: ' 100    aabb.cc80.7000    DYNAMIC     Gi0/1'
 Учитывая то, что по умолчанию регулярные выражения жадные, можно получить все соответствия таким образом:
 
 ```python
-In [14]: m = re.search('( *\d+ +[a-f,0-9,\.]+ +\w+ +\S+\n)+', table)
+In [14]: m = re.search('( *\d+ +[a-f0-9.]+ +\w+ +\S+\n)+', table)
 
 In [15]: print(m.group())
  100    aabb.cc10.7000    DYNAMIC     Gi0/1
@@ -765,7 +765,7 @@ In [15]: print(m.group())
 В данном случае надо получить все строки, начиная с первого соответствия VLAN-MAC-интерфейс.
 
 ```python
-In [16]: m = re.search(' *\d+ +[a-f,0-9,\.]+ +\w+ +\S+.*', table)
+In [16]: m = re.search(' *\d+ +[a-f0-9.]+ +\w+ +\S+.*', table)
 
 In [17]: print(m.group())
  100    aabb.cc10.7000    DYNAMIC     Gi0/1
@@ -779,7 +779,7 @@ In [17]: print(m.group())
 Но, если добавить специальный флаг, re.DOTALL, точка будет включать и перевод строки и в результат попадут все соответствия:
 
 ```python
-In [18]: m = re.search(' *\d+ +[a-f,0-9,\.]+ +\w+ +\S+.*', table, re.DOTALL)
+In [18]: m = re.search(' *\d+ +[a-f0-9.]+ +\w+ +\S+.*', table, re.DOTALL)
 
 In [19]: print(m.group())
  100    aabb.cc10.7000    DYNAMIC     Gi0/1
