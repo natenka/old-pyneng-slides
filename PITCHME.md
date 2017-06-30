@@ -249,9 +249,23 @@ SyntaxError: bytes can only contain ASCII literal characters.
 #VSLIDE
 ### encode или decode &#128561;
 
-### unicode .encode() &#8594; bytes
-### bytes .decode() &#8594; unicode
+#### unicode .encode() &#8594; bytes
+#### bytes .decode() &#8594; unicode
 
+```python
+In [19]: hi_unicode = 'привет'
+
+In [19]: hi_bytes = hi_unicode.encode('utf-8')
+
+In [19]: hi_bytes
+Out[19]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
+
+In [19]: len(hi_bytes)
+Out[19]: 12
+
+In [20]: hi_bytes.decode('utf-8')
+Out[20]: 'привет'
+```
 
 
 #VSLIDE
