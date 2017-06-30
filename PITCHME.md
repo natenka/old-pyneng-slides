@@ -46,6 +46,8 @@ ASCII (American standard code for information interchange) - описывает 
 ### ISO Latin 1 (ISO 8859-1)
 
 ![ISO-8859-1](http://rabbit.eng.miami.edu/info/asciiiso.gif)
+![Windows CP1252](http://rabbit.eng.miami.edu/info/cp1252.gif)
+
 
 #VSLIDE
 
