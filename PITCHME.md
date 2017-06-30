@@ -426,6 +426,19 @@ Out[20]: '뿐胑룐닐뗐苑'
 
 
 
+#HSLIDE
+### Unicode sandwic
+
+#VSLIDE
+### Unicode sandwich
+
+![unicode-sandwich](http://engineering.cerner.com/assets/2014-08-02-the-plain-text-is-a-lie/unicode-sandwich.png)
+
+#VSLIDE
+### Unicode sandwich
+
+![unicode-sandwich](https://nedbatchelder.com/text/unipain_pix/034.png)
+
 &#9658;
 &#128579;
 &#128704;
