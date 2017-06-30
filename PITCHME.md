@@ -108,13 +108,18 @@ ASCII (American standard code for information interchange) - описывает 
 #VSLIDE
 ### UTF-8
 
-| H | i | &#128704; | &#128640; | 
-|:-:|:-:|:---------:|:---------:|
-| 48|69 | 01 f6 c0  | 01 f6 80 |
+| H | i | &#128704; | &#128640; | &#9731; |
+|:-:|:-:|:---------:|:---------:|:-------:|
+| 48|69 | 01 f6 c0  | 01 f6 80  | 26 03   |
 
 
 #HSLIDE
 ### Unicode в Python 3
+
+#VSLIDE
+### str vs bytes
+
+#VSLIDE
 
 
 &#9658;
