@@ -5,6 +5,10 @@
 
 # Unicode
 
+#HSLIDE
+
+### Зачем вообще нужна кодировка?
+
 #VSLIDE
 
 ### Компьютеры работают с байтами
@@ -46,7 +50,6 @@ ASCII (American standard code for information interchange) - описывает 
 ### ISO Latin 1 (ISO 8859-1)
 
 ![ISO-8859-1](http://rabbit.eng.miami.edu/info/asciiiso.gif)
-![Windows CP1252](http://rabbit.eng.miami.edu/info/cp1252.gif)
 
 
 #VSLIDE
@@ -55,6 +58,16 @@ ASCII (American standard code for information interchange) - описывает 
 
 ![Windows CP1252](http://rabbit.eng.miami.edu/info/cp1252.gif)
 
+
+#HSLIDE
+
+### Unicode
+
+* 1,114,112 code points in the range 0x0 to 0x10FFFF
+* The Unicode Standard version 10.0 (released June 2017) defines 136,690
+
+&#9658;
+&#129323;
 
 При этом модуль может автоматически конвертировать байты.
 
