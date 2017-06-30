@@ -116,7 +116,7 @@ ASCII (American standard code for information interchange) - описывает 
 #HSLIDE
 ### Unicode в Python 3
 
-#VSLIDE
+#HSLIDE
 ### str
 
 Строка в Python 3 - это последовательность кодов Unicode.
@@ -130,6 +130,20 @@ Out[4]: str
 In [6]: s.upper()
 Out[6]: 'ПРИВЕТ'
 ```
+
+#VSLIDE
+### str
+
+```python
+In [188]: hi = '\u043f\u0440\u0438\u0432\u0435\u0442'
+
+In [189]: print(hi)
+привет
+
+In [190]: len(hi)
+Out[190]: 6
+```
+
 
 #VSLIDE
 ### ord
@@ -158,6 +172,86 @@ In [161]: chr(9731)
 Out[161]: '☃'
 
 ```
+
+
+#HSLIDE
+### bytes
+
+
+#VSLIDE
+### bytes
+
+```python
+In [20]: hi_bytes = b"Hello"
+
+In [25]: type(hi_bytes)
+Out[25]: bytes
+
+In [22]: hi_bytes.upper()
+Out[22]: b'HELLO'
+
+In [23]: hi_bytes.find(b'l')
+Out[23]: 2
+
+In [24]: len(hi_bytes)
+Out[24]: 5
+
+```
+
+#VSLIDE
+### bytes
+
+Можно работать с байтовыми строками, как с unicode строками:
+```python
+In [36]: d = {b'hi':'Hello', b'by':'Goodbye'}
+
+In [37]: d[b'hi']
+Out[37]: 'Hello'
+
+In [38]: d['hi']
+----------------------------------------------------------
+KeyError                 Traceback (most recent call last)
+<ipython-input-38-259732fc8381> in <module>()
+----> 1 d['hi']
+
+KeyError: 'hi'
+
+```
+
+#VSLIDE
+### bytes
+
+```python
+In [1]: import subprocess
+
+In [2]: result = subprocess.run('ls', stdout=subprocess.PIPE)
+
+In [3]: output = result.stdout
+
+In [4]: output
+Out[4]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+
+In [5]: type(output)
+Out[5]: bytes
+```
+
+#VSLIDE
+### Non ASCII
+
+```python
+In [39]: test = b'привет'
+  File "<ipython-input-39-e8b153ea3e66>", line 1
+    test = b'привет'
+          ^
+SyntaxError: bytes can only contain ASCII literal characters.
+```
+
+#VSLIDE
+### encode или decode &#128561;
+
+### unicode .encode() &#8594; bytes
+### bytes .decode() &#8594; unicode
+
 
 
 #VSLIDE
