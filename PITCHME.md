@@ -127,24 +127,24 @@ ASCII (American standard code for information interchange) - описывает 
 ```python
 In [1]: s = 'привет'
 
-In [4]: type(s)
-Out[4]: str
+In [2]: type(s)
+Out[2]: str
 
-In [6]: s.upper()
-Out[6]: 'ПРИВЕТ'
+In [3]: s.upper()
+Out[3]: 'ПРИВЕТ'
 ```
 
 #VSLIDE
 ### str
 
 ```python
-In [188]: hi = '\u043f\u0440\u0438\u0432\u0435\u0442'
+In [4]: hi = '\u043f\u0440\u0438\u0432\u0435\u0442'
 
-In [189]: print(hi)
+In [5]: print(hi)
 привет
 
-In [190]: len(hi)
-Out[190]: 6
+In [6]: len(hi)
+Out[6]: 6
 ```
 
 
@@ -153,11 +153,11 @@ Out[190]: 6
 
 Функция ord возвращает значение кода Unicode для символа:
 ```python
-In [8]: ord('п')
-Out[8]: 1087
+In [7]: ord('п')
+Out[7]: 1087
 
-In [1]: hex(ord("a"))
-Out[1]: '0x61'
+In [8]: hex(ord("a"))
+Out[8]: '0x61'
 ```
 
 #VSLIDE
@@ -165,14 +165,14 @@ Out[1]: '0x61'
 
 Функция chr возвращает строку Unicode, которая символу, чем код был передан как аргумент:
 ```python
-In [156]: chr(1087)
-Out[156]: 'п'
+In [9]: chr(1087)
+Out[9]: 'п'
 
-In [160]: chr(8364)
-Out[160]: '€'
+In [10]: chr(8364)
+Out[10]: '€'
 
-In [161]: chr(9731)
-Out[161]: '☃'
+In [11]: chr(9731)
+Out[11]: '☃'
 
 ```
 
@@ -185,19 +185,19 @@ Out[161]: '☃'
 ### bytes
 
 ```python
-In [20]: hi_bytes = b"Hello"
+In [12]: hi_bytes = b"Hello"
 
-In [25]: type(hi_bytes)
-Out[25]: bytes
+In [13]: type(hi_bytes)
+Out[13]: bytes
 
-In [22]: hi_bytes.upper()
-Out[22]: b'HELLO'
+In [14]: hi_bytes.upper()
+Out[14]: b'HELLO'
 
-In [23]: hi_bytes.find(b'l')
-Out[23]: 2
+In [15]: hi_bytes.find(b'l')
+Out[15]: 2
 
-In [24]: len(hi_bytes)
-Out[24]: 5
+In [16]: len(hi_bytes)
+Out[16]: 5
 
 ```
 
@@ -206,12 +206,12 @@ Out[24]: 5
 
 Можно работать с байтовыми строками, как с unicode строками:
 ```python
-In [36]: d = {b'hi':'Hello', b'by':'Goodbye'}
+In [17]: d = {b'hi':'Hello', b'by':'Goodbye'}
 
-In [37]: d[b'hi']
-Out[37]: 'Hello'
+In [18]: d[b'hi']
+Out[18]: 'Hello'
 
-In [38]: d['hi']
+In [19]: d['hi']
 ----------------------------------------------------------
 KeyError                 Traceback (most recent call last)
 <ipython-input-38-259732fc8381> in <module>()
@@ -225,24 +225,24 @@ KeyError: 'hi'
 ### bytes
 
 ```python
-In [1]: import subprocess
+In [20]: import subprocess
 
-In [2]: result = subprocess.run('ls', stdout=subprocess.PIPE)
+In [21]: result = subprocess.run('ls', stdout=subprocess.PIPE)
 
-In [3]: output = result.stdout
+In [22]: output = result.stdout
 
-In [4]: output
-Out[4]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+In [23]: output
+Out[23]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
 
-In [5]: type(output)
-Out[5]: bytes
+In [24]: type(output)
+Out[24]: bytes
 ```
 
 #VSLIDE
 ### Non ASCII
 
 ```python
-In [39]: test = b'привет'
+In [25]: test = b'привет'
   File "<ipython-input-39-e8b153ea3e66>", line 1
     test = b'привет'
           ^
@@ -250,7 +250,7 @@ SyntaxError: bytes can only contain ASCII literal characters.
 ```
 
 #HSLIDE
-### encode или decode
+### encode vs decode
 
 #VSLIDE
 
@@ -258,54 +258,54 @@ SyntaxError: bytes can only contain ASCII literal characters.
 #### bytes .decode() &#8594; unicode
 
 ```python
-In [19]: hi_unicode = 'привет'
+In [26]: hi_unicode = 'привет'
 
-In [19]: hi_bytes = hi_unicode.encode('utf-8')
+In [27]: hi_bytes = hi_unicode.encode('utf-8')
 
-In [19]: hi_bytes
-Out[19]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
+In [28]: hi_bytes
+Out[28]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
 
-In [19]: len(hi_bytes)
-Out[19]: 12
+In [29]: len(hi_bytes)
+Out[29]: 12
 
-In [20]: hi_bytes.decode('utf-8')
-Out[20]: 'привет'
+In [30]: hi_bytes.decode('utf-8')
+Out[30]: 'привет'
 ```
 
 #VSLIDE
-### encode или decode
+### encode vs decode
 
 ```python
-In [13]: import subprocess
+In [31]: import subprocess
 
-In [14]: result = subprocess.run('ls', stdout=subprocess.PIPE)
+In [32]: result = subprocess.run('ls', stdout=subprocess.PIPE)
 
-In [15]: result.stdout
-Out[15]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+In [33]: result.stdout
+Out[33]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
 ```
 
 #VSLIDE
-### encode или decode
+### encode vs decode
 
 ```python
-In [16]: output_unicode = result.stdout.decode('utf-8')
+In [34]: output_unicode = result.stdout.decode('utf-8')
 
-In [17]: output_unicode
-Out[17]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+In [35]: output_unicode
+Out[35]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
 ```
 
 #VSLIDE
-### encode или decode
+### encode vs decode
 
 ```python
-In [20]: result = subprocess.run('ls', stdout=subprocess.PIPE, encoding='utf-8')
+In [36]: result = subprocess.run('ls', stdout=subprocess.PIPE, encoding='utf-8')
 
-In [21]: result.stdout
-Out[21]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+In [37]: result.stdout
+Out[37]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
 ```
 
 #VSLIDE
-### encode или decode
+### encode vs decode
 
 
 ```python
@@ -327,6 +327,25 @@ output = t.read_very_eager().decode('utf-8')
 print(output)
 ```
 
+#VSLIDE
+### encode vs decode
+
+
+```python
+In [38]: de_hi_unicode = 'grüezi'
+
+In [39]: bytes(de_hi_unicode, encoding='utf-8')
+Out[39]: b'gr\xc3\xbcezi'
+
+In [40]: bytes(de_hi_unicode, encoding='utf-16')
+Out[40]: b'\xff\xfeg\x00r\x00\xfc\x00e\x00z\x00i\x00'
+
+In [41]: bytes(de_hi_unicode, encoding='utf-32')
+Out[41]: b'\xff\xfe\x00\x00g\x00\x00\x00r\x00\x00\x00\xfc\x00\x00\x00e\x00\x00\x00z\x00\x00\x00i\x00\x00\x00'
+
+```
+
+
 #HSLIDE
 ### Ошибки
 
@@ -335,9 +354,9 @@ print(output)
 ### Ошибки
 
 ```python
-In [210]: hi_unicode = 'привет'
+In [42]: hi_unicode = 'привет'
 
-In [211]: hi_unicode.encode('ascii')
+In [43]: hi_unicode.encode('ascii')
 ------------------------------------------------------------
 UnicodeEncodeError         Traceback (most recent call last)
 <ipython-input-211-ec69c9fd2dae> in <module>()
@@ -350,11 +369,11 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: ordin
 ### Ошибки
 
 ```python
-In [215]: de_hi_unicode = 'grüezi'
+In [44]: de_hi_unicode = 'grüezi'
 
-In [216]: de_hi_unicode.encode('ascii')
----------------------------------------------------------------------------
-UnicodeEncodeError                        Traceback (most recent call last)
+In [45]: de_hi_unicode.encode('ascii')
+------------------------------------------------------------
+UnicodeEncodeError         Traceback (most recent call last)
 <ipython-input-216-31c172a5bbb1> in <module>()
 ----> 1 de_hi_unicode.encode('ascii')
 
@@ -367,11 +386,11 @@ UnicodeEncodeError: 'ascii' codec can't encode character '\xfc' in position 2: o
 ### Ошибки
 
 ```python
-In [217]: hi_unicode = 'привет'
+In [46]: hi_unicode = 'привет'
 
-In [218]: hi_bytes = hi_unicode.encode('utf-8')
+In [47]: hi_bytes = hi_unicode.encode('utf-8')
 
-In [219]: hi_bytes.decode('ascii')
+In [48]: hi_bytes.decode('ascii')
 ------------------------------------------------------------
 UnicodeDecodeError         Traceback (most recent call last)
 <ipython-input-219-aa0ada5e44e9> in <module>()
@@ -385,13 +404,13 @@ UnicodeDecodeError: 'ascii' codec can't decode byte 0xd0 in position 0: ordinal 
 ### Ошибки
 
 ```python
-In [223]: utf_16 = de_hi_unicode.encode('utf-16')
+In [49]: utf_16 = de_hi_unicode.encode('utf-16')
 
-In [224]: de_hi_unicode = 'grüezi'
+In [50]: de_hi_unicode = 'grüezi'
 
-In [225]: utf_16 = de_hi_unicode.encode('utf-16')
+In [51]: utf_16 = de_hi_unicode.encode('utf-16')
 
-In [226]: utf_16.decode('utf-8')
+In [52]: utf_16.decode('utf-8')
 ------------------------------------------------------------
 UnicodeDecodeError         Traceback (most recent call last)
 <ipython-input-226-4b4c731e69e4> in <module>()
@@ -402,19 +421,19 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid 
 ```
 
 #VSLIDE
-### Ошибки
+### Надо знать какая кодировка использовалась
 
 
 ```python
-In [20]: hi_unicode = 'привет'
+In [53]: hi_unicode = 'привет'
 
-In [20]: hi_bytes = hi_unicode.encode('utf-8')
+In [54]: hi_bytes = hi_unicode.encode('utf-8')
 
-In [20]: hi_bytes
-Out[20]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
+In [55]: hi_bytes
+Out[55]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
 
-In [20]: hi_bytes.decode('utf-16')
-Out[20]: '뿐胑룐닐뗐苑'
+In [56]: hi_bytes.decode('utf-16')
+Out[56]: '뿐胑룐닐뗐苑'
 
 ```
 
@@ -424,7 +443,37 @@ Out[20]: '뿐胑룐닐뗐苑'
 #VSLIDE
 ### Обработка ошибок
 
+```python
+In [57]: de_hi_unicode = 'grüezi'
 
+In [58]: de_hi_unicode.encode('ascii', 'replace')
+Out[58]: b'gr?ezi'
+
+In [59]: de_hi_unicode.encode('ascii', 'namereplace')
+Out[59]: b'gr\\N{LATIN SMALL LETTER U WITH DIAERESIS}ezi'
+
+In [60]: de_hi_unicode.encode('ascii', 'ignore')
+Out[60]: b'grezi'
+
+```
+
+#VSLIDE
+### Обработка ошибок
+
+```python
+In [61]: de_hi_unicode = 'grüezi'
+
+In [62]: de_utf8 = de_hi_unicode.encode('utf-8')
+
+In [63]: de_utf8
+Out[63]: b'gr\xc3\xbcezi'
+
+In [64]: de_utf8.decode('ascii', 'ignore')
+Out[64]: 'grezi'
+
+In [65]: de_utf8.decode('ascii', 'replace')
+Out[65]: 'gr��ezi'
+```
 
 #HSLIDE
 ### Unicode sandwich
@@ -440,6 +489,68 @@ Out[20]: '뿐胑룐닐뗐苑'
 ![unicode-sandwich](https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg)
 
 #VSLIDE
+### Работа с файлами
+
+```python
+
+In [66]: de_hi_unicode = 'grüezi'
+
+In [67]: f = open('test_unicode.txt', 'w')
+
+In [68]: f.write(de_hi_unicode+'\n')
+Out[68]: 7
+
+In [69]: f.close()
+
+In [70]: open('test_unicode.txt').read()
+Out[70]: 'grüezi\n'
+
+```
+
+#VSLIDE
+### Работа с файлами
+
+По умолчанию:
+```python
+In [71]: import locale
+
+In [72]: locale.getpreferredencoding()
+Out[72]: 'UTF-8'
+
+```
+
+#VSLIDE
+### Работа с файлами
+
+```python
+In [73]: de_hi_unicode = 'grüezi'
+
+In [74]: f = open('test_unicode.txt', 'w', encoding='utf-8')
+
+In [75]: f.write(de_hi_unicode+'\n')
+Out[75]: 7
+
+In [76]: f.close()
+
+In [77]: open('test_unicode.txt',  encoding='utf-8').read()
+Out[77]: 'grüezi\n'
+
+```
+
+#VSLIDE
+### Работа с файлами
+
+
+```python
+In [78]: file_content = open('test_unicode.txt', 'rb').read()
+
+In [79]: file_content
+Out[79]: b'gr\xc3\xbcezi\n'
+
+In [80]: file_content.decode('utf-8')
+Out[80]: 'grüezi\n'
+```
+
 
 &#128123;
 
