@@ -99,6 +99,8 @@ ASCII (American standard code for information interchange) - описывает 
 &#128520;
 &#128521;
 
+&#128564;
+&#128561;
 
 При этом модуль может автоматически конвертировать байты.
 
