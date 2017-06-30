@@ -67,7 +67,7 @@ ASCII (American standard code for information interchange) - описывает 
 * The Unicode Standard version 10.0 (released June 2017) defines 136,690
 
 &#9658;
-&#129323;
+&#128579;
 
 При этом модуль может автоматически конвертировать байты.
 
