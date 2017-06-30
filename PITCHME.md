@@ -117,7 +117,48 @@ ASCII (American standard code for information interchange) - описывает 
 ### Unicode в Python 3
 
 #VSLIDE
-### str vs bytes
+### str
+
+Строка в Python 3 - это последовательность кодов Unicode.
+
+```python
+In [1]: s = 'привет'
+
+In [4]: type(s)
+Out[4]: str
+
+In [6]: s.upper()
+Out[6]: 'ПРИВЕТ'
+```
+
+#VSLIDE
+### ord
+
+Функция ord возвращает значение кода Unicode для символа:
+```python
+In [8]: ord('п')
+Out[8]: 1087
+
+In [1]: hex(ord("a"))
+Out[1]: '0x61'
+```
+
+#VSLIDE
+### chr
+
+Функция chr возвращает строку Unicode, которая символу, чем код был передан как аргумент:
+```python
+In [156]: chr(1087)
+Out[156]: 'п'
+
+In [160]: chr(8364)
+Out[160]: '€'
+
+In [161]: chr(9731)
+Out[161]: '☃'
+
+```
+
 
 #VSLIDE
 
