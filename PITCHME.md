@@ -94,6 +94,21 @@ ASCII (American standard code for information interchange) - описывает 
 #HSLIDE
 ### Кодировки
 
+* UTF-8
+* UTF-16
+* UTF-32
+
+#VSLIDE
+### UTF-8
+
+* позволяет хранить символы Юникода
+* использует переменное количество байт
+* символы ASCII обозначаются такими же кодами
+
+#VSLIDE
+### UTF-8
+
+
 
 &#9658;
 &#128579;
