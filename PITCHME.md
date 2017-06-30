@@ -72,9 +72,7 @@ ASCII (American standard code for information interchange) - описывает 
 * диапазон 0x0 - 0x10FFFF
 * Стандарт Unicode версии 10.0 (Июнь 2017) определяет 136 690 символов
 
-&#129365;
-&#128519;
-&#129318;
+### &#129365; &#128519; &#129318;
 
 
 #VSLIDE
@@ -87,7 +85,7 @@ ASCII (American standard code for information interchange) - описывает 
 #VSLIDE
 ### schön
 
-U+0073 U+0063 U+0068 U+00f6 U+006e
+### U+0073 U+0063 U+0068 U+00f6 U+006e
 
 #HSLIDE
 ### Кодировки
