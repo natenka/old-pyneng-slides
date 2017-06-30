@@ -427,7 +427,7 @@ Out[20]: '뿐胑룐닐뗐苑'
 
 
 #HSLIDE
-### Unicode sandwic
+### Unicode sandwich
 
 #VSLIDE
 ### Unicode sandwich
@@ -437,7 +437,7 @@ Out[20]: '뿐胑룐닐뗐苑'
 #VSLIDE
 ### Unicode sandwich
 
-![unicode-sandwich](https://nedbatchelder.com/text/unipain_pix/034.png)
+![unicode-sandwich](https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg)
 
 &#9658;
 &#128579;
