@@ -88,7 +88,7 @@ ASCII (American standard code for information interchange) - описывает 
 #HSLIDE
 ### Кодировки
 
-test &#8238;
+test &#8238; test
 
 &#9658;
 &#128579;
