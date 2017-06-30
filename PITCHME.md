@@ -61,14 +61,36 @@ ASCII (American standard code for information interchange) - описывает 
 
 #HSLIDE
 
-### Unicode &#129412
+### Unicode &#129412;
 
 
-* 1,114,112 code points in the range 0x0 to 0x10FFFF
-* The Unicode Standard version 10.0 (released June 2017) defines 136,690
-
+#VSLIDE
 
 ### Unicode
+
+* 1,114,112 кодов
+* диапазон 0x0 - 0x10FFFF
+* Стандарт Unicode версии 10.0 (Июнь 2017) определяет 136 690 символов
+
+&#129365;
+&#128519;
+&#129318;
+
+
+#VSLIDE
+### Unicode
+
+* U+1F383 JACK-O-LANTERN &#127875;
+* U+2615 HOT BEVERAGE  &#9749;
+* U+1f600 GRINNING FACE &#128512;
+
+#VSLIDE
+### schön
+
+U+0073 U+0063 U+0068 U+00f6 U+006e
+
+#HSLIDE
+### Кодировки
 
 
 &#9658;
