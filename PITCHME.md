@@ -61,13 +61,15 @@ ASCII (American standard code for information interchange) - описывает 
 
 #HSLIDE
 
-### Unicode &#129365;
+### Unicode &#129412
 
 
 * 1,114,112 code points in the range 0x0 to 0x10FFFF
 * The Unicode Standard version 10.0 (released June 2017) defines 136,690
 
+
 ### Unicode
+
 
 &#9658;
 &#128579;
