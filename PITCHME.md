@@ -68,11 +68,9 @@ ASCII (American standard code for information interchange) - описывает 
 
 ### Unicode
 
-* 1,114,112 кодов
-* диапазон 0x0 - 0x10FFFF
-* Стандарт Unicode версии 10.0 (Июнь 2017) определяет 136 690 символов
-
-### &#129365; &#128519; &#129318;
+* 1,114,112 кодов &#129318;
+* диапазон 0x0 - 0x10FFFF &#129365;
+* Стандарт Unicode версии 10.0 (Июнь 2017) определяет 136 690 символов  &#128519;
 
 
 #VSLIDE
@@ -90,6 +88,7 @@ ASCII (American standard code for information interchange) - описывает 
 #HSLIDE
 ### Кодировки
 
+test &#8238;
 
 &#9658;
 &#128579;
