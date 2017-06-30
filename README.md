@@ -1,4 +1,4 @@
-# pyneng-slides
+# PyNEng slides Python 2.7
 
 Презентации к курсу ["Python для сетевых инженеров"](https://www.gitbook.com/book/natenka/pyneng/details):
 * [Введение](https://gitpitch.com/natenka/pyneng-slides/course_intro)
@@ -18,7 +18,7 @@
 * [Ansible](https://gitpitch.com/natenka/pyneng-slides/ansible)
 
 
-# pyneng-slides Python 3.6
+# PyNEng slides Python 3.6
 * [Введение](https://gitpitch.com/natenka/pyneng-slides/course_intro)
 * [Основы Python](https://gitpitch.com/natenka/pyneng-slides/python3-basics):
   * Типы данных в Python
@@ -27,3 +27,7 @@
   * Контроль хода программы
   * Работа с файлами
 * [Функции](https://gitpitch.com/natenka/pyneng-slides/python3-functions)
+* [Модули](https://gitpitch.com/natenka/pyneng-slides/python3-modules)
+* [Регулярные выражения](https://gitpitch.com/natenka/pyneng-slides/python3-regex)
+
+
