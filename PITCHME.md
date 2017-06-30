@@ -439,6 +439,11 @@ Out[20]: '뿐胑룐닐뗐苑'
 
 ![unicode-sandwich](https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg)
 
+#VSLIDE
+
+&#128123;
+
+
 &#9658;
 &#128579;
 &#128704;
