@@ -89,9 +89,11 @@ ASCII (American standard code for information interchange) - описывает 
 #VSLIDE
 ### Unicode &#128579;
 
-#### Unicode может даже перевернуть текст:
+В Unicode есть специальный код, который может перевернуть текст:
 
-#### &#8238; Unicode может даже перевернуть текст:
+#### &#8238; Unicode, покажи фокус
+
+![U+202e](https://imgs.xkcd.com/comics/rtl_2x.png)
 
 #HSLIDE
 ### Кодировки
