@@ -119,6 +119,9 @@ ASCII (American standard code for information interchange) - описывает 
 #HSLIDE
 ### str
 
+#VSLIDE
+### str
+
 Строка в Python 3 - это последовательность кодов Unicode.
 
 ```python
@@ -246,8 +249,10 @@ In [39]: test = b'привет'
 SyntaxError: bytes can only contain ASCII literal characters.
 ```
 
+#HSLIDE
+### encode или decode
+
 #VSLIDE
-### encode или decode &#128561;
 
 #### unicode .encode() &#8594; bytes
 #### bytes .decode() &#8594; unicode
@@ -267,8 +272,158 @@ In [20]: hi_bytes.decode('utf-8')
 Out[20]: 'привет'
 ```
 
+#VSLIDE
+### encode или decode
+
+```python
+In [13]: import subprocess
+
+In [14]: result = subprocess.run('ls', stdout=subprocess.PIPE)
+
+In [15]: result.stdout
+Out[15]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+```
 
 #VSLIDE
+### encode или decode
+
+```python
+In [16]: output_unicode = result.stdout.decode('utf-8')
+
+In [17]: output_unicode
+Out[17]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+```
+
+#VSLIDE
+### encode или decode
+
+```python
+In [20]: result = subprocess.run('ls', stdout=subprocess.PIPE, encoding='utf-8')
+
+In [21]: result.stdout
+Out[21]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+```
+
+#VSLIDE
+### encode или decode
+
+
+```python
+import telnetlib
+import time
+
+t = telnetlib.Telnet('192.168.100.1')
+
+t.read_until(b"Username:")
+t.write(b'cisco\n')
+
+t.read_until(b"Password:")
+t.write(b'cisco\n')
+t.write(b'sh ip int br')
+
+time.sleep(5)
+
+output = t.read_very_eager().decode('utf-8')
+print(output)
+```
+
+#HSLIDE
+### Ошибки
+
+
+#VSLIDE
+### Ошибки
+
+```python
+In [210]: hi_unicode = 'привет'
+
+In [211]: hi_unicode.encode('ascii')
+------------------------------------------------------------
+UnicodeEncodeError         Traceback (most recent call last)
+<ipython-input-211-ec69c9fd2dae> in <module>()
+----> 1 hi_unicode.encode('ascii')
+
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: ordinal not in range(128)
+```
+
+#VSLIDE
+### Ошибки
+
+```python
+In [215]: de_hi_unicode = 'grüezi'
+
+In [216]: de_hi_unicode.encode('ascii')
+---------------------------------------------------------------------------
+UnicodeEncodeError                        Traceback (most recent call last)
+<ipython-input-216-31c172a5bbb1> in <module>()
+----> 1 de_hi_unicode.encode('ascii')
+
+UnicodeEncodeError: 'ascii' codec can't encode character '\xfc' in position 2: ordinal not in range(128)`:w
+
+```
+
+
+#VSLIDE
+### Ошибки
+
+```python
+In [217]: hi_unicode = 'привет'
+
+In [218]: hi_bytes = hi_unicode.encode('utf-8')
+
+In [219]: hi_bytes.decode('ascii')
+------------------------------------------------------------
+UnicodeDecodeError         Traceback (most recent call last)
+<ipython-input-219-aa0ada5e44e9> in <module>()
+----> 1 hi_bytes.decode('ascii')
+
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xd0 in position 0: ordinal not in range(128)
+
+```
+
+#VSLIDE
+### Ошибки
+
+```python
+In [223]: utf_16 = de_hi_unicode.encode('utf-16')
+
+In [224]: de_hi_unicode = 'grüezi'
+
+In [225]: utf_16 = de_hi_unicode.encode('utf-16')
+
+In [226]: utf_16.decode('utf-8')
+------------------------------------------------------------
+UnicodeDecodeError         Traceback (most recent call last)
+<ipython-input-226-4b4c731e69e4> in <module>()
+----> 1 utf_16.decode('utf-8')
+
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+```
+
+#VSLIDE
+### Ошибки
+
+
+```python
+In [20]: hi_unicode = 'привет'
+
+In [20]: hi_bytes = hi_unicode.encode('utf-8')
+
+In [20]: hi_bytes
+Out[20]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
+
+In [20]: hi_bytes.decode('utf-16')
+Out[20]: '뿐胑룐닐뗐苑'
+
+```
+
+#HSLIDE
+### Обработка ошибок
+
+#VSLIDE
+### Обработка ошибок
+
 
 
 &#9658;
