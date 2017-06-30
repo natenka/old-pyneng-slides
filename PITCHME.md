@@ -85,10 +85,17 @@ ASCII (American standard code for information interchange) - описывает 
 
 ### U+0073 U+0063 U+0068 U+00f6 U+006e
 
+
+#VSLIDE
+### Unicode &#128579;
+
+Unicode может даже перевернуть текст:
+
+* &#8238; Unicode может даже перевернуть текст:
+
 #HSLIDE
 ### Кодировки
 
-test &#8238; test
 
 &#9658;
 &#128579;
