@@ -562,11 +562,10 @@ Out[80]: 'grüezi\n'
 #VSLIDE
 
 
-* &#128013; [Pragmatic Unicode](https://nedbatchelder.com/text/unipain.html)
-* &#128013; [Unicode HOWTO](https://docs.python.org/3/howto/unicode.html)
-* &#128013; [Standard Encodings](https://docs.python.org/3/library/codecs.html#standard-encodings)
-
-* &#129417; [The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
+1. &#128013; [Pragmatic Unicode](https://nedbatchelder.com/text/unipain.html)
+2. &#129417; [The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
+3. &#128013; [Unicode HOWTO](https://docs.python.org/3/howto/unicode.html)
+4. &#128013; [Standard Encodings](https://docs.python.org/3/library/codecs.html#standard-encodings)
 
 
 #VSLIDE
