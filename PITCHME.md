@@ -66,7 +66,7 @@ import csv
 with open('sw_data.csv') as f:
     reader = csv.reader(f)
     for row in reader:
-        print row
+        print(row)
 ```
 
 Вывод будет таким:
@@ -83,29 +83,7 @@ $ python csv_read.py
 
 ###Чтение файлов в формате CSV
 
-DictReader позволяет получить словари, в которых ключи - это названия столбцов, а значения - значения столбцов (файл csv_read_dict.py):
-```python
-import csv
-
-with open('sw_data.csv') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        print row
-```
-
-Вывод будет таким:
-```
-$ python csv_read_dict.py
-{'model': '3750', 'hostname': 'sw1', 'vendor': 'Cisco', 'location': 'London'}
-{'model': '3850', 'hostname': 'sw2', 'vendor': 'Cisco', 'location': 'Liverpool'}
-{'model': '3650', 'hostname': 'sw3', 'vendor': 'Cisco', 'location': 'Liverpool'}
-{'model': '3650', 'hostname': 'sw4', 'vendor': 'Cisco', 'location': 'London'}
-```
-#VSLIDE
-
-###Чтение файлов в формате CSV
-
-reader - это итератор. Поэтому, если просто вывести reader, то вывод будет таким:
+reader - это итератор:
 ```python
 In [1]: import csv
 
@@ -116,13 +94,54 @@ In [2]: with open('sw_data.csv') as f:
 <_csv.reader object at 0x10385b050>
 ```
 
-Но, если нужно все объекты передать куда-то дальше, его можно превратить в список таким образом:
+#VSLIDE
+
+###Чтение файлов в формате CSV
+
+Заголовки столбцов удобней получить отдельным объектом (файл csv_read_headers.py):
+```py
+import csv
+
+with open('sw_data.csv') as f:
+    reader = csv.reader(f)
+    headers = next(reader)
+    print('Headers: ', headers)
+    for row in reader:
+        print(row)
+```
+
+
+#VSLIDE
+
+###Чтение файлов в формате CSV
+
+DictReader позволяет получить словари, в которых ключи - это названия столбцов, а значения - значения столбцов (файл csv_read_dict.py):
 ```python
-In [3]: with open('sw_data.csv') as f:
-   ...:     reader = csv.reader(f)
-   ...:     print list(reader)
-   ...:
-[['hostname', 'vendor', 'model', 'location'], ['sw1', 'Cisco', '3750', 'London'], ['sw2', 'Cisco', '3850', 'Liverpool'], ['sw3', 'Cisco', '3650', 'Liverpool'], ['sw4', 'Cisco', '3650', 'London']]
+import csv
+
+with open('sw_data.csv') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(row)
+        print(row['hostname'], row['model'])
+
+```
+
+#VSLIDE
+
+###Чтение файлов в формате CSV
+
+Вывод будет таким:
+```
+$ python csv_read_dict.py
+OrderedDict([('hostname', 'sw1'), ('vendor', 'Cisco'), ('model', '3750'), ('location', 'London')])
+sw1 3750
+OrderedDict([('hostname', 'sw2'), ('vendor', 'Cisco'), ('model', '3850'), ('location', 'Liverpool')])
+sw2 3850
+OrderedDict([('hostname', 'sw3'), ('vendor', 'Cisco'), ('model', '3650'), ('location', 'Liverpool')])
+sw3 3650
+OrderedDict([('hostname', 'sw4'), ('vendor', 'Cisco'), ('model', '3650'), ('location', 'London')])
+sw4 3650
 ```
 
 #VSLIDE
@@ -146,7 +165,7 @@ with open('sw_data_new.csv', 'w') as f:
         writer.writerow(row)
 
 with open('sw_data_new.csv') as f:
-    print f.read()
+    print(f.read())
 ```
 
 #VSLIDE
@@ -163,12 +182,13 @@ sw3,Cisco,3650,"Liverpool, Better str"
 sw4,Cisco,3650,"London, Best str"
 ```
 
-Обратите внимание на интересную особенность: последнее значение, взято в кавычки, а остальные строки - нет.
+Обратите внимание: последнее значение, взято в кавычки, а остальные строки - нет.
+
 #VSLIDE
 
 ###Запись файлов в формате CSV
 
-Для того, чтобы все строки записывались в файл csv с кавычками, надо изменить скрипт таким образом (файл csv_write_ver2.py):
+Для того, чтобы все строки записывались в файл csv с кавычками, надо изменить скрипт таким образом (файл csv_write_quoting.py):
 ```python
 import csv
 
@@ -184,7 +204,7 @@ with open('sw_data_new.csv', 'w') as f:
         writer.writerow(row)
 
 with open('sw_data_new.csv') as f:
-    print f.read()
+    print(f.read())
 ```
 
 #VSLIDE
@@ -193,7 +213,7 @@ with open('sw_data_new.csv') as f:
 
 Теперь вывод будет таким:
 ```
-$ python csv_write_ver2.py
+$ python csv_write_quoting.py
 "hostname","vendor","model","location"
 "sw1","Cisco","3750","London, Best str"
 "sw2","Cisco","3850","Liverpool, Better str"
@@ -202,6 +222,30 @@ $ python csv_write_ver2.py
 ```
 
 Теперь все значения с кавычками. И, так как номер модели задан как строка, в изначальном списке, тут он тоже в кавычках.
+
+#VSLIDE
+
+###Запись файлов в формате CSV
+
+Кроме метода writerow, поддерживается метод writerows (файл csv_writerows.py):
+```python
+import csv
+
+data = [['hostname', 'vendor', 'model', 'location'],
+        ['sw1', 'Cisco', '3750', 'London, Best str'],
+        ['sw2', 'Cisco', '3850', 'Liverpool, Better str'],
+        ['sw3', 'Cisco', '3650', 'Liverpool, Better str'],
+        ['sw4', 'Cisco', '3650', 'London, Best str']]
+
+with open('sw_data_new.csv', 'w') as f:
+    writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+    writer.writerows(data)
+
+with open('sw_data_new.csv') as f:
+    print(f.read())
+```
+
+
 
 #VSLIDE
 
@@ -223,7 +267,7 @@ import csv
 with open('sw_data2.csv') as f:
     reader = csv.reader(f, delimiter=';')
     for row in reader:
-        print row
+        print(row)
 ```
 
 
@@ -268,106 +312,67 @@ __JSON (JavaScript Object Notation)__ - это текстовый формат �
 #VSLIDE
 
 ### Чтение. json.load()
-Чтение файла в объект Python:
+
+Чтение файла в формате JSON в объект Python (файл json_read_load.py):
 ```python
-In [1]: import json
+import json
 
-In [2]: with open('sw_templates.json') as f:
-   ...:     templates = json.load(f)
-   ...:
+with open('sw_templates.json') as f:
+    templates = json.load(f)
 
-In [3]: templates
-Out[3]:
-{u'access': [u'switchport mode access',
-  u'switchport access vlan',
-  u'switchport nonegotiate',
-  u'spanning-tree portfast',
-  u'spanning-tree bpduguard enable'],
- u'trunk': [u'switchport trunk encapsulation dot1q',
-  u'switchport mode trunk',
-  u'switchport trunk native vlan 999',
-  u'switchport trunk allowed vlan']}
+for section, commands in templates.items():
+    print(section)
+    print('\n'.join(commands))
+
+```
+
+#VSLIDE
+
+### Чтение. json.load()
+
+Вывод будет таким:
+```python
+$ python json_read_load.py
+{'access': ['switchport mode access', 'switchport access vlan', 'switchport nonegotiate', 'spanning-tree portfast', 'spanning-tree bpduguard enable'], 'trunk': ['switchport trunk encapsulation dot1q', 'switchport mode trunk', 'switchport trunk native vlan 999', 'switchport trunk allowed vlan']}
+access
+switchport mode access
+switchport access vlan
+switchport nonegotiate
+spanning-tree portfast
+spanning-tree bpduguard enable
+trunk
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk native vlan 999
+switchport trunk allowed vlan
+
 ```
 
 #VSLIDE
 
 ### Чтение. json.loads()
 
-Считывание строки в формате JSON в объект Python:
+Считывание строки в формате JSON в объект Python (файл json_read_loads.py):
 ```python
+import json
 
-In [4]: with open('sw_templates.json') as f:
-   ...:     templates = json.loads(f.read())
-   ...:
+with open('sw_templates.json') as f:
+    file_content = f.read()
+    templates = json.loads(file_content)
 
-In [5]: templates
-Out[5]:
-{u'access': [u'switchport mode access',
-  u'switchport access vlan',
-  u'switchport nonegotiate',
-  u'spanning-tree portfast',
-  u'spanning-tree bpduguard enable'],
- u'trunk': [u'switchport trunk encapsulation dot1q',
-  u'switchport mode trunk',
-  u'switchport trunk native vlan 999',
-  u'switchport trunk allowed vlan']}
+print(templates)
+
+for section, commands in templates.items():
+    print(section)
+    print('\n'.join(commands))
+
 ```
 
-
-#VSLIDE
-###Запись
-
-```python
-In [1]: import json
-
-In [2]: trunk_template = ['switchport trunk encapsulation dot1q',
-   ...:                   'switchport mode trunk',
-   ...:                   'switchport trunk native vlan 999',
-   ...:                   'switchport trunk allowed vlan']
-   ...:
-   ...:
-   ...: access_template = ['switchport mode access',
-   ...:                    'switchport access vlan',
-   ...:                    'switchport nonegotiate',
-   ...:                    'spanning-tree portfast',
-   ...:                    'spanning-tree bpduguard enable']
-   ...:
-   ...: to_json = {'trunk':trunk_template, 'access':access_template}
-   ...:
-```
-
-#VSLIDE
-###Запись. json.dump()
-
-Запись объекта в файл:
-```python
-In [3]: with open('sw_templates.json', 'w') as f:
-   ...:     json.dump(to_json, f)
-   ...:
-
-In [4]: cat sw_templates.json
-{"access": ["switchport mode access", "switchport access vlan", "switchport nonegotiate", "spanning-tree portfast", "spanning-tree bpduguard enable"], "trunk": ["switchport trunk encapsulation dot1q", "switchport mode trunk", "switchport trunk native vlan 999", "switchport trunk allowed vlan"]}
-```
 
 #VSLIDE
 ###Запись. json.dumps()
 
-Преобразование объекта в строку в формате JSON:
-```python
-In [5]: with open('sw_templates.json', 'w') as f:
-   ...:     f.write(json.dumps(to_json))
-   ...:
-   ...:
-
-In [6]: cat sw_templates.json
-{"access": ["switchport mode access", "switchport access vlan", "switchport nonegotiate", "spanning-tree portfast", "spanning-tree bpduguard enable"], "trunk": ["switchport trunk encapsulation dot1q", "switchport mode trunk", "switchport trunk native vlan 999", "switchport trunk allowed vlan"]}
-```
-
-
-#VSLIDE
-###Запись
-
-Более удобный для чтения вывод (файл json_write_ver2.py):
+Преобразование объекта в строку в формате JSON (json_write_dumps.py):
 ```python
 import json
 
@@ -376,7 +381,6 @@ trunk_template = ['switchport trunk encapsulation dot1q',
                   'switchport mode trunk',
                   'switchport trunk native vlan 999',
                   'switchport trunk allowed vlan']
-
 
 access_template = ['switchport mode access',
                    'switchport access vlan',
@@ -387,14 +391,73 @@ access_template = ['switchport mode access',
 to_json = {'trunk':trunk_template, 'access':access_template}
 
 with open('sw_templates.json', 'w') as f:
-    f.write(json.dumps(to_json, sort_keys=True, indent=2))
+    f.write(json.dumps(to_json))
 
 with open('sw_templates.json') as f:
-    print f.read()
+    print(f.read())
+
+```
+
+#VSLIDE
+###Запись. json.dump()
+
+Запись объекта Python в файл в формате JSON (файл json_write_dump.py):
+```python
+import json
+
+
+trunk_template = ['switchport trunk encapsulation dot1q',
+                  'switchport mode trunk',
+                  'switchport trunk native vlan 999',
+                  'switchport trunk allowed vlan']
+
+access_template = ['switchport mode access',
+                   'switchport access vlan',
+                   'switchport nonegotiate',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+to_json = {'trunk':trunk_template, 'access':access_template}
+
+with open('sw_templates.json', 'w') as f:
+    json.dump(to_json, f)
+
+with open('sw_templates.json') as f:
+    print(f.read())
+
+```
+
+#VSLIDE
+###Запись
+
+Более удобный для чтения вывод (файл json_write_indent.py):
+```python
+import json
+
+
+trunk_template = ['switchport trunk encapsulation dot1q',
+                  'switchport mode trunk',
+                  'switchport trunk native vlan 999',
+                  'switchport trunk allowed vlan']
+
+access_template = ['switchport mode access',
+                   'switchport access vlan',
+                   'switchport nonegotiate',
+                   'spanning-tree portfast',
+                   'spanning-tree bpduguard enable']
+
+to_json = {'trunk':trunk_template, 'access':access_template}
+
+with open('sw_templates.json', 'w') as f:
+    json.dump(to_json, f, sort_keys=True, indent=2)
+
+with open('sw_templates.json') as f:
+    print(f.read())
 ``` 
 
 #VSLIDE
 ###Запись
+
 Теперь содержимое файла sw_templates.json выглядит так:
 ```json
 {
@@ -415,11 +478,11 @@ with open('sw_templates.json') as f:
 ```
 
 #VSLIDE
-###Запись
+### Изменение типа данных
+
 При работе с форматом json, данные не всегда будут того же типа, что исходные данные в Python.
 
-Например, строки преобразуются в формат unicode, а кортежи - в списки.
-
+Например, кортежи, при записи в JSON, превращаются в списки:
 ```python
 
 In [1]: import json
@@ -433,12 +496,13 @@ In [3]: print type(trunk_template)
 <type 'tuple'>
 
 In [4]: with open('trunk_template.json', 'w') as f:
-   ...:     f.write(json.dumps(trunk_template, sort_keys=True, indent=2))
+   ...:     json.dump(trunk_template, f, sort_keys=True, indent=2)
    ...:
 ```
 
 #VSLIDE
-###Запись
+### Изменение типа данных
+
 ```python
 
 In [5]: cat trunk_template.json
@@ -453,9 +517,38 @@ In [6]: templates = json.load(open('trunk_template.json'))
 In [7]: type(templates)
 Out[7]: list
 
-In [8]: print templates
-[u'switchport trunk encapsulation dot1q', u'switchport mode trunk', u'switchport trunk native vlan 999', u'switchport trunk allowed vlan']
+In [8]: print(templates)
+['switchport trunk encapsulation dot1q', 'switchport mode trunk', 'switchport trunk native vlan 999', 'switchport trunk allowed vlan']
 ```
+
+#VSLIDE
+### Таблица конвертации данных Python в JSON
+
+|  Python     | JSON  |
+|:-----------:|:-----:|
+|  dict       | object|
+| list, tuple | array |
+| str         | string|
+| int, float  | number|
+| True        | true  |
+| False       | false |
+| None        | null  |
+
+#VSLIDE
+### Таблица конвертации JSON в данные Python
+
+| JSON  |  Python |
+|:-----:|:-------:|
+| object| dict
+| array | list
+| string| str
+| number (int) | int
+| number (real)| float
+| true  | True
+| false | False
+| null  | None
+
+
 
 #VSLIDE
 ### Ключи словарей
