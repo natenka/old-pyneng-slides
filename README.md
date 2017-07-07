@@ -20,7 +20,7 @@
 
 # PyNEng slides Python 3.6
 
-* [Введение](https://gitpitch.com/natenka/pyneng-slides/py3-course_intro)
+* [Введение](https://gitpitch.com/natenka/pyneng-slides/py3_course_intro)
 * [Типы данных в Python](https://gitpitch.com/natenka/pyneng-slides/py3-data-structures)
 * [Создание базовых скриптов](https://gitpitch.com/natenka/pyneng-slides/py3-basic-scripts)
 * [Контроль хода программы](https://gitpitch.com/natenka/pyneng-slides/py3-control-structures)
