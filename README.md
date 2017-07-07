@@ -19,15 +19,18 @@
 
 
 # PyNEng slides Python 3.6
-* [Введение](https://gitpitch.com/natenka/pyneng-slides/course_intro)
-* [Основы Python](https://gitpitch.com/natenka/pyneng-slides/python3-basics):
+
+* [Введение](https://gitpitch.com/natenka/pyneng-slides/py3-course_intro)
+* [Основы Python](https://gitpitch.com/natenka/pyneng-slides/py3-basics):
   * Типы данных в Python
   * Создание базовых скриптов
-* [Контроль хода программы. Работа с файлами](https://gitpitch.com/natenka/pyneng-slides/python3-control-structures)
+* [Контроль хода программы. Работа с файлами](https://gitpitch.com/natenka/pyneng-slides/py3-control-structures)
   * Контроль хода программы
   * Работа с файлами
-* [Функции](https://gitpitch.com/natenka/pyneng-slides/python3-functions)
-* [Модули](https://gitpitch.com/natenka/pyneng-slides/python3-modules)
-* [Регулярные выражения](https://gitpitch.com/natenka/pyneng-slides/python3-regex)
+* [Функции](https://gitpitch.com/natenka/pyneng-slides/py3-functions)
+* [Модули](https://gitpitch.com/natenka/pyneng-slides/py3-modules)
+* [Регулярные выражения](https://gitpitch.com/natenka/pyneng-slides/py3-regex)
+* [Unicode](https://gitpitch.com/natenka/pyneng-slides/py3-unicode)
+* [YAML, JSON, CSV](https://gitpitch.com/natenka/pyneng-slides/py3-serialization)
 
 
