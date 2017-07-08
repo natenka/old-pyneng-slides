@@ -1,6 +1,7 @@
-# PyNEng slides Python 2.7
+# Презентации к курсу ["Python для сетевых инженеров"](https://www.gitbook.com/book/natenka/pyneng/details):
 
-Презентации к курсу ["Python для сетевых инженеров"](https://www.gitbook.com/book/natenka/pyneng/details):
+## Слайды для Python 2.7
+
 * [Введение](https://gitpitch.com/natenka/pyneng-slides/course_intro)
 * [Основы Python](https://gitpitch.com/natenka/pyneng-slides):
   * Типы данных в Python
@@ -18,7 +19,7 @@
 * [Ansible](https://gitpitch.com/natenka/pyneng-slides/ansible)
 
 
-# PyNEng slides Python 3.6
+## Слайды для Python 3.6
 
 * [Введение](https://gitpitch.com/natenka/pyneng-slides/py3_course_intro)
 * [Типы данных в Python](https://gitpitch.com/natenka/pyneng-slides/py3-data-structures)
@@ -31,4 +32,8 @@
 * [Unicode](https://gitpitch.com/natenka/pyneng-slides/py3-unicode)
 * [YAML, JSON, CSV](https://gitpitch.com/natenka/pyneng-slides/py3-serialization)
 
+## PDF версии слайдов
+
+* [Python 2.6](https://github.com/natenka/pyneng-slides/tree/py2-pdf)
+* [Python 3.6](https://github.com/natenka/pyneng-slides/tree/py3-pdf)
 
