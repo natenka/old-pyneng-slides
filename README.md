@@ -1,4 +1,4 @@
-# Презентации к курсу [Python для сетевых инженеров](https://www.gitbook.com/book/natenka/pyneng/details):
+# Презентации к курсу [Python для сетевых инженеров](https://www.gitbook.com/book/natenka/pyneng/details)
 
 ## Слайды для Python 2.7
 
