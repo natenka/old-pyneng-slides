@@ -281,7 +281,7 @@ with open('sw_data2.csv') as f:
 
 __JSON (JavaScript Object Notation)__ - это текстовый формат для хранения и обмена данными.
 
-[JSON](https://ru.wikipedia.org/wiki/JSON) по синтаксису очень похож на словари в Python. И достаточно удобен для восприятия.
+[JSON](https://ru.wikipedia.org/wiki/JSON) по синтаксису очень похож на Python. И достаточно удобен для восприятия.
 
 Как и в случае с CSV, в Python есть модуль, который позволяет легко записывать и читать данные в формате JSON.
 
@@ -522,7 +522,7 @@ In [8]: print(templates)
 ```
 
 #VSLIDE
-### Таблица конвертации данных Python в JSON
+### Конвертация данных Python в JSON
 
 |  Python     | JSON  |
 |:-----------:|:-----:|
@@ -535,7 +535,7 @@ In [8]: print(templates)
 | None        | null  |
 
 #VSLIDE
-### Таблица конвертации JSON в данные Python
+### Конвертация JSON в данные Python
 
 | JSON  |  Python |
 |:-----:|:-------:|
@@ -742,13 +742,24 @@ pip install pyyaml
 
 ####Чтение из YAML
 
+Чтение из YAML (файл yaml_read.py):
 ```python
-In [1]: import yaml
+import yaml
+import pprint
 
-In [2]: templates = yaml.load(open('info.yaml'))
+with open('info.yaml') as f:
+    templates = yaml.load(f)
 
-In [3]: templates
-Out[3]:
+pprint.pprint(templates)
+
+```
+
+#VSLIDE
+
+####Чтение из YAML
+Результат:
+```python
+$ python yaml_read.py
 [{'BS': 1550,
   'IT': 791,
   'id': 11,
@@ -767,7 +778,9 @@ Out[3]:
   'name': 'Coventry',
   'to_id': 2,
   'to_name': 'Manchester'}]
+
 ```
+
 
 #VSLIDE
 
@@ -782,7 +795,6 @@ trunk_template = ['switchport trunk encapsulation dot1q',
                   'switchport trunk native vlan 999',
                   'switchport trunk allowed vlan']
 
-
 access_template = ['switchport mode access',
                    'switchport access vlan',
                    'switchport nonegotiate',
@@ -792,10 +804,10 @@ access_template = ['switchport mode access',
 to_yaml = {'trunk':trunk_template, 'access':access_template}
 
 with open('sw_templates.yaml', 'w') as f:
-    f.write(yaml.dump(to_yaml))
+    yaml.dump(to_yaml, f)
 
 with open('sw_templates.yaml') as f:
-    print f.read()
+    print(f.read())
 
 ```
 
@@ -815,7 +827,7 @@ trunk: [switchport trunk encapsulation dot1q, switchport mode trunk, switchport 
 
 ####Запись в YAML
 
-Параметр ```default_flow_style=False``` (файл yaml_write_ver2.py):
+Параметр ```default_flow_style=False``` (файл yaml_write_default_flow_style.py):
 ```python
 import yaml
 
@@ -823,7 +835,6 @@ trunk_template = ['switchport trunk encapsulation dot1q',
                   'switchport mode trunk',
                   'switchport trunk native vlan 999',
                   'switchport trunk allowed vlan']
-
 
 access_template = ['switchport mode access',
                    'switchport access vlan',
@@ -834,7 +845,7 @@ access_template = ['switchport mode access',
 to_yaml = {'trunk':trunk_template, 'access':access_template}
 
 with open('sw_templates.yaml', 'w') as f:
-    f.write(yaml.dump(to_yaml, default_flow_style=False))
+    yaml.dump(to_yaml, f, default_flow_style=False)
 
 with open('sw_templates.yaml') as f:
     print f.read()
