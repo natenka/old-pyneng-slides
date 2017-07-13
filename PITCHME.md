@@ -86,9 +86,8 @@ __SQL (structured query language)__ - используется для описа
 Для того чтобы создать БД (или открыть уже созданную) надо просто вызвать sqlite3 таким образом:
 ```
 $ sqlite3 testDB.db
-SQLite version 3.7.13 2012-06-11 02:05:22
-Enter ".help" for instructions
-Enter SQL statements terminated with a ";"
+SQLite version 3.8.7.1 2014-10-29 13:59:56
+Enter ".help" for usage hints.
 sqlite> 
 ```
 
@@ -195,13 +194,13 @@ sqlite> DROP table switch;
 
 Если указываются значения для всех полей, добавить запись можно таким образом (порядок полей должен соблюдаться):
 ```sql
-sqlite> INSERT into switch values ('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str');
+sqlite> INSERT into switch values ('0010.A1AA.C1CC', 'sw1', 'Cisco 3750', 'London, Green Str');
 ```
 
 Если нужно указать не все поля, или указать их в произвольном порядке, используется такая запись:
 ```sql
 sqlite> INSERT into switch (mac, model, location, hostname)
-   ...> values ('0000.BBBB.CCCC', 'Cisco 3850', 'London, Green Str', 'sw5');
+   ...> values ('0020.A2AA.C2CC', 'Cisco 3850', 'London, Green Str', 'sw2');
 ```
 
 #VSLIDE
@@ -213,8 +212,8 @@ sqlite> INSERT into switch (mac, model, location, hostname)
 Например:
 ```sql
 sqlite> SELECT * from switch;
-0000.AAAA.CCCC|sw1|Cisco 3750|London, Green Str
-0000.BBBB.CCCC|sw5|Cisco 3850|London, Green Str
+0010.A1AA.C1CC|sw1|Cisco 3750|London, Green Str
+0020.A2AA.C2CC|sw2|Cisco 3850|London, Green Str
 ```
 
 #VSLIDE
@@ -226,8 +225,9 @@ sqlite> SELECT * from switch;
 sqlite> .headers ON
 sqlite> SELECT * from switch;
 mac|hostname|model|location
-0000.AAAA.CCCC|sw1|Cisco 3750|London, Green Str
-0000.BBBB.CCCC|sw5|Cisco 3850|London, Green Str
+0010.A1AA.C1CC|sw1|Cisco 3750|London, Green Str
+0020.A2AA.C2CC|sw2|Cisco 3850|London, Green Str
+
 ```
 
 #VSLIDE
@@ -240,11 +240,68 @@ mac|hostname|model|location
 ```sql
 sqlite> .mode column
 sqlite> SELECT * from switch;
-mac             hostname    model       location         
+mac             hostname    model       location
 --------------  ----------  ----------  -----------------
-0000.AAAA.CCCC  sw1         Cisco 3750  London, Green Str
-0000.BBBB.CCCC  sw5         Cisco 3850  London, Green Str
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
 ```
+
+#VSLIDE
+
+### Метакоманда ```.read```
+
+В таблице switch всего две записи:
+```
+sqlite> SELECT * from switch;
+mac             hostname    model       location
+--------------  ----------  ----------  -----------------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
+
+```
+
+
+#VSLIDE
+### Метакоманда ```.read```
+
+Метакоманда .read позволяет загружать команды SQL из файла.
+
+Для добавления записей, заготовлен файл add_rows_to_testdb.txt:
+```sql
+INSERT into switch values ('0030.A3AA.C1CC', 'sw3', 'Cisco 3750', 'London, Green Str');
+INSERT into switch values ('0040.A4AA.C2CC', 'sw4', 'Cisco 3850', 'London, Green Str');
+INSERT into switch values ('0050.A5AA.C3CC', 'sw5', 'Cisco 3850', 'London, Green Str');
+INSERT into switch values ('0060.A6AA.C4CC', 'sw6', 'C3750', 'London, Green Str');
+INSERT into switch values ('0070.A7AA.C5CC', 'sw7', 'Cisco 3650', 'London, Green Str');
+```
+
+#VSLIDE
+### Метакоманда ```.read```
+
+Для загрузки команд из файла, надо выполнить команду:
+```
+sqlite> .read add_rows_to_testdb.txt
+
+```
+
+#VSLIDE
+### Метакоманда ```.read```
+
+Теперь таблица switch выглядит так:
+```sql
+sqlite> SELECT * from switch;
+mac             hostname    model       location
+--------------  ----------  ----------  -----------------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str
+0060.A6AA.C4CC  sw6         C3750       London, Green Str
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str
+
+```
+
 
 #VSLIDE
 
@@ -254,34 +311,44 @@ mac             hostname    model       location
 С помощью этого оператора можно указывать определенные условия, по которым отбираются данные.
 Если условие выполнено, возвращается соответствующее значение из таблицы, если нет, не возвращается.
 
-Например, таблица switch выглядит так:
+#VSLIDE
+### WHERE
+
+Таблица switch выглядит так:
 ```sql
 sqlite> SELECT * from switch;
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.DDDD.DDDD  sw1         Cisco 3850  London, Green Str  10.255.0.1  255         MNGMT      
-0000.BBBB.CCCC  sw5         Cisco 3850  London, Green Str  10.255.0.5  255         MNGMT      
-0000.2222.CCCC  sw2         Cisco 3750  London, Green Str  10.255.0.2  255         MNGMT      
-0000.3333.CCCC  sw3         Cisco 3750  London, Green Str  10.255.0.3  255         MNGMT      
-0000.4444.CCCC  sw4         Cisco 3650  London, Green Str  10.255.0.4  255         MNGMT      
+mac             hostname    model       location
+--------------  ----------  ----------  -----------------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str
+0060.A6AA.C4CC  sw6         C3750       London, Green Str
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str
+
 ```
 
-#VSLIDE
 
+#VSLIDE
 ### WHERE
-Показать только те коммутаторы, модель которых 3750:
+
+Показать только те коммутаторы, модель которых 3850:
 ```sql
-sqlite> SELECT * from switch WHERE model = 'Cisco 3750';
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.2222.CCCC  sw2         Cisco 3750  London, Green Str  10.255.0.2  255         MNGMT      
-0000.3333.CCCC  sw3         Cisco 3750  London, Green Str  10.255.0.3  255         MNGMT      
+sqlite> SELECT * from switch WHERE model = 'Cisco 3850';
+mac             hostname    model       location
+--------------  ----------  ----------  -----------------
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str
+
 ```
 
 #VSLIDE
 
 ### WHERE
-Оператор where позволяет указывать не только конкретное значение поля.
+
+Оператор WHERE позволяет указывать не только конкретное значение поля.
 Если добавить к нему оператор like, можно указывать шаблон поля.
 
 LIKE с помощью символов ```_``` и ```%``` указывает на что должно быть похоже значение:
@@ -293,55 +360,48 @@ LIKE с помощью символов ```_``` и ```%``` указывает н
 #VSLIDE
 
 ### WHERE
-Например, если в таблице поле model записано в разном формате:
-```sql
-sqlite> SELECT * from switch;
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.DDDD.DDDD  sw1         Cisco 3850  London, Green Str  10.255.0.1  255         MNGMT      
-0000.BBBB.CCCC  sw5         Cisco 3850  London, Green Str  10.255.0.5  255         MNGMT      
-0000.2222.CCCC  sw2         C3750       London, Green Str  10.255.0.2  255         MNGMT      
-0000.3333.CCCC  sw3         Cisco 3750  London, Green Str  10.255.0.3  255         MNGMT      
-0000.4444.CCCC  sw4         Cisco 3650  London, Green Str  10.255.0.4  255         MNGMT      
-```
 
-#VSLIDE
+Например, у коммутатора sw6 поле model записано в таком формате C3750, а у коммутаторов sw1 и sw3 в таком Cisco 3750.
 
-### WHERE
-В таком варианте предыдущий запрос с оператором WHERE не поможет:
+В таком варианте запрос с оператором WHERE не покажет sw6:
 ```sql
 sqlite> SELECT * from switch WHERE model = 'Cisco 3750';
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.3333.CCCC  sw3         Cisco 3750  London, Green Str  10.255.0.3  255         MNGMT      
+mac             hostname    model       location
+--------------  ----------  ----------  -----------------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+
 ```
+
+
+#VSLIDE
+### WHERE
 
 Но, если вместе с оператором WHERE использовать оператор ```LIKE```:
 ```sql
 sqlite> SELECT * from switch WHERE model LIKE '%3750';
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.2222.CCCC  sw2         C3750       London, Green Str  10.255.0.2  255         MNGMT      
-0000.3333.CCCC  sw3         Cisco 3750  London, Green Str  10.255.0.3  255         MNGMT      
+mac             hostname    model       location
+--------------  ----------  ----------  -----------------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+0060.A6AA.C4CC  sw6         C3750       London, Green Str
+
 ```
 
 #VSLIDE
 
 ### ALTER
 
-Оператор alter позволяет менять существующую таблицу: добавлять новые колонки или переименовывать таблицу.
+Оператор ALTER позволяет менять существующую таблицу: добавлять новые колонки или переименовывать таблицу.
 
-
-Новые поля:
+Добавим в таблицу новые поля:
 * mngmt_ip - IP-адрес коммутатора в менеджмент VLAN
 * mngmt_vid - VLAN ID (номер VLAN) для менеджмент VLAN
-* mngmt_vname - Имя VLAN, который используется для менеджмента
 
 Добавление записей с помощью команды ALTER:
 ```sql
 sqlite> ALTER table switch ADD COLUMN mngmt_ip text;
-sqlite> ALTER table switch ADD COLUMN mngmt_vid varchar(10);
-sqlite> ALTER table switch ADD COLUMN mngmt_vname  text;
+sqlite> ALTER table switch ADD COLUMN mngmt_vid integer;
 ```
 
 #VSLIDE
@@ -351,35 +411,117 @@ sqlite> ALTER table switch ADD COLUMN mngmt_vname  text;
 Теперь таблица выглядит так (новые поля установлены в значение NULL):
 ```sql
 sqlite> SELECT * from switch;
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.AAAA.CCCC  sw1         Cisco 3750  London, Green Str                                     
-0000.BBBB.CCCC  sw5         Cisco 3850  London, Green Str                                    
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str
+0060.A6AA.C4CC  sw6         C3750       London, Green Str
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str
+
 ```
 
 #VSLIDE
 
 ### UPDATE
 
-Оператор update используется для изменения существующей записи таблицы.
+Оператор UPDATE используется для изменения существующей записи таблицы.
 
-Обычно, update используется вместе с оператором where, чтобы уточнить какую именно запись необходимо изменить.
+Обычно, UPDATE используется вместе с оператором where, чтобы уточнить какую именно запись необходимо изменить.
 
+С помощью UPDATE, можно заполнить новые столбцы в таблице:
 ```sql
-sqlite> UPDATE switch set model = 'Cisco 3850' where hostname = 'sw1';
-sqlite> UPDATE switch set mac = '0000.DDDD.DDDD' where hostname = 'sw1';
+sqlite> UPDATE switch set mngmt_ip = '10.255.1.1' WHERE hostname = 'sw1';
 ```
 
-#VSLIDE
 
+#VSLIDE
 ### UPDATE
+
 Результат будет таким:
 ```
 sqlite> SELECT * from switch;
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.DDDD.DDDD  sw1         Cisco 3850  London, Green Str  10.255.0.1  255         MNGMT      
-0000.BBBB.CCCC  sw5         Cisco 3850  London, Green Str  10.255.0.5  255         MNGMT      
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str  10.255.1.1
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str
+0060.A6AA.C4CC  sw6         C3750       London, Green Str
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str
+```
+#VSLIDE
+### UPDATE
+
+Аналогичным образом можно изменить и номер VLAN:
+```sql
+sqlite> UPDATE switch set mngmt_vid = 255 WHERE hostname = 'sw1';
+sqlite> SELECT * from switch;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str
+0060.A6AA.C4CC  sw6         C3750       London, Green Str
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str
+
+```
+
+#VSLIDE
+### UPDATE
+
+И можно изменить несколько полей за раз:
+```sql
+sqlite> UPDATE switch set mngmt_ip = '10.255.1.2', mngmt_vid = 255 WHERE hostname = 'sw2';
+sqlite> SELECT * from switch;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str
+0060.A6AA.C4CC  sw6         C3750       London, Green Str
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str
+
+```
+
+#VSLIDE
+### UPDATE
+
+Чтобы не заполнять поля mngmt_ip и mngmt_vid вручную, заполним остальное из файла update_fields_in_testdb.txt:
+```
+UPDATE switch set mngmt_ip = '10.255.1.3', mngmt_vid = 255 WHERE hostname = 'sw3';
+UPDATE switch set mngmt_ip = '10.255.1.4', mngmt_vid = 255 WHERE hostname = 'sw4';
+UPDATE switch set mngmt_ip = '10.255.1.5', mngmt_vid = 255 WHERE hostname = 'sw5';
+UPDATE switch set mngmt_ip = '10.255.1.6', mngmt_vid = 255 WHERE hostname = 'sw6';
+UPDATE switch set mngmt_ip = '10.255.1.7', mngmt_vid = 255 WHERE hostname = 'sw7';
+
+```
+
+#VSLIDE
+### UPDATE
+
+После загрузки команд, таблица выглядит так:
+```sql
+sqlite> .read update_fields_in_testdb.txt
+
+sqlite> SELECT * from switch;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.A1AA.C1CC  sw1         Cisco 3750  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0030.A3AA.C1CC  sw3         Cisco 3750  London, Green Str  10.255.1.3  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+
 ```
 
 #VSLIDE
@@ -392,25 +534,103 @@ mac             hostname    model       location           mngmt_ip    mngmt_vid
 
 Например:
 ```sql
-sqlite> DELETE from switch where hostname = 'sw4';
+sqlite> DELETE from switch where hostname = 'sw8';
 ```
+
+#VSLIDE
+### DELETE
+
+Теперь в таблице нет строки с коммутатором sw:
+```sql
+sqlite> SELECT * from switch;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.D1DD.E1EE  sw1         Cisco 3850  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+0030.A3AA.C1CC  sw3         Cisco 3850  London, Green Str  10.255.1.3  255
+
+```
+
 
 #VSLIDE
 
 ### ORDER BY
 
 Оператор ORDER BY используется для сортировки вывода по определенному полю, по возрастанию или убыванию.
+Для этого он добавляется к оператору SELECT.
 
-Например, выведем все записи в таблице switch и отсортируем их по имени коммутаторов (по умолчанию выполняется сортировка по умолчанию, поэтому параметр ASC можно не указывать):
+Если выполнить простой запрос SELECT, вывод будет таким:
+```sql
+sqlite> SELECT * from switch;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.D1DD.E1EE  sw1         Cisco 3850  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+0030.A3AA.C1CC  sw3         Cisco 3850  London, Green Str  10.255.1.3  255
+
+```
+
+#VSLIDE
+### ORDER BY
+
+С помощью оператора ORDER BY можно вывести записи в таблице switch отсортированными их по имени коммутаторов:
 ```sql
 sqlite> SELECT * from switch ORDER BY hostname ASC;
-mac             hostname    model       location           mngmt_ip    mngmt_vid   mngmt_vname
---------------  ----------  ----------  -----------------  ----------  ----------  -----------
-0000.DDDD.DDDD  sw1         Cisco 3850  London, Green Str  10.255.0.1  255         MNGMT      
-0000.2222.CCCC  sw2         C3750       London, Green Str  10.255.0.2  255         MNGMT      
-0000.3333.CCCC  sw3         Cisco 3750  London, Green Str  10.255.0.3  255         MNGMT      
-0000.BBBB.CCCC  sw5         Cisco 3850  London, Green Str  10.255.0.5  255         MNGMT      
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.D1DD.E1EE  sw1         Cisco 3850  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0030.A3AA.C1CC  sw3         Cisco 3850  London, Green Str  10.255.1.3  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+
 ```
+
+#VSLIDE
+### ORDER BY
+
+По умолчанию сортировка выполняется по возрастанию, поэтому в запросе можно было не указывать параметр ASC:
+```sql
+sqlite> SELECT * from switch ORDER BY hostname;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.D1DD.E1EE  sw1         Cisco 3850  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0030.A3AA.C1CC  sw3         Cisco 3850  London, Green Str  10.255.1.3  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+```
+
+#VSLIDE
+### ORDER BY
+
+Сортировка по IP-адресу, по убыванию:
+```sql
+sqlite> SELECT * from switch ORDER BY mngmt_ip DESC;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0030.A3AA.C1CC  sw3         Cisco 3850  London, Green Str  10.255.1.3  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0010.D1DD.E1EE  sw1         Cisco 3850  London, Green Str  10.255.1.1  255
+
+```
+
 
 #HSLIDE
 
