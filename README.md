@@ -35,6 +35,6 @@
 
 ## PDF версии слайдов
 
-* [Python 2.6](https://github.com/natenka/pyneng-slides/tree/py2-pdf)
+* [Python 2.7](https://github.com/natenka/pyneng-slides/tree/py2-pdf)
 * [Python 3.6](https://github.com/natenka/pyneng-slides/tree/py3-pdf)
 
