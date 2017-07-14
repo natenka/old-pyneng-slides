@@ -495,7 +495,7 @@ mac             hostname    model       location           mngmt_ip    mngmt_vid
 ### UPDATE
 
 Чтобы не заполнять поля mngmt_ip и mngmt_vid вручную, заполним остальное из файла update_fields_in_testdb.txt:
-```
+```sql
 UPDATE switch set mngmt_ip = '10.255.1.3', mngmt_vid = 255 WHERE hostname = 'sw3';
 UPDATE switch set mngmt_ip = '10.255.1.4', mngmt_vid = 255 WHERE hostname = 'sw4';
 UPDATE switch set mngmt_ip = '10.255.1.5', mngmt_vid = 255 WHERE hostname = 'sw5';
@@ -521,6 +521,70 @@ mac             hostname    model       location           mngmt_ip    mngmt_vid
 0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
 0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
 0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+
+```
+
+#VSLIDE
+### REPLACE
+
+Оператор REPLACE используется для добавления или замены данных в таблице.
+
+Когда возникает нарушение условия уникальности поля, выражение с оператором REPLACE:
+* удаляет существующую строку, которая вызвала нарушение
+* добавляет новую строку
+
+#VSLIDE
+### REPLACE
+
+У выражения REPLACE есть два вида:
+```
+sqlite> INSERT OR REPLACE INTO switch
+   ...> VALUES ('0030.A3AA.C1CC', 'sw3', 'Cisco 3850', 'London, Green Str', '10.255.1.3', 255);
+```
+
+Или более короткий вариант:
+```
+sqlite> REPLACE INTO switch
+   ...> VALUES ('0030.A3AA.C1CC', 'sw3', 'Cisco 3850', 'London, Green Str', '10.255.1.3', 255);
+```
+
+#VSLIDE
+### REPLACE
+
+Результатом любой из этих команд, будет замена модели коммутатора sw3:
+```sql
+sqlite> SELECT * from switch;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.D1DD.E1EE  sw1         Cisco 3850  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+0030.A3AA.C1CC  sw3         Cisco 3850  London, Green Str  10.255.1.3  255
+
+```
+
+#VSLIDE
+### REPLACE
+
+При добавлении записи, для которой не возникает нарушения уникальности поля, replace работает как обычный insert:
+```
+sqlite> REPLACE INTO switch
+   ...> VALUES ('0080.A8AA.C8CC', 'sw8', 'Cisco 3850', 'London, Green Str', '10.255.1.8', 255);
+
+sqlite> SELECT * from switch;
+mac             hostname    model       location           mngmt_ip    mngmt_vid
+--------------  ----------  ----------  -----------------  ----------  ----------
+0010.D1DD.E1EE  sw1         Cisco 3850  London, Green Str  10.255.1.1  255
+0020.A2AA.C2CC  sw2         Cisco 3850  London, Green Str  10.255.1.2  255
+0040.A4AA.C2CC  sw4         Cisco 3850  London, Green Str  10.255.1.4  255
+0050.A5AA.C3CC  sw5         Cisco 3850  London, Green Str  10.255.1.5  255
+0060.A6AA.C4CC  sw6         C3750       London, Green Str  10.255.1.6  255
+0070.A7AA.C5CC  sw7         Cisco 3650  London, Green Str  10.255.1.7  255
+0030.A3AA.C1CC  sw3         Cisco 3850  London, Green Str  10.255.1.3  255
+0080.A8AA.C8CC  sw8         Cisco 3850  London, Green Str  10.255.1.8  255
 
 ```
 
@@ -876,7 +940,7 @@ In [4]: cursor.execute('select * from switch')
 Out[4]: <sqlite3.Cursor at 0x104eda810>
 
 In [5]: cursor.fetchone()
-Out[5]: (u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
+Out[5]: ('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str')
 ```
 
 #VSLIDE
@@ -884,8 +948,8 @@ Out[5]: (u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
 
 Если повторно вызвать метод, он вернет следующую строку:
 ```python
-In [6]: print cursor.fetchone()
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
+In [6]: print(cursor.fetchone())
+('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str')
 ```
 
 #VSLIDE
@@ -905,18 +969,18 @@ Out[7]: <sqlite3.Cursor at 0x104eda810>
 In [8]: while True:
    ...:     next_row = cursor.fetchone()
    ...:     if next_row:
-   ...:         print next_row
+   ...:         print(next_row)
    ...:     else:
    ...:         break
    ...:
-(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
-(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')
-(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0001', u'sw5', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0002', u'sw6', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0003', u'sw7', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0004', u'sw8', u'Cisco 3750', u'London, Green Str')
+('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str')
+('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str')
+('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str')
+('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')
+('0000.1111.0001', 'sw5', 'Cisco 3750', 'London, Green Str')
+('0000.1111.0002', 'sw6', 'Cisco 3750', 'London, Green Str')
+('0000.1111.0003', 'sw7', 'Cisco 3750', 'London, Green Str')
+
 ```
 
 #VSLIDE
@@ -935,7 +999,7 @@ cursor.fetchmany([size=cursor.arraysize])
 С помощью параметра size, можно указывать какое количество строк возвращается.
 По умолчанию, параметр size равен значению cursor.arraysize:
 ```python
-In [9]: print cursor.arraysize
+In [9]: print(cursor.arraysize)
 1
 ```
 
@@ -944,28 +1008,27 @@ In [9]: print cursor.arraysize
 
 Например, таким образом можно возвращать по три строки из запроса:
 ```python
+In [25]: cursor.execute('select * from switch')
+Out[25]: <sqlite3.Cursor at 0x104eda810>
 
-In [10]: cursor.execute('select * from switch')
-Out[10]: <sqlite3.Cursor at 0x104eda810>
+In [26]: from pprint import pprint
 
-In [11]: while True:
+In [27]: while True:
     ...:     three_rows = cursor.fetchmany(3)
     ...:     if three_rows:
-    ...:         print three_rows
-    ...:         print
+    ...:         pprint(three_rows)
     ...:     else:
     ...:         break
     ...:
-[(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str'),
- (u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
- (u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')]
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str')]
+[('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0001', 'sw5', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0002', 'sw6', 'Cisco 3750', 'London, Green Str')]
+[('0000.1111.0003', 'sw7', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0004', 'sw8', 'Cisco 3750', 'London, Green Str')]
 
-[(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0001', u'sw5', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0002', u'sw6', u'Cisco 3750', u'London, Green Str')]
-
-[(u'0000.1111.0003', u'sw7', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0004', u'sw8', u'Cisco 3750', u'London, Green Str')]
 ```
 
 
@@ -979,14 +1042,15 @@ Out[12]: <sqlite3.Cursor at 0x104eda810>
 
 In [13]: cursor.fetchall()
 Out[13]:
-[(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str'),
- (u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str'),
- (u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str'),
- (u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0001', u'sw5', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0002', u'sw6', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0003', u'sw7', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0004', u'sw8', u'Cisco 3750', u'London, Green Str')]
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0001', 'sw5', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0002', 'sw6', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0003', 'sw7', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0004', 'sw8', 'Cisco 3750', 'London, Green Str')]
+
 ```
 
 #VSLIDE
@@ -996,23 +1060,23 @@ Out[13]:
 
 То есть, если до метода fetchall, использовался, например, метод fetchone, то метод fetchall вернет оставшиеся строки запроса:
 ```python
-In [14]: cursor.execute('select * from switch')
-Out[14]: <sqlite3.Cursor at 0x104eda810>
+In [30]: cursor.execute('select * from switch')
+Out[30]: <sqlite3.Cursor at 0x104eda810>
 
-In [15]: cursor.fetchone()
-Out[15]: (u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
+In [31]: cursor.fetchone()
+Out[31]: ('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str')
 
-In [16]: cursor.fetchone()
-Out[16]: (u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
+In [32]: cursor.fetchone()
+Out[32]: ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str')
 
-In [17]: cursor.fetchall()
-Out[17]:
-[(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str'),
- (u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0001', u'sw5', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0002', u'sw6', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0003', u'sw7', u'Cisco 3750', u'London, Green Str'),
- (u'0000.1111.0004', u'sw8', u'Cisco 3750', u'London, Green Str')]
+In [33]: cursor.fetchall()
+Out[33]:
+[('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0001', 'sw5', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0002', 'sw6', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0003', 'sw7', 'Cisco 3750', 'London, Green Str'),
+ ('0000.1111.0004', 'sw8', 'Cisco 3750', 'London, Green Str')]
 ```
 
 #VSLIDE
@@ -1027,19 +1091,19 @@ Out[17]:
 #### Cursor как итератор
 
 ```python
-In [18]: result = cursor.execute('select * from switch')
+In [34]: result = cursor.execute('select * from switch')
 
-In [19]: for row in result:
-    ...:     print row
+In [35]: for row in result:
+    ...:     print(row)
     ...:
-(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
-(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')
-(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0001', u'sw5', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0002', u'sw6', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0003', u'sw7', u'Cisco 3750', u'London, Green Str')
-(u'0000.1111.0004', u'sw8', u'Cisco 3750', u'London, Green Str')
+('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str')
+('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str')
+('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str')
+('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')
+('0000.1111.0001', 'sw5', 'Cisco 3750', 'London, Green Str')
+('0000.1111.0002', 'sw6', 'Cisco 3750', 'London, Green Str')
+('0000.1111.0003', 'sw7', 'Cisco 3750', 'London, Green Str')
+('0000.1111.0004', 'sw8', 'Cisco 3750', 'London, Green Str')
 ```
 
 #VSLIDE
@@ -1069,14 +1133,15 @@ data = [('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
 
 con = sqlite3.connect('sw_inventory2.db')
 
-con.execute("create table switch (mac text primary key, hostname text, model text, location text)")
+con.execute("""create table switch
+            (mac text primary key, hostname text, model text, location text)""")
 
 query = "INSERT into switch values (?, ?, ?, ?)"
 con.executemany(query, data)
 con.commit()
 
 for row in con.execute("select * from switch"):
-    print row
+    print(row)
 
 con.close()
 ```
@@ -1087,10 +1152,10 @@ con.close()
 Результат выполнения будет таким:
 ```
 $ python create_sw_inventory_ver1.py
-(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
-(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')
-(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str')
+('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str')
+('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str')
+('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str')
+('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')
 ```
 
 #VSLIDE
@@ -1102,17 +1167,18 @@ $ python create_sw_inventory_ver1.py
 В таблице switch поле mac должно быть уникальным.
 И, если попытаться записать пересекающийся MAC-адрес, возникнет ошибка:
 ```python
-In [22]: con = sqlite3.connect('sw_inventory2.db')
+In [37]: con = sqlite3.connect('sw_inventory2.db')
 
-In [23]: query = "INSERT into switch values ('0000.AAAA.DDDD', 'sw7', 'Cisco 2960', 'London, Green Str')"
+In [38]: query = "INSERT into switch values ('0000.AAAA.DDDD', 'sw7', 'Cisco 2960', 'London, Green Str')"
 
-In [24]: con.execute(query)
----------------------------------------------------------------------------
-IntegrityError                            Traceback (most recent call last)
+In [39]: con.execute(query)
+------------------------------------------------------------
+IntegrityError             Traceback (most recent call last)
 <ipython-input-56-ad34d83a8a84> in <module>()
 ----> 1 con.execute(query)
 
 IntegrityError: UNIQUE constraint failed: switch.mac
+
 ```
 
 #VSLIDE
@@ -1120,12 +1186,13 @@ IntegrityError: UNIQUE constraint failed: switch.mac
 
 Соответственно, можно перехватить исключение:
 ```python
-In [25]: try:
+In [40]: try:
     ...:     con.execute(query)
     ...: except sqlite3.IntegrityError as e:
-    ...:     print "Error occured: ", e
+    ...:     print("Error occured: ", e)
     ...:
 Error occured:  UNIQUE constraint failed: switch.mac
+
 ```
 
 #VSLIDE
@@ -1157,24 +1224,30 @@ data = [('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
 
 
 con = sqlite3.connect('sw_inventory3.db')
-con.execute("create table switch (mac text primary key, hostname text, model text, location text)")
+con.execute("""create table switch
+               (mac text primary key, hostname text, model text, location text)""")
 
 try:
     with con:
         query = "INSERT into switch values (?, ?, ?, ?)"
         con.executemany(query, data)
+
 except sqlite3.IntegrityError as e:
-    print "Error occured: ", e
+    print("Error occured: ", e)
 
 for row in con.execute("select * from switch"):
-    print row
+    print(row)
+
+con.close()
 ```
 
 #VSLIDE
 ### Connection как менеджер контекста
 
+Файл create_sw_inventory_ver2_functions.py:
 ```python
 # -*- coding: utf-8 -*-
+from pprint import pprint
 import sqlite3
 
 data = [('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
@@ -1182,37 +1255,143 @@ data = [('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
         ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
         ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')]
 
-con = sqlite3.connect('sw_inventory3.db')
-con.execute("create table switch (mac text primary key, hostname text, model text, location text)")
 
-try:
-    with con:
-        query = "INSERT into switch values (?, ?, ?, ?)"
-        con.executemany(query, data)
-except sqlite3.IntegrityError as e:
-    print "Error occured: ", e
+def create_connection(db_name):
+    '''
+    Функция создает соединение с БД db_name
+    и возвращает его
+    '''
+    connection = sqlite3.connect(db_name)
+    return connection
+```
 
-for row in con.execute("select * from switch"):
-    print row
+#VSLIDE
+### Connection как менеджер контекста
 
-print '-'*30
+Файл create_sw_inventory_ver2_functions.py:
+```python
 
-#MAC-адрес sw7 совпадает с MAC-адресом существующего коммутатора - sw3
+def write_data_to_db(connection, query, data):
+    '''
+    Функция ожидает аргументы:
+     * connection - соединение с БД
+     * query - запрос, который нужно выполнить
+     * data - данные, которые надо передать в виде списка кортежей
+
+    Функция пытается записать все данные из списка data.
+    Если данные удалось записать успешно, изменения сохраняются в БД
+    и функция возвращает True.
+    Если в процессе записи возникла ошибка, транзакция откатывается
+    и функция возвращает False.
+    '''
+    try:
+        with connection:
+            connection.executemany(query, data)
+    except sqlite3.IntegrityError as e:
+        print("Error occured: ", e)
+        return False
+    else:
+        print("Запись данных прошла успешно")
+        return True
+
+def get_all_from_db(connection, query):
+    '''
+    Функция ожидает аргументы:
+     * connection - соединение с БД
+     * query - запрос, который нужно выполнить
+
+    Функция возвращает данные полученные из БД.
+    '''
+    result = [row for row in connection.execute(query)]
+    return result
+```
+
+#VSLIDE
+### Connection как менеджер контекста
+
+Файл create_sw_inventory_ver2_functions.py:
+```python
+
+if __name__ == '__main__':
+    con = create_connection('sw_inventory3.db')
+
+    print("Создание таблицы...")
+    schema = """create table switch
+                (mac text primary key, hostname text, model text, location text)"""
+    con.execite(schema)
+
+    query_insert = "INSERT into switch values (?, ?, ?, ?)"
+    query_get_all = "SELECT * from switch"
+
+    print("Запись данных в БД:")
+    pprint(data)
+    write_data_to_db(con, query_insert, data)
+    print("\nПроверка содержимого БД")
+    pprint(get_all_from_db(con, query_get_all))
+
+    con.close()
+
+```
+
+#VSLIDE
+### Connection как менеджер контекста
+
+Результат выполнения скрипта выглядит так:
+```
+$ python create_sw_inventory_ver2_functions.py
+Создание таблицы...
+Запись данных в БД:
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')]
+Запись данных прошла успешно
+
+Проверка содержимого БД
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')]
+
+```
+
+#VSLIDE
+### Connection как менеджер контекста
+
+Теперь проверим как функция write_data_to_db отработает при наличии одинаковых MAC-адресов в данных.
+
+В файле create_sw_inventory_ver3.py используются функции из файла create_sw_inventory_ver2_functions.py и подразумевается, что скрипт будет запускаться, после записи предыдущих данных:
+```python
+# -*- coding: utf-8 -*-
+from pprint import pprint
+import sqlite3
+import create_sw_inventory_ver2_functions as dbf
+
+#MAC-адрес sw7 совпадает с MAC-адресом коммутатора sw3 в списке data
 data2 = [('0055.AAAA.CCCC', 'sw5', 'Cisco 3750', 'London, Green Str'),
          ('0066.BBBB.CCCC', 'sw6', 'Cisco 3780', 'London, Green Str'),
          ('0000.AAAA.DDDD', 'sw7', 'Cisco 2960', 'London, Green Str'),
          ('0088.AAAA.CCCC', 'sw8', 'Cisco 3750', 'London, Green Str')]
 
-try:
-    with con:
-        query = "INSERT into switch values (?, ?, ?, ?)"
-        con.executemany(query, data2)
-except sqlite3.IntegrityError as e:
-    print "Error occured: ", e
+con = dbf.create_connection('sw_inventory3.db')
 
-for row in con.execute("select * from switch"):
-    print row
+query_insert = "INSERT into switch values (?, ?, ?, ?)"
+query_get_all = "SELECT * from switch"
+
+print("\nПроверка текущего содержимого БД")
+pprint(dbf.get_all_from_db(con, query_get_all))
+
+print('-'*60)
+print("Попытка записать данные с повторяющимся MAC-адресом:")
+pprint(data2)
+dbf.write_data_to_db(con, query_insert, data2)
+print("\nПроверка содержимого БД")
+pprint(dbf.get_all_from_db(con, query_get_all))
+
+con.close()
+
 ```
+
 
 #VSLIDE
 ### Connection как менеджер контекста
@@ -1220,93 +1399,148 @@ for row in con.execute("select * from switch"):
 Результат выполнения скрипта:
 ```
 $ python create_sw_inventory_ver3.py
-(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
-(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')
-(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str')
-------------------------------
+
+Проверка текущего содержимого БД
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')]
+------------------------------------------------------------
+Попытка записать данные с повторяющимся MAC-адресом:
+[('0055.AAAA.CCCC', 'sw5', 'Cisco 3750', 'London, Green Str'),
+ ('0066.BBBB.CCCC', 'sw6', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw7', 'Cisco 2960', 'London, Green Str'),
+ ('0088.AAAA.CCCC', 'sw8', 'Cisco 3750', 'London, Green Str')]
 Error occured:  UNIQUE constraint failed: switch.mac
-(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
-(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')
-(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str')
+
+Проверка содержимого БД
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')]
+
 ```
+
 
 #VSLIDE
 ### Connection как менеджер контекста
 
-Обратите внимание, что содержимое таблицы switch до и после второго добавления информации - одинаково.
+Содержимое таблицы switch до и после добавления информации - одинаково.
 Это значит, что не записалась ни одна строка из списка data2.
 
 Так получилось из-за того, что используется метод executemany и
 в пределах одной транзакции мы пытаемся записать все 4 строки.
 Если возникает ошибка с одной из них - откатываются все изменения.
 
+Иногда, это именно то поведение, которое нужно.
+Если же надо чтобы игнорировались только строки с ошибками, надо использовать метод execute и записывать каждую строку отдельно.
+
 #VSLIDE
 ### Connection как менеджер контекста
 
+В файле create_sw_inventory_ver4.py создана функция write_rows_to_db, которая уже по очереди пишет данные и, если возникла ошибка, то только изменения для конкретных данных откатываются:
 ```python
 # -*- coding: utf-8 -*-
+from pprint import pprint
 import sqlite3
+import create_sw_inventory_ver2_functions as dbf
 
-data = [('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
-        ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
-        ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
-        ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')]
-
-con = sqlite3.connect('sw_inventory3.db')
-con.execute("create table switch (mac text primary key, hostname text, model text, location text)")
-
-try:
-    with con:
-        query = "INSERT into switch values (?, ?, ?, ?)"
-        con.executemany(query, data)
-except sqlite3.IntegrityError as e:
-    print "Error occured: ", e
-
-for row in con.execute("select * from switch"):
-    print row
-
-print '-'*30
-
-#MAC-адрес sw7 совпадает с MAC-адресом существующего коммутатора - sw3
+#MAC-адрес sw7 совпадает с MAC-адресом коммутатора sw3 в списке data
 data2 = [('0055.AAAA.CCCC', 'sw5', 'Cisco 3750', 'London, Green Str'),
          ('0066.BBBB.CCCC', 'sw6', 'Cisco 3780', 'London, Green Str'),
          ('0000.AAAA.DDDD', 'sw7', 'Cisco 2960', 'London, Green Str'),
          ('0088.AAAA.CCCC', 'sw8', 'Cisco 3750', 'London, Green Str')]
-
-for row in data2:
-    try:
-        with con:
-            query = "INSERT into switch values (?, ?, ?, ?)"
-            con.execute(query, row)
-    except sqlite3.IntegrityError as e:
-        print "Error occured: ", e
-
-for row in con.execute("select * from switch"):
-    print row
 ```
 
 #VSLIDE
 ### Connection как менеджер контекста
 
-```
-$ python create_sw_inventory_ver4.py
-(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
-(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')
-(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str')
-------------------------------
-Error occured:  UNIQUE constraint failed: switch.mac
-(u'0000.AAAA.CCCC', u'sw1', u'Cisco 3750', u'London, Green Str')
-(u'0000.BBBB.CCCC', u'sw2', u'Cisco 3780', u'London, Green Str')
-(u'0000.AAAA.DDDD', u'sw3', u'Cisco 2960', u'London, Green Str')
-(u'0011.AAAA.CCCC', u'sw4', u'Cisco 3750', u'London, Green Str')
-(u'0055.AAAA.CCCC', u'sw5', u'Cisco 3750', u'London, Green Str')
-(u'0066.BBBB.CCCC', u'sw6', u'Cisco 3780', u'London, Green Str')
-(u'0088.AAAA.CCCC', u'sw8', u'Cisco 3750', u'London, Green Str')
+Файл create_sw_inventory_ver4.py
+```python
+def write_rows_to_db(connection, query, data, verbose=False):
+    '''
+    Функция ожидает аргументы:
+     * connection - соединение с БД
+     * query - запрос, который нужно выполнить
+     * data - данные, которые надо передать в виде списка кортежей
+
+    Функция пытается записать по очереди кортежи из списка data.
+    Если кортеж удалось записать успешно, изменения сохраняются в БД.
+    Если в процессе записи кортежа возникла ошибка, транзакция откатывается.
+
+    Флаг verbose контролирует то, будут ли выведены сообщения об удачной
+    или неудачной записи кортежа.
+    '''
+    for row in data:
+        try:
+            with connection:
+                connection.execute(query, row)
+        except sqlite3.IntegrityError as e:
+            if verbose:
+                print('При записи данных "{}" возникла ошибка'.format(', '.join(row), e))
+        else:
+            if verbose:
+                print('Запись данных "{}" прошла успешно'.format(', '.join(row)))
 ```
 
+#VSLIDE
+### Connection как менеджер контекста
+
+Файл create_sw_inventory_ver4.py
+```python
+con = dbf.create_connection('sw_inventory3.db')
+
+query_insert = 'INSERT into switch values (?, ?, ?, ?)'
+query_get_all = 'SELECT * from switch'
+
+print('\nПроверка текущего содержимого БД')
+pprint(dbf.get_all_from_db(con, query_get_all))
+
+print('-'*60)
+print('Попытка записать данные с повторяющимся MAC-адресом:')
+pprint(data2)
+write_rows_to_db(con, query_insert, data2, verbose=True)
+print('\nПроверка содержимого БД')
+pprint(dbf.get_all_from_db(con, query_get_all))
+
+con.close()
+
+```
+
+
+#VSLIDE
+### Connection как менеджер контекста
+
+Теперь результат выполнения будет таким (пропущен только sw7):
+```
+$ python create_sw_inventory_ver4.py
+
+Проверка текущего содержимого БД
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')]
+------------------------------------------------------------
+Попытка записать данные с повторяющимся MAC-адресом:
+[('0055.AAAA.CCCC', 'sw5', 'Cisco 3750', 'London, Green Str'),
+ ('0066.BBBB.CCCC', 'sw6', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw7', 'Cisco 2960', 'London, Green Str'),
+ ('0088.AAAA.CCCC', 'sw8', 'Cisco 3750', 'London, Green Str')]
+Запись данных "0055.AAAA.CCCC, sw5, Cisco 3750, London, Green Str" прошла успешно
+Запись данных "0066.BBBB.CCCC, sw6, Cisco 3780, London, Green Str" прошла успешно
+При записи данных "0000.AAAA.DDDD, sw7, Cisco 2960, London, Green Str" возникла ошибка
+Запись данных "0088.AAAA.CCCC, sw8, Cisco 3750, London, Green Str" прошла успешно
+
+Проверка содержимого БД
+[('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
+ ('0000.BBBB.CCCC', 'sw2', 'Cisco 3780', 'London, Green Str'),
+ ('0000.AAAA.DDDD', 'sw3', 'Cisco 2960', 'London, Green Str'),
+ ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str'),
+ ('0055.AAAA.CCCC', 'sw5', 'Cisco 3750', 'London, Green Str'),
+ ('0066.BBBB.CCCC', 'sw6', 'Cisco 3780', 'London, Green Str'),
+ ('0088.AAAA.CCCC', 'sw8', 'Cisco 3750', 'London, Green Str')]
+
+```
 
 #HSLIDE
 ## Пример использования SQLite
@@ -1323,7 +1557,7 @@ Error occured:  UNIQUE constraint failed: switch.mac
 
 Определение таблицы прописано в отдельном файле dhcp_snooping_schema.sql и выглядит так:
 ```sql
-create table dhcp (
+create table if not exists dhcp (
     mac          text primary key,
     ip           text,
     vlan         text,
@@ -1338,11 +1572,11 @@ create table dhcp (
 import sqlite3
 
 with sqlite3.connect('dhcp_snooping.db') as conn:
-    print 'Creating schema...'
+    print('Creating schema...')
     with open('dhcp_snooping_schema.sql', 'r') as f:
         schema = f.read()
         conn.executescript(schema)
-    print "Done"
+    print("Done")
 ```
 
 #VSLIDE
@@ -1398,27 +1632,30 @@ Total number of bindings: 4
 import sqlite3
 import re
 
-regex = re.compile('(.+?) +(.*?) +\d+ +[\w-]+ +(\d+) +(.*$)')
+regex = re.compile('(\S+) +(\S+) +\d+ +\S+ +(\d+) +(\S+)')
+
 result = []
 
 with open('dhcp_snooping.txt') as data:
     for line in data:
-        if line[0].isdigit():
-            result.append(regex.search(line).groups())
+        match = regex.search(line)
+        if match:
+            result.append(match.groups())
 
 with sqlite3.connect('dhcp_snooping.db') as conn:
-    print 'Creating schema...'
+    print('Creating schema...')
     with open('dhcp_snooping_schema.sql', 'r') as f:
         schema = f.read()
         conn.executescript(schema)
-    print "Done"
+    print("Done")
 
-    print 'Inserting DHCP Snooping data'
+    print('Inserting DHCP Snooping data')
 
     for row in result:
         query = """insert into dhcp (mac, ip, vlan, interface)
-        values (?, ?, ?, ?)""" 
+                   values (?, ?, ?, ?)"""
         conn.execute(query, row)
+
 ```
 
 #VSLIDE
@@ -1441,10 +1678,14 @@ Inserting DHCP Snooping data
 Проверим, что данные записались:
 ```
 $ sqlite3 dhcp_snooping.db "select * from dhcp"
-00:09:BB:3D:D6:58|10.1.10.2|10|FastEthernet0/1
-00:04:A3:3E:5B:69|10.1.5.2|5|FastEthernet0/10
-00:05:B3:7E:9B:60|10.1.5.4|5|FastEthernet0/9
-00:07:BC:3F:A6:50|10.1.10.6|10|FastEthernet0/3
+-- Loading resources from /home/vagrant/.sqliterc
+
+mac                ip          vlan        interface
+-----------------  ----------  ----------  ---------------
+00:09:BB:3D:D6:58  10.1.10.2   10          FastEthernet0/1
+00:04:A3:3E:5B:69  10.1.5.2    5           FastEthernet0/1
+00:05:B3:7E:9B:60  10.1.5.4    5           FastEthernet0/9
+00:09:BC:3F:A6:50  10.1.10.6   10          FastEthernet0/3
 ```
 
 #VSLIDE
@@ -1452,7 +1693,11 @@ $ sqlite3 dhcp_snooping.db "select * from dhcp"
 Теперь попробуем запросить по определенному параметру:
 ```
 $ sqlite3 dhcp_snooping.db "select * from dhcp where ip = '10.1.5.2'"
-00:04:A3:3E:5B:69|10.1.5.2|5|FastEthernet0/10
+-- Loading resources from /home/vagrant/.sqliterc
+
+mac                ip          vlan        interface
+-----------------  ----------  ----------  ----------------
+00:04:A3:3E:5B:69  10.1.5.2    5           FastEthernet0/10
 ```
 
 То есть, теперь на основании одного параметра, можно получать остальные.
@@ -1469,28 +1714,33 @@ data_filename = 'dhcp_snooping.txt'
 db_filename = 'dhcp_snooping.db'
 schema_filename = 'dhcp_snooping_schema.sql'
 
-regex = re.compile('(.+?) +(.*?) +\d+ +[\w-]+ +(\d+) +(.*$)')
+regex = re.compile('(\S+) +(\S+) +\d+ +\S+ +(\d+) +(\S+)')
 
-with open(data_filename) as data:
-    result = [regex.search(line).groups() for line in data if line[0].isdigit()]
+result = []
+
+with open('dhcp_snooping.txt') as data:
+    for line in data:
+        match = regex.search(line)
+        if match:
+            result.append(match.groups())
 
 db_exists = os.path.exists(db_filename)
 
 with sqlite3.connect(db_filename) as conn:
     if not db_exists:
-        print 'Creating schema...'
+        print('Creating schema...')
         with open(schema_filename, 'r') as f:
             schema = f.read()
         conn.executescript(schema)
-        print 'Done'
+        print('Done')
 
-        print 'Inserting DHCP Snooping data'
+        print('Inserting DHCP Snooping data')
         for val in result:
             query = """insert into dhcp (mac, ip, vlan, interface)
-            values (?, ?, ?, ?)"""
+                       values (?, ?, ?, ?)"""
             conn.execute(query, val)
     else:
-        print 'Database exists, assume dhcp table does, too.'
+        print('Database exists, assume dhcp table does, too.')
 ```
 
 #VSLIDE
@@ -1536,28 +1786,18 @@ keys.remove(key)
 with sqlite3.connect(db_filename) as conn:
     #Позволяет далее обращаться к данным в колонках, по имени колонки
     conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
 
-    cursor.execute("select * from dhcp where %s = ?" % key, (value,))
+    print("\nDetailed information for host(s) with", key, value)
+    print('-' * 40)
 
-    print "\nDetailed information for host(s) with", key, value
-    print '-' * 40
-    for row in cursor.fetchall():
+    query = "select * from dhcp where {} = ?".format( key )
+    result = conn.execute(query, (value,))
+
+    for row in result:
         for k in keys:
-            print "%-12s: %s" % (k, row[k])
-        print '-' * 40
+            print("{:12}: {}".format(k, row[k]))
+        print('-' * 40)
 ```
-
-#VSLIDE
-
-
-Комментарии к скрипту:
-* ```conn.row_factory = sqlite3.Row``` 
- * позволяет далее обращаться к данным в колонках, по имени колонки
-* ```cursor.execute("select * from dhcp where %s = ?" % key, (value,))```
- * из БД выбираются те строки, в которых ключ равен указанному значению
-* Полученная информацию выводится на стандартный поток вывода:
- * перебираем полученные результаты и выводим только те поля, названия которых находятся в списке keys
 
 #VSLIDE
 
@@ -1593,12 +1833,58 @@ interface   : FastEthernet0/3
 
 #VSLIDE
 
+Вторая версия скрипта для получения данных, с небольшими улучшениями:
+* Вместо форматирования строк, используется словарь, в котором описаны запросы, соответствующие каждому ключу.
+* Выполняется проверка ключа, который был выбран
+* Для получения заголовков всех столбцов, который соответствуют запросу, используется метод keys()
+
+#VSLIDE
+
+Файл get_data_ver2.py:
+```python
+# -*- coding: utf-8 -*-
+import sqlite3
+import sys
+
+db_filename = 'dhcp_snooping.db'
+
+query_dict = {'vlan': "select mac, ip, interface from dhcp where vlan = ?",
+              'mac': "select vlan, ip, interface from dhcp where mac = ?",
+              'ip': "select vlan, mac, interface from dhcp where ip = ?",
+              'interface': "select vlan, mac, ip from dhcp where interface = ?"}
+
+
+key, value = sys.argv[1:]
+keys = query_dict.keys()
+
+if not key in keys:
+    print("Enter key from {}".format(','.join(keys)))
+else:
+
+    with sqlite3.connect(db_filename) as conn:
+        conn.row_factory = sqlite3.Row
+
+        print("\nDetailed information for host(s) with", key, value)
+        print('-' * 40)
+
+        query = query_dict[key]
+        result = conn.execute(query, (value,))
+
+        for row in result:
+            for row_name in row.keys():
+                print("{:12}: {}".format(row_name, row[row_name]))
+            print('-' * 40)
+
+```
+
+#VSLIDE
+
+
 В этом скрипте есть несколько недостатков:
 * не проверяется количество аргументов, которые передаются скрипту
-* не проверяется правильность аргументов
 * хотелось бы собирать информацию с разных коммутаторов. А для этого надо добавить поле, которое указывает на каком коммутаторе была найдена запись
 
 
 Кроме того, многое нужно доработать в скрипте, который создает БД и записывает данные.
 
-Все доработки будут выполняться в упражнениях к этому разделу.
+Все доработки будут выполняться в заданиях этого раздела.
