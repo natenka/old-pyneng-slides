@@ -731,6 +731,9 @@ connection = sqlite3.connect('dhcp_snooping.db')
 cursor = connection.cursor()
 ```
 
+#HSLIDE
+### Выполнение команд SQL
+
 #VSLIDE
 ### Выполнение команд SQL
 
@@ -913,7 +916,7 @@ In [16]: cursor.executescript("""
 Out[16]: <sqlite3.Cursor at 0x10efd67a0>
 ```
 
-#VSLIDE
+#HSLIDE
 ### Получение результатов запроса
 
 #VSLIDE
@@ -1079,6 +1082,9 @@ Out[33]:
  ('0000.1111.0004', 'sw8', 'Cisco 3750', 'London, Green Str')]
 ```
 
+#HSLIDE
+#### Cursor как итератор
+
 #VSLIDE
 #### Cursor как итератор
 
@@ -1106,7 +1112,7 @@ In [35]: for row in result:
 ('0000.1111.0004', 'sw8', 'Cisco 3750', 'London, Green Str')
 ```
 
-#VSLIDE
+#HSLIDE
 ### Использование модуля sqlite3 без явного создания курсора
 
 #VSLIDE
@@ -1158,7 +1164,7 @@ $ python create_sw_inventory_ver1.py
 ('0011.AAAA.CCCC', 'sw4', 'Cisco 3750', 'London, Green Str')
 ```
 
-#VSLIDE
+#HSLIDE
 #### Обработка исключений
 
 #VSLIDE
@@ -1195,7 +1201,7 @@ Error occured:  UNIQUE constraint failed: switch.mac
 
 ```
 
-#VSLIDE
+#HSLIDE
 ### Connection как менеджер контекста
 
 #VSLIDE
