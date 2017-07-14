@@ -95,7 +95,7 @@ sqlite>
 
 #VSLIDE
 
-#### Метакоманды
+### Метакоманды
 К метакомандам относятся несколько специальных команд, для работы с SQLite.
 Они относятся только к утилите sqlite3, а не к SQL языку. В конце этих команд ```;``` ставить не нужно.
 
@@ -107,7 +107,7 @@ sqlite>
 
 #VSLIDE
 
-#### Метакоманды
+### Метакоманды
 
 Примеры выполнения:
 ```
@@ -744,7 +744,7 @@ cursor = connection.cursor()
 
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 
 Метод execute позволяет выполнить одну команду SQL.
 
@@ -758,7 +758,7 @@ In [3]: cursor = connection.cursor()
 ```
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 
 Создание таблицы switch с помощью метода execute:
 ```python
@@ -767,14 +767,14 @@ Out[4]: <sqlite3.Cursor at 0x1085be880>
 ```
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 
 Выражения SQL могут быть параметризированы - вместо данных можно подставлять специальные значения.
 Засчет этого можно использовать одну и ту же команду SQL для передачи разных данных.
 
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 
 Например, таблицу switch нужно заполнить данными из списка data:
 ```python
@@ -786,7 +786,7 @@ In [5]: data = [
 ```
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 
 Для этого можно использовать запрос вида:
 ```python
@@ -796,7 +796,7 @@ In [6]: query = "INSERT into switch values (?, ?, ?, ?)"
 Знаки вопроса в команде используются для подстановки данных, которые будут передаваться методу execute.
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 
 Теперь можно передать данные таким образом:
 ```
@@ -809,14 +809,14 @@ In [7]: for row in data:
 Если нужно передать кортеж с одним элементом, используется запись ```(value, )```.
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 Чтобы изменения применились, нужно выполнить commit (обратите внимание, что метод commit вызывается у соединения):
 ```
 In [8]: connection.commit()
 ```
 
 #VSLIDE
-#### Метод execute
+### Метод execute
 
 Теперь, при запросе из командной строки sqlite3, можно увидеть эти строки в таблице switch:
 ```
@@ -832,14 +832,14 @@ mac             hostname    model       location
 ```
 
 #VSLIDE
-#### Метод executemany
+### Метод executemany
 
 Метод executemany позволяет выполнить одну команду SQL для последовательности параметров (или для итератора).
 
 С помощью метода executemany, в таблицу switch можно добавить аналогичный список данных одной командой.
 
 #VSLIDE
-#### Метод executemany
+### Метод executemany
 
 Например, в таблицу switch надо добавить данные из списка data2:
 ```python
@@ -851,7 +851,7 @@ In [9]: data2 = [
 ```
 
 #VSLIDE
-#### Метод executemany
+### Метод executemany
 
 Для этого нужно использовать аналогичный запрос вида:
 ```python
@@ -867,7 +867,7 @@ In [12]: connection.commit()
 ```
 
 #VSLIDE
-#### Метод executemany
+### Метод executemany
 
 После выполнения commit, данные доступны в таблице:
 ```
@@ -886,12 +886,12 @@ mac             hostname    model       location
 
 
 #VSLIDE
-#### Метод executescript
+### Метод executescript
 
 Метод executescript позволяет выполнить несколько выражений SQL за один раз.
 
 #VSLIDE
-#### Метод executescript
+### Метод executescript
 
 Особенно удобно использовать этот метод при создании таблиц:
 ```python
@@ -927,7 +927,7 @@ Out[16]: <sqlite3.Cursor at 0x10efd67a0>
 * использование курсора как итератора - возвращается итератор
 
 #VSLIDE
-#### Метод fetchone
+### Метод fetchone
 
 Метод fetchone возвращает одну строку данных.
 
@@ -947,7 +947,7 @@ Out[5]: ('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str')
 ```
 
 #VSLIDE
-#### Метод fetchone
+### Метод fetchone
 
 Если повторно вызвать метод, он вернет следующую строку:
 ```python
@@ -956,13 +956,13 @@ In [6]: print(cursor.fetchone())
 ```
 
 #VSLIDE
-#### Метод fetchone
+### Метод fetchone
 
 Аналогичным образом метод будет возвращать следующие строки.
 После обработки всех строк, метод начинает возвращать None.
 
 #VSLIDE
-#### Метод fetchone
+### Метод fetchone
 
 Засчет этого, метод можно использовать в цикле, например, так:
 ```python
@@ -987,7 +987,7 @@ In [8]: while True:
 ```
 
 #VSLIDE
-#### Метод fetchmany
+### Метод fetchmany
 
 Метод fetchmany возвращает возвращает список строк данных.
 
@@ -997,7 +997,7 @@ cursor.fetchmany([size=cursor.arraysize])
 ```
 
 #VSLIDE
-#### Метод fetchmany
+### Метод fetchmany
 
 С помощью параметра size, можно указывать какое количество строк возвращается.
 По умолчанию, параметр size равен значению cursor.arraysize:
@@ -1007,7 +1007,7 @@ In [9]: print(cursor.arraysize)
 ```
 
 #VSLIDE
-#### Метод fetchmany
+### Метод fetchmany
 
 Например, таким образом можно возвращать по три строки из запроса:
 ```python
@@ -1036,7 +1036,7 @@ In [27]: while True:
 
 
 #VSLIDE
-#### Метод fetchall
+### Метод fetchall
 
 Метод fetchall возвращает все строки в виде списка:
 ```python
@@ -1057,7 +1057,7 @@ Out[13]:
 ```
 
 #VSLIDE
-#### Метод fetchall
+### Метод fetchall
 
 Важный аспект работы метода - он возвращает все оставшиеся строки.
 
@@ -1086,7 +1086,7 @@ Out[33]:
 ## Cursor как итератор
 
 #VSLIDE
-#### Cursor как итератор
+### Cursor как итератор
 
 Если нужно построчно обрабатывать результирующие строки, лучше использовать курсор как итератор.
 При этом не нужно использовать методы fetch.
@@ -1094,7 +1094,7 @@ Out[33]:
 При использовании методов execute, возвращается курсор.
 
 #VSLIDE
-#### Cursor как итератор
+### Cursor как итератор
 
 ```python
 In [34]: result = cursor.execute('select * from switch')
@@ -1168,7 +1168,7 @@ $ python create_sw_inventory_ver1.py
 ## Обработка исключений
 
 #VSLIDE
-#### Обработка исключений
+### Обработка исключений
 
 В таблице switch поле mac должно быть уникальным.
 И, если попытаться записать пересекающийся MAC-адрес, возникнет ошибка:
@@ -1188,7 +1188,7 @@ IntegrityError: UNIQUE constraint failed: switch.mac
 ```
 
 #VSLIDE
-#### Обработка исключений
+### Обработка исключений
 
 Соответственно, можно перехватить исключение:
 ```python
@@ -1299,6 +1299,13 @@ def write_data_to_db(connection, query, data):
     else:
         print("Запись данных прошла успешно")
         return True
+```
+
+#VSLIDE
+### Connection как менеджер контекста
+
+Файл create_sw_inventory_ver2_functions.py:
+```python
 
 def get_all_from_db(connection, query):
     '''
@@ -1365,8 +1372,6 @@ $ python create_sw_inventory_ver2_functions.py
 ### Connection как менеджер контекста
 
 Теперь проверим как функция write_data_to_db отработает при наличии одинаковых MAC-адресов в данных.
-
-В файле create_sw_inventory_ver3.py используются функции из файла create_sw_inventory_ver2_functions.py и подразумевается, что скрипт будет запускаться, после записи предыдущих данных:
 ```python
 # -*- coding: utf-8 -*-
 from pprint import pprint
