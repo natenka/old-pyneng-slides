@@ -11,3 +11,4 @@
 * [Регулярные выражения](https://gitpitch.com/natenka/pyneng-slides/py3-regex)
 * [Unicode](https://gitpitch.com/natenka/pyneng-slides/py3-unicode)
 * [YAML, JSON, CSV](https://gitpitch.com/natenka/pyneng-slides/py3-serialization)
+* [Базы данных](https://gitpitch.com/natenka/pyneng-slides/py3-db)
