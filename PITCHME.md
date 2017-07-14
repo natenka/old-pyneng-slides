@@ -732,7 +732,7 @@ cursor = connection.cursor()
 ```
 
 #HSLIDE
-### Выполнение команд SQL
+## Выполнение команд SQL
 
 #VSLIDE
 ### Выполнение команд SQL
@@ -917,7 +917,7 @@ Out[16]: <sqlite3.Cursor at 0x10efd67a0>
 ```
 
 #HSLIDE
-### Получение результатов запроса
+## Получение результатов запроса
 
 #VSLIDE
 ### Получение результатов запроса
@@ -1083,7 +1083,7 @@ Out[33]:
 ```
 
 #HSLIDE
-#### Cursor как итератор
+## Cursor как итератор
 
 #VSLIDE
 #### Cursor как итератор
@@ -1113,7 +1113,7 @@ In [35]: for row in result:
 ```
 
 #HSLIDE
-### Использование модуля sqlite3 без явного создания курсора
+## Использование модуля sqlite3 без явного создания курсора
 
 #VSLIDE
 ### Использование модуля sqlite3 без явного создания курсора
@@ -1165,7 +1165,7 @@ $ python create_sw_inventory_ver1.py
 ```
 
 #HSLIDE
-#### Обработка исключений
+## Обработка исключений
 
 #VSLIDE
 #### Обработка исключений
@@ -1202,7 +1202,7 @@ Error occured:  UNIQUE constraint failed: switch.mac
 ```
 
 #HSLIDE
-### Connection как менеджер контекста
+## Connection как менеджер контекста
 
 #VSLIDE
 ### Connection как менеджер контекста
