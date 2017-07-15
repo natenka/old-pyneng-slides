@@ -136,7 +136,7 @@ seq  name      file
 Создадим таблицу switch, в которой хранится информация о коммутаторах:
 ```sql
 sqlite> CREATE table switch (
-   ...>     mac          text primary key,
+   ...>     mac          text not NULL primary key,
    ...>     hostname     text,
    ...>     model        text,
    ...>     location     text
@@ -149,7 +149,7 @@ sqlite> CREATE table switch (
 
 Аналогично можно было создать таблицу и таким образом:
 ```sql
-sqlite> create table switch (mac text primary key, hostname text, model text, location text);
+sqlite> create table switch (mac text not NULL primary key, hostname text, model text, location text);
 ```
 
 Поле mac является первичным ключом. Это автоматически значит, что:
@@ -168,7 +168,7 @@ sqlite> create table switch (mac text primary key, hostname text, model text, lo
 ```sql
 sqlite> .schema switch
 CREATE TABLE switch (
-mac          text primary key,
+mac          text not NULL primary key,
 hostname     text,
 model        text,
 location     text
@@ -762,7 +762,7 @@ In [3]: cursor = connection.cursor()
 
 Создание таблицы switch с помощью метода execute:
 ```python
-In [4]: cursor.execute("create table switch (mac text primary key, hostname text, model text, location text)")
+In [4]: cursor.execute("create table switch (mac text not NULL primary key, hostname text, model text, location text)")
 Out[4]: <sqlite3.Cursor at 0x1085be880>
 ```
 
@@ -901,12 +901,12 @@ In [15]: cursor = connection.cursor()
 
 In [16]: cursor.executescript("""
     ...:     create table switches(
-    ...:         hostname     text primary key,
+    ...:         hostname     text not NULL primary key,
     ...:         location     text
     ...:     );
     ...:
     ...:     create table dhcp(
-    ...:         mac          text primary key,
+    ...:         mac          text not NULL primary key,
     ...:         ip           text,
     ...:         vlan         text,
     ...:         interface    text,
@@ -1139,7 +1139,7 @@ data = [('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
 
 con = sqlite3.connect('sw_inventory2.db')
 
-con.execute("""create table switch
+con.execute("""create table not NULL switch
             (mac text primary key, hostname text, model text, location text)""")
 
 query = "INSERT into switch values (?, ?, ?, ?)"
@@ -1231,7 +1231,7 @@ data = [('0000.AAAA.CCCC', 'sw1', 'Cisco 3750', 'London, Green Str'),
 
 con = sqlite3.connect('sw_inventory3.db')
 con.execute("""create table switch
-               (mac text primary key, hostname text, model text, location text)""")
+               (mac text not NULL primary key, hostname text, model text, location text)""")
 
 try:
     with con:
@@ -1330,7 +1330,7 @@ if __name__ == '__main__':
 
     print("Создание таблицы...")
     schema = """create table switch
-                (mac text primary key, hostname text, model text, location text)"""
+                (mac text not NULL primary key, hostname text, model text, location text)"""
     con.execite(schema)
 
     query_insert = "INSERT into switch values (?, ?, ?, ?)"
@@ -1569,7 +1569,7 @@ $ python create_sw_inventory_ver4.py
 Определение таблицы прописано в отдельном файле dhcp_snooping_schema.sql и выглядит так:
 ```sql
 create table if not exists dhcp (
-    mac          text primary key,
+    mac          text not NULL primary key,
     ip           text,
     vlan         text,
     interface    text
@@ -1582,19 +1582,21 @@ create table if not exists dhcp (
 ```python
 import sqlite3
 
-with sqlite3.connect('dhcp_snooping.db') as conn:
-    print('Creating schema...')
-    with open('dhcp_snooping_schema.sql', 'r') as f:
-        schema = f.read()
-        conn.executescript(schema)
-    print("Done")
+conn = sqlite3.connect('dhcp_snooping.db')
+
+print('Creating schema...')
+with open('dhcp_snooping_schema.sql', 'r') as f:
+    schema = f.read()
+    conn.executescript(schema)
+print("Done")
+
+conn.close()
 ```
 
 #VSLIDE
 
 Комментарии к файлу:
-* используется менеджер контекста ```with```
-* при выполнении строки ```with sqlite3.connect('dhcp_snooping.db') as conn```:
+* при выполнении строки ```conn = sqlite3.connect('dhcp_snooping.db')```:
  * создается файл dhcp_snooping.db, если его нет
  * создается объект Connection
 * в БД создается таблица, на основании команд, которые указаны в файле dhcp_snooping_schema.sql:
@@ -1653,19 +1655,26 @@ with open('dhcp_snooping.txt') as data:
         if match:
             result.append(match.groups())
 
-with sqlite3.connect('dhcp_snooping.db') as conn:
-    print('Creating schema...')
-    with open('dhcp_snooping_schema.sql', 'r') as f:
-        schema = f.read()
-        conn.executescript(schema)
-    print("Done")
+conn = sqlite3.connect('dhcp_snooping.db')
 
-    print('Inserting DHCP Snooping data')
+print('Creating schema...')
+with open('dhcp_snooping_schema.sql', 'r') as f:
+    schema = f.read()
+    conn.executescript(schema)
+print("Done")
 
-    for row in result:
-        query = """insert into dhcp (mac, ip, vlan, interface)
-                   values (?, ?, ?, ?)"""
-        conn.execute(query, row)
+print('Inserting DHCP Snooping data')
+
+for row in result:
+    try:
+        with conn:
+            query = """insert into dhcp (mac, ip, vlan, interface)
+                       values (?, ?, ?, ?)"""
+            conn.execute(query, row)
+    except sqlite3.IntegrityError as e:
+        print("Error occured: ", e)
+
+conn.close()
 
 ```
 
@@ -1737,30 +1746,33 @@ with open('dhcp_snooping.txt') as data:
 
 db_exists = os.path.exists(db_filename)
 
-with sqlite3.connect(db_filename) as conn:
-    if not db_exists:
-        print('Creating schema...')
-        with open(schema_filename, 'r') as f:
-            schema = f.read()
-        conn.executescript(schema)
-        print('Done')
+conn = sqlite3.connect(db_filename)
 
-        print('Inserting DHCP Snooping data')
-        for val in result:
+if not db_exists:
+    print('Creating schema...')
+    with open(schema_filename, 'r') as f:
+        schema = f.read()
+    conn.executescript(schema)
+    print('Done')
+else:
+    print('Database exists, assume dhcp table does, too.')
+
+print('Inserting DHCP Snooping data')
+
+for row in result:
+    try:
+        with conn:
             query = """insert into dhcp (mac, ip, vlan, interface)
                        values (?, ?, ?, ?)"""
-            conn.execute(query, val)
-    else:
-        print('Database exists, assume dhcp table does, too.')
+            conn.execute(query, row)
+    except sqlite3.IntegrityError as e:
+        print("Error occured: ", e)
+
+conn.close()
+
 ```
 
 #VSLIDE
-
-Проверим. В случае если файл уже есть:
-```
-$ python create_sqlite_ver3.py 
-Database exists, assume dhcp table does, too.
-```
 
 Если файла нет (предварительно его удалить):
 ```
@@ -1771,6 +1783,33 @@ Done
 Inserting DHCP Snooping data
 ```
 
+#VSLIDE
+
+В случае если файл уже есть, но данные не записаны:
+```
+$ rm dhcp_snooping.db
+
+$ python create_sqlite_ver1.py
+Creating schema...
+Done
+$ python create_sqlite_ver3.py
+Database exists, assume dhcp table does, too.
+Inserting DHCP Snooping data
+```
+
+#VSLIDE
+
+Если есть и БД и данные:
+```python
+$ python create_sqlite_ver3.py
+Database exists, assume dhcp table does, too.
+Inserting DHCP Snooping data
+Error occured:  UNIQUE constraint failed: dhcp.mac
+Error occured:  UNIQUE constraint failed: dhcp.mac
+Error occured:  UNIQUE constraint failed: dhcp.mac
+Error occured:  UNIQUE constraint failed: dhcp.mac
+
+```
 #VSLIDE
 
 Теперь делаем отдельный скрипт, который занимается отправкой запросов в БД и выводом результатов. Он должен:
@@ -1794,20 +1833,22 @@ key, value = sys.argv[1:]
 keys = ['mac', 'ip', 'vlan', 'interface']
 keys.remove(key)
 
-with sqlite3.connect(db_filename) as conn:
-    #Позволяет далее обращаться к данным в колонках, по имени колонки
-    conn.row_factory = sqlite3.Row
+conn = sqlite3.connect(db_filename)
 
-    print("\nDetailed information for host(s) with", key, value)
+#Позволяет далее обращаться к данным в колонках, по имени колонки
+conn.row_factory = sqlite3.Row
+
+print("\nDetailed information for host(s) with", key, value)
+print('-' * 40)
+
+query = "select * from dhcp where {} = ?".format( key )
+result = conn.execute(query, (value,))
+
+for row in result:
+    for k in keys:
+        print("{:12}: {}".format(k, row[k]))
     print('-' * 40)
 
-    query = "select * from dhcp where {} = ?".format( key )
-    result = conn.execute(query, (value,))
-
-    for row in result:
-        for k in keys:
-            print("{:12}: {}".format(k, row[k]))
-        print('-' * 40)
 ```
 
 #VSLIDE
@@ -1869,22 +1910,21 @@ key, value = sys.argv[1:]
 keys = query_dict.keys()
 
 if not key in keys:
-    print("Enter key from {}".format(','.join(keys)))
+    print("Enter key from {}".format(', '.join(keys)))
 else:
+    conn = sqlite3.connect(db_filename)
+    conn.row_factory = sqlite3.Row
 
-    with sqlite3.connect(db_filename) as conn:
-        conn.row_factory = sqlite3.Row
+    print("\nDetailed information for host(s) with", key, value)
+    print('-' * 40)
 
-        print("\nDetailed information for host(s) with", key, value)
+    query = query_dict[key]
+    result = conn.execute(query, (value,))
+
+    for row in result:
+        for row_name in row.keys():
+            print("{:12}: {}".format(row_name, row[row_name]))
         print('-' * 40)
-
-        query = query_dict[key]
-        result = conn.execute(query, (value,))
-
-        for row in result:
-            for row_name in row.keys():
-                print("{:12}: {}".format(row_name, row[row_name]))
-            print('-' * 40)
 
 ```
 
