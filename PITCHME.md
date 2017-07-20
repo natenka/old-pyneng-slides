@@ -30,7 +30,7 @@ In [1]: import getpass
 In [2]: password = getpass.getpass()
 Password:
 
-In [3]: print password
+In [3]: print(password)
 testpass
 ```
 
@@ -97,19 +97,15 @@ In [1]: import pexpect
 
 In [2]: output = pexpect.run('ls -ls')
 
-In [3]: print output
-total 368
-  8 -rw-r--r--   1 natasha  staff     372 Sep 26 08:36 LICENSE.md
-  8 -rw-r--r--   1 natasha  staff    3483 Sep 26 08:36 README.md
- 16 -rw-r--r--   1 natasha  staff    7098 Oct  5 11:41 SUMMARY.md
-  8 -rw-r--r--   1 natasha  staff      70 Sep 25 19:01 about.md
-  0 drwxr-xr-x  17 natasha  staff     578 Sep 25 19:05 book
-  8 -rw-r--r--   1 natasha  staff     239 Sep 27 06:32 book.json
-288 -rw-r--r--   1 natasha  staff  146490 Sep 27 09:11 cover.jpg
-  0 drwxr-xr-x   6 natasha  staff     204 Sep 25 19:01 exercises
- 24 -rw-r--r--   1 natasha  staff   10024 Sep 25 19:01 faq.md
-  0 drwxr-xr-x   3 natasha  staff     102 Sep 27 16:25 resources
-  8 -rw-r--r--   1 natasha  staff    3633 Sep 27 15:52 schedule.md
+In [3]: print(output)
+b'total 44\r\n4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py\r\n4 -rw-r--r-- 1 vagrant vagrant 3393 Jul 14 07:15 2_telnetlib.py\r\n4 -rw-r--r-- 1 vagrant vagrant 3452 Jul 14 07:15 3_paramiko.py\r\n'
+
+In [4]: print(output.decode('utf-8'))
+total 44
+4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py
+4 -rw-r--r-- 1 vagrant vagrant 3393 Jul 14 07:15 2_telnetlib.py
+4 -rw-r--r-- 1 vagrant vagrant 3452 Jul 14 07:15 3_paramiko.py
+
 ```
 
 #VSLIDE
@@ -122,7 +118,7 @@ total 368
 t = pexpect.spawn('ssh user@10.1.1.1')
 
 t.expect('Password:')
-t.sendline("userpass")
+t.sendline('userpass')
 t.expect('>')
 ```
 
@@ -136,7 +132,7 @@ import getpass
 import sys
 
 COMMAND = sys.argv[1]
-USER = raw_input("Username: ")
+USER = input("Username: ")
 PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
@@ -149,8 +145,8 @@ DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
 Пример использования pexpect для подключения к оборудованию и передачи команды show (файл 1_pexpect.py):
 ```python
 for IP in DEVICES_IP:
-    print "Connection to device %s" % IP
-    t = pexpect.spawn('ssh %s@%s' % (USER, IP))
+    print("Connection to device {}".format( IP ))
+    t = pexpect.spawn('ssh {}@{}'.format( USER, IP ))
 
     t.expect('Password:')
     t.sendline(PASSWORD)
@@ -168,7 +164,7 @@ for IP in DEVICES_IP:
     t.sendline(COMMAND)
 
     t.expect('#')
-    print t.before
+    print(t.before.decode('utf-8'))
 
 ```
 
@@ -178,7 +174,7 @@ for IP in DEVICES_IP:
 Выполнение скрипта выглядит так:
 ```python
 $ python 1_pexpect.py "sh ip int br"
-Username: nata
+Username: cisco
 Password:
 Enter enable secret:
 Connection to device 192.168.100.1
@@ -236,8 +232,12 @@ In [2]: p = pexpect.spawn('/bin/bash -c "ls -ls | grep SUMMARY"')
 In [3]: p.expect(pexpect.EOF)
 Out[3]: 0
 
-In [4]: print p.before
- 16 -rw-r--r--   1 natasha  staff    7156 Oct  5 13:05 SUMMARY.md
+In [4]: print(p.before)
+b'4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py\r\n'
+
+In [5]: print(p.before.decode('utf-8'))
+4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py
+
 ```
 
 #VSLIDE
@@ -319,12 +319,13 @@ import time
 import getpass
 import sys
 
-COMMAND = sys.argv[1]
-USER = raw_input("Username: ")
-PASSWORD = getpass.getpass()
-ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
+COMMAND = sys.argv[1].encode('utf-8')
+USER = input("Username: ").encode('utf-8')
+PASSWORD = getpass.getpass().encode('utf-8')
+ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ').encode('utf-8')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+
 ```
 
 #VSLIDE
@@ -333,28 +334,26 @@ DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
 
 Файл 2_telnetlib.py:
 ```python
-
 for IP in DEVICES_IP:
-    print "Connection to device %s" % IP
+    print("Connection to device {}".format( IP ))
     t = telnetlib.Telnet(IP)
 
-    t.read_until("Username:")
-    t.write(USER + '\n')
+    t.read_until(b"Username:")
+    t.write(USER + b'\n')
 
-    t.read_until("Password:")
-    t.write(PASSWORD + '\n')
-    t.write("enable\n")
+    t.read_until(b"Password:")
+    t.write(PASSWORD + b'\n')
+    t.write(b"enable\n")
 
-    t.read_until("Password:")
-    t.write(ENABLE_PASS + '\n')
-    t.write("terminal length 0\n")
-    t.write(COMMAND + '\n')
+    t.read_until(b"Password:")
+    t.write(ENABLE_PASS + b'\n')
+    t.write(b"terminal length 0\n")
+    t.write(COMMAND + b'\n')
 
     time.sleep(5)
 
-    output = t.read_very_eager()
-    print output
-
+    output = t.read_very_eager().decode('utf-8')
+    print(output)
 ```
 
 #VSLIDE
@@ -375,7 +374,7 @@ telnetlib очень похож на pexpect:
 Выполнение скрипта:
 ```
 $ python 2_telnetlib.py "sh ip int br"
-Username: nata
+Username: cisco
 Password:
 Enter enable secret:
 Connection to device 192.168.100.1
@@ -453,11 +452,12 @@ import sys
 import time
 
 COMMAND = sys.argv[1]
-USER = raw_input("Username: ")
+USER = input("Username: ")
 PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+
 ```
 
 #VSLIDE
@@ -465,13 +465,13 @@ DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
 
 Пример использования Paramiko (файл 3_paramiko.py):
 ```python
-
 for IP in DEVICES_IP:
-    print "Connection to device %s" % IP
+    print("Connection to device {}".format( IP ))
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    client.connect(hostname=IP, username=USER, password=PASSWORD, look_for_keys=False, allow_agent=False)
+    client.connect(hostname=IP, username=USER, password=PASSWORD,
+                   look_for_keys=False, allow_agent=False)
     ssh = client.invoke_shell()
 
     ssh.send("enable\n")
@@ -480,12 +480,13 @@ for IP in DEVICES_IP:
 
     ssh.send("terminal length 0\n")
     time.sleep(1)
-    print ssh.recv(1000)
+    print(ssh.recv(1000).decode('utf-8'))
 
     ssh.send(COMMAND + "\n")
     time.sleep(2)
-    result = ssh.recv(5000)
-    print result
+    result = ssh.recv(5000).decode('utf-8')
+    print(result)
+
 ```
 
 #VSLIDE
@@ -613,8 +614,8 @@ R3#
 
     ssh.send(COMMAND + "\n")
     time.sleep(3)
-    result = ssh.recv(5000)
-    print result
+    result = ssh.recv(5000).decode('utf-8')
+    print(result)
 ```
 
 #HSLIDE
@@ -644,11 +645,12 @@ import sys
 
 
 COMMAND = sys.argv[1]
-USER = raw_input("Username: ")
+USER = input("Username: ")
 PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+
 ```
 
 #VSLIDE
@@ -657,7 +659,7 @@ DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
 Пример использования netmiko (файл 4_netmiko.py):
 ```python
 for IP in DEVICES_IP:
-    print "Connection to device %s" % IP
+    print("Connection to device {}".format( IP ))
     DEVICE_PARAMS = {'device_type': 'cisco_ios',
                      'ip': IP,
                      'username':USER,
@@ -666,9 +668,9 @@ for IP in DEVICES_IP:
 
     ssh = ConnectHandler(**DEVICE_PARAMS)
     ssh.enable()
-    
+
     result = ssh.send_command(COMMAND)
-    print result
+    print(result)
 ```
 
 #VSLIDE
@@ -912,11 +914,12 @@ import sys
 import time
 
 COMMAND = sys.argv[1]
-USER = raw_input("Username: ")
+USER = input("Username: ")
 PASSWORD = getpass.getpass()
 ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
 
 DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
+
 ```
 
 #VSLIDE
@@ -925,7 +928,7 @@ DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
 Файл 4_netmiko_telnet.py:
 ```python
 for IP in DEVICES_IP:
-    print "Connection to device %s" % IP
+    print("Connection to device {}".format( IP ))
     DEVICE_PARAMS = {'device_type': 'cisco_ios_telnet',
                      'ip': IP,
                      'username':USER,
@@ -936,7 +939,7 @@ for IP in DEVICES_IP:
     ssh.enable()
 
     result = ssh.send_command(COMMAND)
-    print result
+    print(result)
 ```
 
 #VSLIDE
@@ -1006,7 +1009,7 @@ start_time = datetime.now()
 #Тут выполняются действия
 time.sleep(5)
 
-print datetime.now() - start_time
+print(datetime.now() - start_time)
 ```
 
 #VSLIDE
@@ -1059,13 +1062,13 @@ devices = yaml.load(open('devices.yaml'))
 
 def connect_ssh(device_dict, command):
 
-    print "Connection to device %s" % device_dict['ip']
+    print("Connection to device {}".format( device_dict['ip'] ))
 
     ssh = ConnectHandler(**device_dict)
     ssh.enable()
 
     result = ssh.send_command(command)
-    print result
+    print(result)
 
 for router in devices['routers']:
     connect_ssh(router, COMMAND)
@@ -1124,8 +1127,8 @@ def connect_ssh(device_dict, command):
     ssh.enable()
     result = ssh.send_command(command)
 
-    print "Connection to device %s" % device_dict['ip']
-    print result
+    print("Connection to device {}".format( device_dict['ip'] ))
+    print(result)
 
 
 def conn_threads(function, devices, command):
@@ -1175,12 +1178,12 @@ sys     0m0.068s
 Для полноценной работы с потоками, необходимо также научиться получать данные из потоков.
 Чаще всего, для этого используется очередь.
 
-Очередь - это структура данных, которая используется и в работе с сетевым оборудованием. Объект Queue.Queue() - это FIFO очередь.
+Очередь - это структура данных, которая используется и в работе с сетевым оборудованием. Объект queue.Queue() - это FIFO очередь.
 
 #VSLIDE
 ### Получение данных из потоков
 
-В Python есть модуль Queue, который позволяет создавать разные типы очередей.
+В Python есть модуль queue, который позволяет создавать разные типы очередей.
 
 Очередь передается как аргумент в функцию connect_ssh, которая подключается к устройству по SSH. Результат выполнения команды добавляется в очередь.
 
@@ -1194,7 +1197,7 @@ from netmiko import ConnectHandler
 import sys
 import yaml
 import threading
-from Queue import Queue
+from queue import Queue
 
 COMMAND = sys.argv[1]
 devices = yaml.load(open('devices.yaml'))
@@ -1203,7 +1206,7 @@ def connect_ssh(device_dict, command, queue):
     ssh = ConnectHandler(**device_dict)
     ssh.enable()
     result = ssh.send_command(command)
-    print "Connection to device %s" % device_dict['ip']
+    print("Connection to device {}".format( device_dict['ip'] ))
 
     #Добавляем словарь в очередь
     queue.put({ device_dict['ip']: result })
@@ -1211,7 +1214,6 @@ def connect_ssh(device_dict, command, queue):
 
 def conn_threads(function, devices, command):
     threads = []
-    #Создаем очередь
     q = Queue()
 
     for device in devices:
@@ -1230,7 +1232,7 @@ def conn_threads(function, devices, command):
 
     return results
 
-print conn_threads(connect_ssh, devices['routers'], COMMAND)
+print(conn_threads(connect_ssh, devices['routers'], COMMAND))
 ```
 
 #VSLIDE
@@ -1263,7 +1265,7 @@ def connect_ssh(device_dict, command, queue):
     ssh = ConnectHandler(**device_dict)
     ssh.enable()
     result = ssh.send_command(command)
-    print "Connection to device %s" % device_dict['ip']
+    print("Connection to device {}".format( device_dict['ip'] ))
 
     #Добавляем словарь в список
     queue.append({ device_dict['ip']: result })
@@ -1290,7 +1292,7 @@ def conn_threads(function, devices, command):
 
     return q
 
-print conn_threads(connect_ssh, devices['routers'], COMMAND)
+print(conn_threads(connect_ssh, devices['routers'], COMMAND))
 ```
 
 #HSLIDE
@@ -1324,7 +1326,7 @@ def connect_ssh(device_dict, command, queue):
     ssh.enable()
     result = ssh.send_command(command)
 
-    print "Connection to device %s" % device_dict['ip']
+    print("Connection to device {}".format( device_dict['ip'] ))
     queue.put({device_dict['ip']: result})
 
 
@@ -1346,14 +1348,14 @@ def conn_processes(function, devices, command):
 
     return results
 
-print( conn_processes(connect_ssh, devices['routers'], COMMAND) )
+print(( conn_processes(connect_ssh, devices['routers'], COMMAND) ))
 ```
 
 #VSLIDE
 ### Модуль multiprocessing
 
 Обратите внимание, что этот пример аналогичен последнему примеру, который использовался с модулем threading.
-Единственное отличие в том, что в модуле multiprocessing есть своя реализация очереди, поэтому нет необходимости использовать модуль Queue.
+Единственное отличие в том, что в модуле multiprocessing есть своя реализация очереди, поэтому нет необходимости использовать модуль queue.
 
 #VSLIDE
 ### Модуль multiprocessing
