@@ -500,13 +500,12 @@ for IP in DEVICES_IP:
 #VSLIDE
 ### Модуль paramiko
 
-* ```client.connect(IP, username=USER, password=PASSWORD, look_for_keys=False, allow_agent=False)```
- * ```client.connect``` - метод, который выполняет подключение к SSH-серверу и аутентифицирует подключение
-    * ```hostname``` - имя хоста или IP-адрес
-    * ```username``` - имя пользователя
-    * ```password``` - пароль
-    * ```look_for_keys``` - по умолчанию paramiko выполняет аутентификацию по ключам. Чтобы отключить это, надо поставить поставив False
-    * ```allow_agent``` - paramiko может подключаться к локальному SSH агенту ОС. Это нужно при работе с ключами, а так как, в данном случае, аутентификация выполняется по логину/паролю, это нужно отключить.
+* ```client.connect``` - метод, который выполняет подключение к SSH-серверу и аутентифицирует подключение
+  * ```hostname``` - имя хоста или IP-адрес
+  * ```username``` - имя пользователя
+  * ```password``` - пароль
+  * ```look_for_keys``` - по умолчанию paramiko выполняет аутентификацию по ключам. Чтобы отключить это, надо поставить поставив False
+  * ```allow_agent``` - paramiko может подключаться к локальному SSH агенту ОС. Это нужно при работе с ключами, а так как, в данном случае, аутентификация выполняется по логину/паролю, это нужно отключить.
 
 #VSLIDE
 ### Модуль paramiko
@@ -1129,7 +1128,13 @@ def connect_ssh(device_dict, command):
 
     print("Connection to device {}".format( device_dict['ip'] ))
     print(result)
+```
 
+#VSLIDE
+## Модуль threading
+
+Файл netmiko_threading.py:
+```python
 
 def conn_threads(function, devices, command):
     threads = []
@@ -1163,7 +1168,6 @@ sys     0m0.068s
 #VSLIDE
 ## Модуль threading
 
-Комментарии к функции conn_threads:
 * ```threading.Thread``` - класс, который создает поток. Ему передается функция, которую надо выполнить, и её аргументы
 * ```th.start()``` - запуск потока
 * ```threads.append(th)``` - поток добавляется в список
@@ -1210,7 +1214,13 @@ def connect_ssh(device_dict, command, queue):
 
     #Добавляем словарь в очередь
     queue.put({ device_dict['ip']: result })
+```
 
+#VSLIDE
+### Получение данных из потоков
+
+Файл netmiko_threading_data.py:
+```python
 
 def conn_threads(function, devices, command):
     threads = []
@@ -1269,7 +1279,13 @@ def connect_ssh(device_dict, command, queue):
 
     #Добавляем словарь в список
     queue.append({ device_dict['ip']: result })
+```
 
+#VSLIDE
+### Получение данных из потоков
+
+Файл netmiko_threading_data_list.py:
+```python
 
 def conn_threads(function, devices, command):
     threads = []
@@ -1328,7 +1344,13 @@ def connect_ssh(device_dict, command, queue):
 
     print("Connection to device {}".format( device_dict['ip'] ))
     queue.put({device_dict['ip']: result})
+```
 
+#VSLIDE
+### Модуль multiprocessing
+
+Файл netmiko_multiprocessing.py:
+```python
 
 def conn_processes(function, devices, command):
     processes = []
