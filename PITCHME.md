@@ -1640,14 +1640,14 @@ trunks:
 ```
 $ python cfg_gen.py templates/set.txt data_files/set.yml
 
-  interface Fa0/1
-            switchport trunk allowed vlan add 10,20
+interface Fa0/1
+ switchport trunk allowed vlan add 10,20
 
-  interface Fa0/2
-            switchport trunk allowed vlan 10,30
+interface Fa0/2
+ switchport trunk allowed vlan 10,30
 
-  interface Fa0/3
-            switchport trunk allowed vlan remove 10
+interface Fa0/3
+ switchport trunk allowed vlan remove 10
 
 ```
 
