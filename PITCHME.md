@@ -14,7 +14,7 @@ TextFSM это библиотека созданная Google для обраб�
 
 Для начала, библиотеку надо установить:
 ```
-pip install gtextfsm
+pip install textfsm
 ```
 
 #VSLIDE
@@ -90,8 +90,8 @@ template = open('traceroute.textfsm')
 fsm = textfsm.TextFSM(template)
 result = fsm.ParseText(traceroute)
 
-print fsm.header
-print result
+print(fsm.header)
+print(result)
 ```
 
 #VSLIDE
@@ -115,7 +115,7 @@ $ python parse_traceroute.py
 * ```template = open('traceroute.textfsm')``` - содержимое файла с шаблоном TextFSM считывается в переменную template
 * ```fsm = textfsm.TextFSM(template)``` - класс, который обрабатывает шаблон и создает из него объект в TextFSM
 * ```result = fsm.ParseText(traceroute)``` - метод, который обрабатывает переданный вывод согласно шаблону и возращает список списков, в котором каждый элемент это обработанная строка
-* В конце выводится заголовок: ```print fsm.header```, который содержит имена переменных
+* В конце выводится заголовок: ```print(fsm.header)```, который содержит имена переменных
 * И результат обработки
 
 #VSLIDE
@@ -327,8 +327,7 @@ re_table = textfsm.TextFSM(f)
 header = re_table.header
 result = re_table.ParseText(output)
 
-print tabulate(result, headers=header)
-
+print(tabulate(result, headers=header))
 ```
 
 #VSLIDE
@@ -897,6 +896,212 @@ Network    Mask      Distance    Metric  NextHop
 ```
 
 #HSLIDE
+### show etherchannel summary
+
+#VSLIDE
+### show etherchannel summary
+
+TextFSM удобно использовать для разбора вывода, который отображается столбцами или для обработки вывода, который находится в разных строках.
+Менее удобными получаются шаблоны, когда надо получить несколько однотипных элементов из одной строки.
+
+#VSLIDE
+### show etherchannel summary
+
+Пример вывода команды show etherchannel summary (файл output/sh_etherchannel_summary.txt):
+```
+sw1# sh etherchannel summary
+Flags:  D - down        P - bundled in port-channel
+        I - stand-alone s - suspended
+        H - Hot-standby (LACP only)
+        R - Layer3      S - Layer2
+        U - in use      f - failed to allocate aggregator
+
+        M - not in use, minimum links not met
+        u - unsuitable for bundling
+        w - waiting to be aggregated
+        d - default port
+
+
+Number of channel-groups in use: 2
+Number of aggregators:           2
+
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------------------
+1      Po1(SU)         LACP      Fa0/1(P)   Fa0/2(P)   Fa0/3(P)
+3      Po3(SU)          -        Fa0/11(P)   Fa0/12(P)   Fa0/13(P)   Fa0/14(P)
+```
+
+#VSLIDE
+### show etherchannel summary
+
+В данном случае, нужно получить:
+* имя и номер port-channel. Например, Po1
+* список всех портов в нем. Например, ['Fa0/1', 'Fa0/2', 'Fa0/3']
+
+Сложность тут в том, что порты находятся в одной строке, а в TextFSM нельзя указывать одну и ту же переменную несколько раз в строке.
+Но, есть возможность несколько раз искать совпадение в строке.
+
+
+
+#VSLIDE
+### show etherchannel summary
+
+Первая версия шаблона выглядит так:
+```
+Value CHANNEL (\S+)
+Value List MEMBERS (\w+\d+\/\d+)
+
+Start
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +${MEMBERS}\( -> Record
+```
+
+#VSLIDE
+### show etherchannel summary
+
+В шаблоне две переменные:
+* CHANNEL - имя и номер агрегированного порта
+* MEMBERS - список портов, которые входят в агрегированный порт. Для этой переменной указан тип - List
+
+Результат:
+```
+CHANNEL    MEMBERS
+---------  ----------
+Po1        ['Fa0/1']
+Po3        ['Fa0/11']
+```
+
+#VSLIDE
+### show etherchannel summary
+
+Пока что в выводе только первый порт, а нужно чтобы попали все порты.
+В данном случае, надо продолжить обработку строки с портами, после найденного совпадения.
+То есть, использовать действие Continue и описать следующее выражение.
+
+Единственная строка, которая есть в шаблоне, описывает первый порт.
+Надо добавить строку, которая описывает следующий порт.
+
+
+#VSLIDE
+### show etherchannel summary
+
+Следующая версия шаблона:
+```
+Value CHANNEL (\S+)
+Value List MEMBERS (\w+\d+\/\d+)
+
+Start
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +${MEMBERS}\( -> Continue
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +\S+ +${MEMBERS}\( -> Record
+```
+
+Вторая строка описывает такое же выражение, но переменная MEMBERS смещается на следующий порт.
+
+
+#VSLIDE
+### show etherchannel summary
+
+Результат:
+```
+CHANNEL    MEMBERS
+---------  --------------------
+Po1        ['Fa0/1', 'Fa0/2']
+Po3        ['Fa0/11', 'Fa0/12']
+```
+
+
+#VSLIDE
+### show etherchannel summary
+
+Аналогично надо дописать в шаблон строки, которые описывают третий и четвертый порт.
+Но, так как в выводе может быть переменное количество портов, надо перенести правило Record на отдельную строку, чтобы оно не было привязано к конкретному количеству портов в строке.
+
+Если Record будет находиться, например, после строки, в которой описаны четыре порта, для ситуации когда портов в строке меньше, запись не будет выполняться.
+
+
+#VSLIDE
+### show etherchannel summary
+
+Итоговый шаблон (файл templates/sh_etherchannel_summary.txt):
+```
+Value CHANNEL (\S+)
+Value List MEMBERS (\w+\d+\/\d+)
+
+Start
+  ^\d+.* -> Continue.Record
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +\S+ +${MEMBERS}\( -> Continue
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +(\S+ +){2} +${MEMBERS}\( -> Continue
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +(\S+ +){3} +${MEMBERS}\( -> Continue
+```
+
+#VSLIDE
+### show etherchannel summary
+
+Результат обработки:
+```
+CHANNEL    MEMBERS
+---------  ----------------------------------------
+Po1        ['Fa0/1', 'Fa0/2', 'Fa0/3']
+Po3        ['Fa0/11', 'Fa0/12', 'Fa0/13', 'Fa0/14']
+```
+
+#VSLIDE
+### show etherchannel summary
+
+Возможен ещё один вариант вывода команды sh etherchannel summary (файл output/sh_etherchannel_summary2.txt):
+```
+sw1# sh etherchannel summary
+Flags:  D - down        P - bundled in port-channel
+        I - stand-alone s - suspended
+        H - Hot-standby (LACP only)
+        R - Layer3      S - Layer2
+        U - in use      f - failed to allocate aggregator
+
+        M - not in use, minimum links not met
+        u - unsuitable for bundling
+        w - waiting to be aggregated
+        d - default port
+
+
+Number of channel-groups in use: 2
+Number of aggregators:           2
+
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------------------
+1      Po1(SU)         LACP      Fa0/1(P)   Fa0/2(P)   Fa0/3(P)
+3      Po3(SU)          -        Fa0/11(P)   Fa0/12(P)   Fa0/13(P)   Fa0/14(P)
+                                 Fa0/15(P)   Fa0/16(P)
+```
+
+#VSLIDE
+### show etherchannel summary
+
+Для того чтобы шаблон обрабатывал и этот вариант, надо его модифицировать (файл templates/sh_etherchannel_summary2.txt):
+```
+Value CHANNEL (\S+)
+Value List MEMBERS (\w+\d+\/\d+)
+
+Start
+  ^\d+.* -> Continue.Record
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +${MEMBERS}\( -> Continue
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +\S+ +${MEMBERS}\( -> Continue
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +(\S+ +){2} +${MEMBERS}\( -> Continue
+  ^\d+ +${CHANNEL}\(\S+ +[\w-]+ +[\w ]+ +(\S+ +){3} +${MEMBERS}\( -> Continue
+  ^ +${MEMBERS} -> Continue
+  ^ +\S+ +${MEMBERS} -> Continue
+  ^ +(\S+ +){2} +${MEMBERS} -> Continue
+  ^ +(\S+ +){3} +${MEMBERS} -> Continue
+```
+
+Результат будет таким:
+```
+CHANNEL    MEMBERS
+---------  ------------------------------------------------------------
+Po1        ['Fa0/1', 'Fa0/2', 'Fa0/3']
+Po3        ['Fa0/11', 'Fa0/12', 'Fa0/13', 'Fa0/14', 'Fa0/15', 'Fa0/16']
+```
+
+
+#HSLIDE
 
 ## TextFSM CLI Table
 
@@ -984,7 +1189,7 @@ index
 
 Для начала, импортируем класс clitable:
 ```python
-In [1]: import textfsm.clitable as clitable
+In [1]: import clitable
 ```
 
 #VSLIDE
@@ -1044,7 +1249,7 @@ cli_table.LabelValueTable  cli_table.header           cli_table.separator
 
 Например, если вызвать ```print cli_table```, получим такой вывод:
 ```python
-In [7]: print cli_table
+In [7]: print(cli_table)
 Network, Mask, Distance, Metric, NextHop
 10.0.24.0, /24, 110, 20, ['10.0.12.2']
 10.0.34.0, /24, 110, 20, ['10.0.13.3']
@@ -1059,7 +1264,7 @@ Network, Mask, Distance, Metric, NextHop
 
 Метод FormattedTable позволяет получить вывод в виде таблицы:
 ```python
-In [8]: print cli_table.FormattedTable()
+In [8]: print(cli_table.FormattedTable())
  Network    Mask  Distance  Metric  NextHop
 ====================================================================
  10.0.24.0  /24   110       20      10.0.12.2
@@ -1077,14 +1282,7 @@ In [8]: print cli_table.FormattedTable()
 
 Чтобы получить из объекта cli_table структурированный вывод, например, список списков, надо обратиться к объекту таким образом:
 ```python
-In [9]: data_rows = []
-
-In [10]: for row in cli_table:
-   ....:     current_row = []
-   ....:     for value in row:
-   ....:         current_row.append(value)
-   ....:     data_rows.append(current_row)
-   ....:
+In [9]: data_rows = [list(row) for row in cli_table]
 
 In [11]: data_rows
 Out[11]:
@@ -1095,8 +1293,6 @@ Out[11]:
  ['10.4.4.4', '/32', '110', '21', ['10.0.13.3', '10.0.12.2', '10.0.14.4']],
  ['10.5.35.0', '/24', '110', '20', ['10.0.13.3']]]
 
-
-
 ```
 
 #VSLIDE
@@ -1104,14 +1300,7 @@ Out[11]:
 
 Отдельно можно получить названия столбцов:
 ```python
-In [12]: cli_table.header.viewvalues()
-Out[12]: dict_values([])
-
-In [13]: header = []
-
-In [13]: for name in cli_table.header:
-   ....:     header.append(name)
-   ....:
+In [12]: header = list(cli_table.header)
 
 In [14]: header
 Out[14]: ['Network', 'Mask', 'Distance', 'Metric', 'NextHop']
@@ -1125,32 +1314,25 @@ Out[14]: ['Network', 'Mask', 'Distance', 'Metric', 'NextHop']
 
 Соберем всё в один скрипт (файл textfsm_clitable.py):
 ```python
-import textfsm.clitable as clitable
+import clitable
 
 output_sh_ip_route_ospf = open('output/sh_ip_route_ospf.txt').read()
+
 cli_table = clitable.CliTable('index', 'templates')
+
 attributes = {'Command': 'show ip route ospf' , 'Vendor': 'Cisco'}
+
 cli_table.ParseCmd(output_sh_ip_route_ospf, attributes)
+print("CLI Table output:\n", cli_table)
 
-print "CLI Table output:\n", cli_table
-print "Formatted Table:\n", cli_table.FormattedTable()
+print("Formatted Table:\n", cli_table.FormattedTable())
 
-data_rows = []
+data_rows = [list(row) for row in cli_table]
+header = list(cli_table.header)
 
-for row in cli_table:
-    current_row = []
-    for value in row:
-        current_row.append(value)
-    data_rows.append(current_row)
-
-header = []
-for name in cli_table.header:
-    header.append(name)
-
-print header
+print(header)
 for row in data_rows:
-    print row
-
+    print(row)
 
 ```
 
@@ -1187,7 +1369,6 @@ Formatted Table:
 ['10.3.3.3', '/32', '110', '11', ['10.0.13.3']]
 ['10.4.4.4', '/32', '110', '21', ['10.0.13.3', '10.0.12.2', '10.0.14.4']]
 ['10.5.35.0', '/24', '110', '20', ['10.0.13.3']]
-
 
 ```
 
