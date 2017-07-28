@@ -34,6 +34,7 @@
 * [Базы данных](https://gitpitch.com/natenka/pyneng-slides/py3-db)
 * [Подключение к оборудованию](https://gitpitch.com/natenka/pyneng-slides/py3-ssh-telnet)
 * [Jinja2](https://gitpitch.com/natenka/pyneng-slides/py3-jinja2)
+* [TextFSM](https://gitpitch.com/natenka/pyneng-slides/py3-textfsm)
 
 ## PDF версии слайдов
 
