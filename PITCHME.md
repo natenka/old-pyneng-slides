@@ -58,7 +58,7 @@ router ospf 10
 ```python
 from jinja2 import Template
 
-template = Template(u"""
+template = Template("""
 hostname {{name}}
 !
 interface Loopback255
@@ -77,7 +77,7 @@ router ospf 10
 
 liverpool = {'id':'11', 'name':'Liverpool', 'int':'Gi1/0/17', 'ip':'10.1.1.10'}
 
-print template.render( liverpool )
+print(template.render(liverpool))
 ```
 
 #VSLIDE
@@ -123,11 +123,8 @@ router ospf 10
 ```python
 # -*- coding: utf-8 -*-
 from jinja2 import Template
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
-template_r1 = Template(u"""
+template_r1 = Template("""
 hostname {{name}}
 !
 interface Loopback10
@@ -172,15 +169,6 @@ router ospf 10
 #VSLIDE
 ### Пример использования Jinja2
 
-Эти строки меняют кодировку по умолчанию ascii на utf-8:
-```
-reload(sys)
-sys.setdefaultencoding('utf-8')
-```
-
-#VSLIDE
-### Пример использования Jinja2
-
 Файл routers_info.yml
 ```yaml
 - id: 11
@@ -220,7 +208,7 @@ routers = yaml.load(open('routers_info.yml'))
 for router in routers:
     r1_conf = router['name']+'_r1.txt'
     with open(r1_conf,'w') as f:
-        f.write(template_r1.render( router ))
+        f.write(template_r1.render(router))
 ```
 
 #VSLIDE
@@ -384,11 +372,8 @@ router ospf 10
 # -*- coding: utf-8 -*-
 from jinja2 import Environment, FileSystemLoader
 import yaml
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
-env = Environment(loader = FileSystemLoader('templates'))
+env = Environment(loader=FileSystemLoader('templates'))
 template = env.get_template('router_template.txt')
 
 routers = yaml.load(open('routers_info.yml'))
@@ -396,7 +381,7 @@ routers = yaml.load(open('routers_info.yml'))
 for router in routers:
     r1_conf = router['name']+'_r1.txt'
     with open(r1_conf,'w') as f:
-        f.write(template.render( router ))
+        f.write(template.render(router))
 ```
 
 #VSLIDE
@@ -455,18 +440,17 @@ env = Environment(loader = FileSystemLoader(curr_dir))
 from jinja2 import Environment, FileSystemLoader
 import yaml
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 TEMPLATE_DIR, template = sys.argv[1].split('/')
 VARS_FILE = sys.argv[2]
 
-env = Environment(loader = FileSystemLoader(TEMPLATE_DIR), trim_blocks=True)
+env = Environment(loader=FileSystemLoader(TEMPLATE_DIR),
+                  trim_blocks=True, lstrip_blocks=True)
 template = env.get_template(template)
 
-vars_dict = yaml.load( open( VARS_FILE ) )
+vars_dict = yaml.load(open(VARS_FILE))
 
-print template.render( vars_dict )
+print(template.render(vars_dict))
 ```
 
 #VSLIDE
@@ -496,6 +480,269 @@ env = Environment(loader = FileSystemLoader(TEMPLATE_DIR), trim_blocks=True)
 Пример запуска скрипта:
 ```
 $ python cfg_gen.py templates/variables.txt data_files/vars.yml
+```
+
+#HSLIDE
+## Контроль символов whitespace
+
+#VSLIDE
+### trim_blocks
+
+Параметр ```trim_blocks``` удаляет первую пустую строку после блока конструкции, если его значение равно True (по умолчанию False).
+
+Посмотрим на эффект применения флага на примере шаблона templates/env_flags.txt:
+```
+router bgp {{ bgp.local_as }}
+ {% for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {% endfor %}
+```
+
+#VSLIDE
+### trim_blocks
+
+Если скрипт cfg_gen.py запускается без флагов trim_blocks, lstrip_blocks:
+```
+env = Environment(loader = FileSystemLoader(TEMPLATE_DIR))
+```
+
+Вывод будет таким:
+```
+$ python cfg_gen.py templates/env_flags.txt data_files/router.yml
+router bgp 100
+
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+```
+
+#VSLIDE
+### trim_blocks
+
+При добавлении флага trim_blocks таким образом:
+```python
+env = Environment(loader = FileSystemLoader(TEMPLATE_DIR), trim_blocks=True)
+```
+
+Результат выполнения будет таким:
+```
+$ python cfg_gen.py templates/env_flags.txt data_files/router.yml
+router bgp 100
+  neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+  neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+
+```
+
+#VSLIDE
+### lstrip_blocks
+
+Но перед строками ```neighbor ... remote-as``` появились два пробела.
+Так получилось из-за того, что перед блоком ```{% for ibgp in bgp.ibgp_neighbors %}``` стоит пробел.
+После того, как был отключен лишний перевод строки, пробелы и табы перед блоком добавляются к первой строке блока.
+
+Но это не влияет на следующие строки.
+Поэтому строки с ```neighbor ... update-source``` отображаются с одним пробелом.
+
+#VSLIDE
+### lstrip_blocks
+
+Параметр ```lstrip_blocks``` контролирует то, будут ли удаляться пробелы и табы от начала строки до начала блока (до открывающейся фигурной скобки).
+
+Если добавить аргумент ```lstrip_blocks=True``` таким образом:
+```
+env = Environment(loader = FileSystemLoader(TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
+```
+
+#VSLIDE
+### lstrip_blocks
+
+Результат выполнения будет таким:
+```
+$ python cfg_gen.py templates/env_flags.txt data_files/router.yml
+router bgp 100
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+```
+
+#VSLIDE
+### Отключение lstrip_blocks для блока
+
+Иногда, нужно отключить функциональность lstrip_blocks для блока.
+
+Например, если параметр ```lstrip_blocks``` установлен равным True в окружении, но нужно отключить его для второго блока в шаблоне (файл templates/env_flags2.txt):
+```
+router bgp {{ bgp.local_as }}
+ {% for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {% endfor %}
+
+router bgp {{ bgp.local_as }}
+ {%+ for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {% endfor %}
+```
+
+#VSLIDE
+### Отключение lstrip_blocks для блока
+
+Результат будет таким:
+```
+$ python cfg_gen.py templates/env_flags2.txt data_files/router.yml
+router bgp 100
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+
+router bgp 100
+  neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+```
+
+#VSLIDE
+### Отключение lstrip_blocks для блока
+
+Плюс после знака процента отключает lstrip_blocks для блока.
+В данном случае, только для начала блока.
+
+Если сделать таким образом (плюс добавлен в выражении для завершения блока):
+```
+router bgp {{ bgp.local_as }}
+ {% for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {% endfor %}
+
+router bgp {{ bgp.local_as }}
+ {%+ for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {%+ endfor %}
+```
+
+#VSLIDE
+### Отключение lstrip_blocks для блока
+
+Он будет отключен и для конца блока:
+```
+$ python cfg_gen.py templates/env_flags2.txt data_files/router.yml
+router bgp 100
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+
+router bgp 100
+  neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+  neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+```
+
+#VSLIDE
+### Удаление whitespace в блоке
+
+Аналогичным образом можно контролировать удаление whitespace для блока.
+
+Для этого примера в окружении не выставлены флаги:
+```
+env = Environment(loader = FileSystemLoader(TEMPLATE_DIR))
+```
+
+#VSLIDE
+### Удаление whitespace в блоке
+
+Шаблон templates/env_flags3.txt:
+```
+router bgp {{ bgp.local_as }}
+ {% for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {% endfor %}
+
+router bgp {{ bgp.local_as }}
+ {%- for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {% endfor %}
+```
+
+Обратите внимание на минус в начале второго блока.
+Минут удаляет все whitespace символы. В данном случае, в начале блока.
+
+#VSLIDE
+### Удаление whitespace в блоке
+
+Результат будет таким:
+```
+$ python cfg_gen.py templates/env_flags3.txt data_files/router.yml
+router bgp 100
+
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+
+
+router bgp 100
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+
+```
+
+#VSLIDE
+### Удаление whitespace в блоке
+
+Если добавить минут в конец блока:
+```
+router bgp {{ bgp.local_as }}
+ {% for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {% endfor %}
+
+router bgp {{ bgp.local_as }}
+ {%- for ibgp in bgp.ibgp_neighbors %}
+ neighbor {{ ibgp }} remote-as {{ bgp.local_as }}
+ neighbor {{ ibgp }} update-source {{ bgp.loopback }}
+ {%- endfor %}
+```
+
+#VSLIDE
+### Удаление whitespace в блоке
+
+Удалится пустая строка и в конце блока:
+```
+$ python cfg_gen.py templates/env_flags3.txt data_files/router.yml
+router bgp 100
+
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
+
+
+router bgp 100
+ neighbor 10.0.0.2 remote-as 100
+ neighbor 10.0.0.2 update-source lo100
+ neighbor 10.0.0.3 remote-as 100
+ neighbor 10.0.0.3 update-source lo100
 ```
 
 #HSLIDE
@@ -608,7 +855,7 @@ hostname {{ name }}
 interface Loopback0
  ip address 10.0.0.{{ id }} 255.255.255.255
 
-{% for vlan, name in vlans.iteritems() %}
+{% for vlan, name in vlans.items() %}
 vlan {{ vlan }}
  name {{ name }}
 {% endfor %}
@@ -616,9 +863,9 @@ vlan {{ vlan }}
 router ospf 1
  router-id 10.0.0.{{ id }}
  auto-cost reference-bandwidth 10000
-{% for networks in ospf %}
+ {% for networks in ospf %}
  network {{ networks.network }} area {{ networks.area }}
-{% endfor %}
+ {% endfor %}
 ```
 
 #VSLIDE
@@ -704,7 +951,7 @@ hostname {{ name }}
 interface Loopback0
  ip address 10.0.0.{{ id }} 255.255.255.255
 
-{% for vlan, name in vlans.iteritems() %}
+{% for vlan, name in vlans.items() %}
 vlan {{ vlan }}
  name {{ name }}
 {% endfor %}
@@ -713,9 +960,9 @@ vlan {{ vlan }}
 router ospf 1
  router-id 10.0.0.{{ id }}
  auto-cost reference-bandwidth 10000
-{% for networks in ospf %}
+ {% for networks in ospf %}
  network {{ networks.network }} area {{ networks.area }}
-{% endfor %}
+ {% endfor %}
 {% endif %}
 ```
 
@@ -814,15 +1061,15 @@ router ospf 1
 
 Пример шаблона templates/if_vlans.txt:
 ```
-{% for intf, params in trunks.iteritems() %}
+{% for intf, params in trunks.items() %}
 interface {{ intf }}
-{% if params.action == 'add' %}
+ {% if params.action == 'add' %}
  switchport trunk allowed vlan add {{ params.vlans }}
-{% elif params.action == 'delete' %}
-  switchport trunk allowed vlan remove {{ params.vlans }}
-{% else %}
-  switchport trunk allowed vlan {{ params.vlans }}
-{% endif %}
+ {% elif params.action == 'delete' %}
+ switchport trunk allowed vlan remove {{ params.vlans }}
+ {% else %}
+ switchport trunk allowed vlan {{ params.vlans }}
+ {% endif %}
 {% endfor %}
 ```
 
@@ -852,13 +1099,13 @@ trunks:
 ```
 {% for intf in trunks %}
 interface {{ intf }}
-{% if trunks[intf]['action'] == 'add' %}
+ {% if trunks[intf]['action'] == 'add' %}
  switchport trunk allowed vlan add {{ trunks[intf]['vlans'] }}
-{% elif trunks[intf]['action'] == 'delete' %}
-  switchport trunk allowed vlan remove {{ trunks[intf]['vlans'] }}
-{% else %}
-  switchport trunk allowed vlan {{ trunks[intf]['vlans'] }}
-{% endif %}
+ {% elif trunks[intf]['action'] == 'delete' %}
+ switchport trunk allowed vlan remove {{ trunks[intf]['vlans'] }}
+ {% else %}
+ switchport trunk allowed vlan {{ trunks[intf]['vlans'] }}
+ {% endif %}
 {% endfor %}
 ```
 
@@ -883,7 +1130,7 @@ interface Fa0/2
 
 Пример шаблона templates/if_for.txt с фильтром, в цикле for:
 ```
-{% for vlan, name in vlans.iteritems() if vlan > 15 %}
+{% for vlan, name in vlans.items() if vlan > 15 %}
 vlan {{ vlan }}
  name {{ name }}
 {% endfor %}
@@ -947,9 +1194,9 @@ Jinja поддерживает большое количество встрое�
 ```
 router ospf 1
  auto-cost reference-bandwidth {{ ref_bw | default(10000) }}
-{% for networks in ospf %}
+ {% for networks in ospf %}
  network {{ networks.network }} area {{ networks.area }}
-{% endfor %}
+ {% endfor %}
 ```
 
 Если переменная ref_bw определена в словаре, будет подставлено её значение.
@@ -1065,13 +1312,13 @@ dictsort(value, case_sensitive=False, by='key')
 ```
 {% for intf, params in trunks | dictsort %}
 interface {{ intf }}
-{% if params.action == 'add' %}
-  switchport trunk allowed vlan add {{ params.vlans }}
-{% elif params.action == 'delete' %}
-  switchport trunk allowed vlan remove {{ params.vlans }}
-{% else %}
-  switchport trunk allowed vlan {{ params.vlans }}
-{% endif %}
+ {% if params.action == 'add' %}
+ switchport trunk allowed vlan add {{ params.vlans }}
+ {% elif params.action == 'delete' %}
+ switchport trunk allowed vlan remove {{ params.vlans }}
+ {% else %}
+ switchport trunk allowed vlan {{ params.vlans }}
+ {% endif %}
 {% endfor %}
 ```
 
@@ -1123,13 +1370,13 @@ interface Fa0/3
 ```
 {% for intf, params in trunks | dictsort %}
 interface {{ intf }}
-{% if params.action == 'add' %}
-  switchport trunk allowed vlan add {{ params.vlans | join(',') }}
-{% elif params.action == 'delete' %}
-  switchport trunk allowed vlan remove {{ params.vlans | join(',') }}
-{% else %}
-  switchport trunk allowed vlan {{ params.vlans | join(',') }}
-{% endif %}
+ {% if params.action == 'add' %}
+ switchport trunk allowed vlan add {{ params.vlans | join(',') }}
+ {% elif params.action == 'delete' %}
+ switchport trunk allowed vlan remove {{ params.vlans | join(',') }}
+ {% else %}
+ switchport trunk allowed vlan {{ params.vlans | join(',') }}
+ {% endif %}
 {% endfor %}
 ```
 
@@ -1245,24 +1492,24 @@ router ospf 1
 Шаблон templates/test_iterable.txt (сделаны отступы, чтобы былы понятней ответвления):
 ```
 {% for intf, params in trunks | dictsort %}
-  interface {{ intf }}
-  {% if params.vlans is iterable %}
-    {% if params.action == 'add' %}
-      switchport trunk allowed vlan add {{ params.vlans | join(',') }}
-    {% elif params.action == 'delete' %}
-      switchport trunk allowed vlan remove {{ params.vlans | join(',') }}
-    {% else %}
-      switchport trunk allowed vlan {{ params.vlans | join(',') }}
-    {% endif %}
-  {% else %}
-    {% if params.action == 'add' %}
-      switchport trunk allowed vlan add {{ params.vlans }}
-    {% elif params.action == 'delete' %}
-      switchport trunk allowed vlan remove {{ params.vlans }}
-    {% else %}
-      switchport trunk allowed vlan {{ params.vlans }}
-    {% endif %}
-  {% endif %}
+interface {{ intf }}
+ {% if params.vlans is iterable %}
+   {% if params.action == 'add' %}
+ switchport trunk allowed vlan add {{ params.vlans | join(',') }}
+   {% elif params.action == 'delete' %}
+ switchport trunk allowed vlan remove {{ params.vlans | join(',') }}
+   {% else %}
+ switchport trunk allowed vlan {{ params.vlans | join(',') }}
+   {% endif %}
+ {% else %}
+   {% if params.action == 'add' %}
+ switchport trunk allowed vlan add {{ params.vlans }}
+   {% elif params.action == 'delete' %}
+ switchport trunk allowed vlan remove {{ params.vlans }}
+   {% else %}
+ switchport trunk allowed vlan {{ params.vlans }}
+   {% endif %}
+ {% endif %}
 {% endfor %}
 ```
 
@@ -1329,27 +1576,27 @@ $ python cfg_gen.py templates/test_iterable.txt data_files/test_iterable.yml
 Пример шаблона templates/set.txt, в котором выражение set используется чтобы задать более короткие имена параметрам:
 ```
 {% for intf, params in trunks | dictsort %}
-  {% set vlans = params.vlans %}
-  {% set action = params.action %}
+ {% set vlans = params.vlans %}
+ {% set action = params.action %}
 
-  interface {{ intf }}
-  {% if vlans is iterable %}
-    {% if action == 'add' %}
-      switchport trunk allowed vlan add {{ vlans | join(',') }}
-    {% elif action == 'delete' %}
-      switchport trunk allowed vlan remove {{ vlans | join(',') }}
-    {% else %}
-      switchport trunk allowed vlan {{ vlans | join(',') }}
-    {% endif %}
+interface {{ intf }}
+ {% if vlans is iterable %}
+  {% if action == 'add' %}
+ switchport trunk allowed vlan add {{ vlans | join(',') }}
+  {% elif action == 'delete' %}
+ switchport trunk allowed vlan remove {{ vlans | join(',') }}
   {% else %}
-    {% if action == 'add' %}
-      switchport trunk allowed vlan add {{ vlans }}
-    {% elif action == 'delete' %}
-      switchport trunk allowed vlan remove {{ vlans }}
-    {% else %}
-      switchport trunk allowed vlan {{ vlans }}
-    {% endif %}
+ switchport trunk allowed vlan {{ vlans | join(',') }}
   {% endif %}
+ {% else %}
+  {% if action == 'add' %}
+ switchport trunk allowed vlan add {{ vlans }}
+  {% elif action == 'delete' %}
+ switchport trunk allowed vlan remove {{ vlans }}
+  {% else %}
+ switchport trunk allowed vlan {{ vlans }}
+  {% endif %}
+ {% endif %}
 {% endfor %}
 ```
 
@@ -1584,10 +1831,12 @@ logging 10.1.1.1
 Пример базового шаблона templates/base_router.txt:
 ```
 !
+{% block services %}
 service timestamps debug datetime msec localtime show-timezone year
 service timestamps log datetime msec localtime show-timezone year
 service password-encryption
 service sequence-numbers
+{% endblock %}
 !
 no ip domain lookup
 !
@@ -1618,8 +1867,15 @@ line vty 0 4
 #VSLIDE
 ### Наследование шаблонов
 
-Обратите внимание на три блока, которые созданы в шаблоне:
+Обратите внимание на четыре блока, которые созданы в шаблоне:
 ```
+{% block services %}
+service timestamps debug datetime msec localtime show-timezone year
+service timestamps log datetime msec localtime show-timezone year
+service password-encryption
+service sequence-numbers
+{% endblock %}
+!
 {% block ospf %}
 router ospf 1
  auto-cost reference-bandwidth 10000
@@ -1713,9 +1969,9 @@ router ospf 1
 ```
 {% block ospf %}
 {{ super() }}
-{% for networks in ospf %}
+ {% for networks in ospf %}
  network {{ networks.network }} area {{ networks.area }}
-{% endfor %}
+ {% endfor %}
 {% endblock %}
 ```
 
