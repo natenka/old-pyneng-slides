@@ -1506,9 +1506,7 @@ Ansible обнаружил ошибку и возвращает сообщени
 ### wait_for
 
 Пример playbook (файл 3_ios_command_wait_for.yml):
-```yml
----
-
+```
 - name: Run show commands on routers
   hosts: cisco-routers
   gather_facts: false
@@ -1522,7 +1520,6 @@ Ansible обнаружил ошибку и возвращает сообщени
         wait_for:
           - result[0] contains 'Success rate is 100 percent'
         provider: "{{ cli }}"
-
 ```
 
 #VSLIDE
