@@ -2221,8 +2221,6 @@ file prompt quiet
 
 Playbook 4_ios_config_save_when.yml
 ```
----
-
 - name: Run cfg commands on routers
   hosts: cisco-routers
   gather_facts: false
@@ -2246,8 +2244,6 @@ Playbook 4_ios_config_save_when.yml
 
 Вариант самостоятельного сохранения 4_ios_config_save.yml:
 ```yml
----
-
 - name: Run cfg commands on routers
   hosts: cisco-routers
   gather_facts: false
