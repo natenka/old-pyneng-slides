@@ -154,7 +154,7 @@ $
 
 Если же перейти в репозиторий Git:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/setup_prompt.png)
+![alt](https://pyneng.github.io/assets/images/setup_prompt.png)
 
 
 #HSLIDE
@@ -166,7 +166,7 @@ __git status__
 
 Для этого в Git есть команда git status:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_status_0.png)
+![alt](https://pyneng.github.io/assets/images/git_status_0.png)
 
 #VSLIDE
 ### Работа с Git
@@ -179,14 +179,14 @@ Git сообщает, что мы находимся в ветке master (эт�
 
 Создадим первый файл README и добавим в него пару произвольных строк текста:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/vi_readme.png)
+![alt](https://pyneng.github.io/assets/images/vi_readme.png)
 
 #VSLIDE
 ### Работа с Git
 
 После этого приглашение выглядит таким образом:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/bash_prompt.png)
+![alt](https://pyneng.github.io/assets/images/bash_prompt.png)
 
 #VSLIDE
 ### Работа с Git
@@ -194,7 +194,7 @@ Git сообщает, что мы находимся в ветке master (эт�
 Почему-то в приглашении показано, что есть два файла, за которыми git еще не следит.
 Посмотрим в git status откуда взялся второй файл:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_status_1.png)
+![alt](https://pyneng.github.io/assets/images/git_status_1.png)
 
 Git сообщает, что есть файлы за которыми он не следит, подсказывает какой командой это сделать.
 
@@ -224,7 +224,7 @@ Git сообщает, что есть файлы за которыми он не
 
 После этого, git status показывает:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_status_2.png)
+![alt](https://pyneng.github.io/assets/images/git_status_2.png)
 
 
 #VSLIDE
@@ -241,21 +241,21 @@ Git сообщает, что есть файлы за которыми он не
 
 Можно указать, что надо следить за конкретным файлом:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_add_readme.png)
+![alt](https://pyneng.github.io/assets/images/git_add_readme.png)
 
 #VSLIDE
 ### git add
 
 Или за всеми файлами:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_add_all.png)
+![alt](https://pyneng.github.io/assets/images/git_add_all.png)
 
 #VSLIDE
 ### git add
 
 Проверим как теперь выглядит вывод git status:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_status_3.png)
+![alt](https://pyneng.github.io/assets/images/git_status_3.png)
 
 
 Теперь файлы находятся в секции "Changes to be committed".
@@ -268,7 +268,7 @@ Git сообщает, что есть файлы за которыми он не
 У команды git commit есть только один обязательный параметр - флаг ```-m```.
 Он позволяет указать сообщение для этого коммита:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_commit_1.png)
+![alt](https://pyneng.github.io/assets/images/git_commit_1.png)
 
 #VSLIDE
 ### git commit
@@ -276,7 +276,7 @@ Git сообщает, что есть файлы за которыми он не
 
 После этого, git status отображает:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_status_4.png)
+![alt](https://pyneng.github.io/assets/images/git_status_4.png)
 
 
 Фраза "working directory clean" обозначает, что нет изменений, которые нужно добавить в Git или закоммитить.
@@ -293,14 +293,14 @@ Git сообщает, что есть файлы за которыми он не
 Например, внесем изменения в файл README и .gitignore, но не будем добавлять их в репозиторий.
 Команда git status показывает, что оба файла изменены:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_status_5.png)
+![alt](https://pyneng.github.io/assets/images/git_status_5.png)
 
 #VSLIDE
 ### git diff
 
 Если дать команду git diff, она покажет внесенные изменения:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_diff.png)
+![alt](https://pyneng.github.io/assets/images/git_diff.png)
 
 То есть, команда git diff показывает какие изменения были внесены с последнего коммита.
 
@@ -309,21 +309,21 @@ Git сообщает, что есть файлы за которыми он не
 
 Если теперь добавить изменения в файлах, и ещё раз выполнить команду git diff, она ничего не покажет:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_add_git_diff.png)
+![alt](https://pyneng.github.io/assets/images/git_add_git_diff.png)
 
 #VSLIDE
 ### git diff
 
 Чтобы показать отличия между staging и последним коммитом, надо добавить параметр --staged:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_diff_staged.png)
+![alt](https://pyneng.github.io/assets/images/git_diff_staged.png)
 
 #VSLIDE
 ### git diff
 
 Закоммитим изменения:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_commit_2.png)
+![alt](https://pyneng.github.io/assets/images/git_commit_2.png)
 
 
 #VSLIDE
@@ -332,7 +332,7 @@ Git сообщает, что есть файлы за которыми он не
 Иногда нужно посмотреть когда были выполнены последние изменения.
 В этом поможет команда git log:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_log.png)
+![alt](https://pyneng.github.io/assets/images/git_log.png)
 
 По умолчанию команда показывает все коммиты, начиная с самого свежего.
 
@@ -342,13 +342,13 @@ Git сообщает, что есть файлы за которыми он не
 С помощью дополнительных параметров, можно не только посмотреть информацию о коммитах, но и какие изменения были внесены.
 Флаг -p позволяет отобразить отличия, которые были внесены каждым коммитом:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_log_p.png)
+![alt](https://pyneng.github.io/assets/images/git_log_p.png)
 
 #VSLIDE
 ### git log
 
 Более короткий вариант вывода можно вывести с флагом ```--stat```:
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/git_log_stat.png)
+![alt](https://pyneng.github.io/assets/images/git_log_stat.png)
 
 
