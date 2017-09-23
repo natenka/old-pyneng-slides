@@ -423,6 +423,406 @@ line vty 0 4
 ## Полезные модули
 
 #HSLIDE
+## Модуль pprint
+
+#VSLIDE
+### Модуль pprint
+
+Модуль pprint позволяет красиво отображать объекты Python.
+При этом сохраняется структура объекта и отображение, которое выводит pprint, можно использовать для создания объекта.
+
+Самый простой вариант использования модуля - функция pprint.
+
+Например, словарь с вложенными словарями отобразится так:
+```python
+In [6]: london_co = {'r1': {'hostname': 'london_r1', 'location': '21 New Globe Wal
+   ...: k', 'vendor': 'Cisco', 'model': '4451', 'IOS': '15.4', 'IP': '10.255.0.1'}
+   ...: , 'r2': {'hostname': 'london_r2', 'location': '21 New Globe Walk', 'vendor
+   ...: ': 'Cisco', 'model': '4451', 'IOS': '15.4', 'IP': '10.255.0.2'}, 'sw1': {'
+   ...: hostname': 'london_sw1', 'location': '21 New Globe Walk', 'vendor': 'Cisco
+   ...: ', 'model': '3850', 'IOS': '3.6.XE', 'IP': '10.255.0.101'}}
+   ...:
+
+In [7]: from pprint import pprint
+
+In [8]: pprint(london_co)
+{'r1': {'IOS': '15.4',
+        'IP': '10.255.0.1',
+        'hostname': 'london_r1',
+        'location': '21 New Globe Walk',
+        'model': '4451',
+        'vendor': 'Cisco'},
+ 'r2': {'IOS': '15.4',
+        'IP': '10.255.0.2',
+        'hostname': 'london_r2',
+        'location': '21 New Globe Walk',
+        'model': '4451',
+        'vendor': 'Cisco'},
+ 'sw1': {'IOS': '3.6.XE',
+         'IP': '10.255.0.101',
+         'hostname': 'london_sw1',
+         'location': '21 New Globe Walk',
+         'model': '3850',
+         'vendor': 'Cisco'}}
+```
+
+#VSLIDE
+### Модуль pprint
+
+Список списков:
+```python
+In [13]: interfaces = [['FastEthernet0/0', '15.0.15.1', 'YES', 'manual', 'up', 'up
+    ...: '], ['FastEthernet0/1', '10.0.1.1', 'YES', 'manual', 'up', 'up'], ['FastE
+    ...: thernet0/2', '10.0.2.1', 'YES', 'manual', 'up', 'down']]
+    ...:
+
+In [14]: pprint(interfaces)
+[['FastEthernet0/0', '15.0.15.1', 'YES', 'manual', 'up', 'up'],
+ ['FastEthernet0/1', '10.0.1.1', 'YES', 'manual', 'up', 'up'],
+ ['FastEthernet0/2', '10.0.2.1', 'YES', 'manual', 'up', 'down']]
+```
+
+#VSLIDE
+### Модуль pprint
+
+Строка:
+```python
+In [18]: tunnel
+Out[18]: '\ninterface Tunnel0\n ip address 10.10.10.1 255.255.255.0\n ip mtu 1416\n ip ospf hello-interval 5\n tunnel source FastEthernet1/0\n tunnel protection ipsec profile DMVPN\n'
+
+In [19]: pprint(tunnel)
+('\n'
+ 'interface Tunnel0\n'
+ ' ip address 10.10.10.1 255.255.255.0\n'
+ ' ip mtu 1416\n'
+ ' ip ospf hello-interval 5\n'
+ ' tunnel source FastEthernet1/0\n'
+ ' tunnel protection ipsec profile DMVPN\n')
+
+```
+
+#VSLIDE
+### Ограничение вложенности
+
+У функции pprint есть дополнительный параметр depth, который позволяет ограничивать глубину отображения структуры данных.
+
+Например, есть такой словарь:
+```python
+In [3]: result = {
+   ...:  'interface Tunnel0': [' ip unnumbered Loopback0',
+   ...:   ' tunnel mode mpls traffic-eng',
+   ...:   ' tunnel destination 10.2.2.2',
+   ...:   ' tunnel mpls traffic-eng priority 7 7',
+   ...:   ' tunnel mpls traffic-eng bandwidth 5000',
+   ...:   ' tunnel mpls traffic-eng path-option 10 dynamic',
+   ...:   ' no routing dynamic'],
+   ...:  'ip access-list standard LDP': [' deny   10.0.0.0 0.0.255.255',
+   ...:   ' permit 10.0.0.0 0.255.255.255'],
+   ...:  'router bgp 100': {' address-family vpnv4': ['  neighbor 10.2.2.2 activat
+   ...: e',
+   ...:    '  neighbor 10.2.2.2 send-community both',
+   ...:    '  exit-address-family'],
+   ...:   ' bgp bestpath igp-metric ignore': [],
+   ...:   ' bgp log-neighbor-changes': [],
+   ...:   ' neighbor 10.2.2.2 next-hop-self': [],
+   ...:   ' neighbor 10.2.2.2 remote-as 100': [],
+   ...:   ' neighbor 10.2.2.2 update-source Loopback0': [],
+   ...:   ' neighbor 10.4.4.4 remote-as 40': []},
+   ...:  'router ospf 1': [' mpls ldp autoconfig area 0',
+   ...:   ' mpls traffic-eng router-id Loopback0',
+   ...:   ' mpls traffic-eng area 0',
+   ...:   ' network 10.0.0.0 0.255.255.255 area 0']}
+   ...:
+```
+
+#VSLIDE
+### Модуль pprint
+
+Можно отобразить только ключи, указав глубину равной 1:
+```python
+In [5]: pprint(result, depth=1)
+{'interface Tunnel0': [...],
+ 'ip access-list standard LDP': [...],
+ 'router bgp 100': {...},
+ 'router ospf 1': [...]}
+```
+
+Скрытые уровни сложенности заменяются ```...```.
+
+#VSLIDE
+### Модуль pprint
+
+Если указать глубину равно 2, отобразится следующий уровень:
+```python
+In [6]: pprint(result, depth=2)
+{'interface Tunnel0': [' ip unnumbered Loopback0',
+                       ' tunnel mode mpls traffic-eng',
+                       ' tunnel destination 10.2.2.2',
+                       ' tunnel mpls traffic-eng priority 7 7',
+                       ' tunnel mpls traffic-eng bandwidth 5000',
+                       ' tunnel mpls traffic-eng path-option 10 dynamic',
+                       ' no routing dynamic'],
+ 'ip access-list standard LDP': [' deny   10.0.0.0 0.0.255.255',
+                                 ' permit 10.0.0.0 0.255.255.255'],
+ 'router bgp 100': {' address-family vpnv4': [...],
+                    ' bgp bestpath igp-metric ignore': [],
+                    ' bgp log-neighbor-changes': [],
+                    ' neighbor 10.2.2.2 next-hop-self': [],
+                    ' neighbor 10.2.2.2 remote-as 100': [],
+                    ' neighbor 10.2.2.2 update-source Loopback0': [],
+                    ' neighbor 10.4.4.4 remote-as 40': []},
+ 'router ospf 1': [' mpls ldp autoconfig area 0',
+                   ' mpls traffic-eng router-id Loopback0',
+                   ' mpls traffic-eng area 0',
+                   ' network 10.0.0.0 0.255.255.255 area 0']}
+
+```
+
+#VSLIDE
+### pformat
+
+pformat - это функция, которая отображает результат в виде строки.
+Ее удобно использовать, если необходимо записать структуру данных в какой-то файл, например, для логирования.
+
+```python
+In [15]: from pprint import pformat
+
+In [16]: formatted_result = pformat(result)
+
+In [17]: print(formatted_result)
+{'interface Tunnel0': [' ip unnumbered Loopback0',
+                       ' tunnel mode mpls traffic-eng',
+                       ' tunnel destination 10.2.2.2',
+                       ' tunnel mpls traffic-eng priority 7 7',
+                       ' tunnel mpls traffic-eng bandwidth 5000',
+                       ' tunnel mpls traffic-eng path-option 10 dynamic',
+                       ' no routing dynamic'],
+ 'ip access-list standard LDP': [' deny   10.0.0.0 0.0.255.255',
+                                 ' permit 10.0.0.0 0.255.255.255'],
+ 'router bgp 100': {' address-family vpnv4': ['  neighbor 10.2.2.2 activate',
+                                              '  neighbor 10.2.2.2 '
+                                              'send-community both',
+                                              '  exit-address-family'],
+                    ' bgp bestpath igp-metric ignore': [],
+                    ' bgp log-neighbor-changes': [],
+                    ' neighbor 10.2.2.2 next-hop-self': [],
+                    ' neighbor 10.2.2.2 remote-as 100': [],
+                    ' neighbor 10.2.2.2 update-source Loopback0': [],
+                    ' neighbor 10.4.4.4 remote-as 40': []},
+ 'router ospf 1': [' mpls ldp autoconfig area 0',
+                   ' mpls traffic-eng router-id Loopback0',
+                   ' mpls traffic-eng area 0',
+                   ' network 10.0.0.0 0.255.255.255 area 0']}
+```
+
+
+#HSLIDE
+## Модуль tabulate
+
+#VSLIDE
+### Модуль tabulate
+
+tabulate - это библиотека, которая позволяет красиво отображать табличные данные.
+
+tabulate не входит в стандартную библиотеку Python, поэтому его нужно установить:
+```
+pip install tabulate
+```
+
+#VSLIDE
+### Модуль tabulate
+
+Модуль поддерживает такие типы табличных данных:
+* список списков (в общем случае iterable of iterables)
+* список словарей (или любой другой итерируемый объект со словарями). Ключи используются как имена столбцов
+* словарь с итерируемыми объектами. Ключи используются как имена столбцов
+
+#VSLIDE
+### Модуль tabulate
+
+Для генерации таблицы используется функция tabulate:
+```python
+In [1]: from tabulate import tabulate
+
+In [2]: sh_ip_int_br = [('FastEthernet0/0', '15.0.15.1', 'up', 'up'),
+   ...:  ('FastEthernet0/1', '10.0.12.1', 'up', 'up'),
+   ...:  ('FastEthernet0/2', '10.0.13.1', 'up', 'up'),
+   ...:  ('Loopback0', '10.1.1.1', 'up', 'up'),
+   ...:  ('Loopback100', '100.0.0.1', 'up', 'up')]
+   ...:
+
+In [4]: print(tabulate(sh_ip_int_br))
+---------------  ---------  --  --
+FastEthernet0/0  15.0.15.1  up  up
+FastEthernet0/1  10.0.12.1  up  up
+FastEthernet0/2  10.0.13.1  up  up
+Loopback0        10.1.1.1   up  up
+Loopback100      100.0.0.1  up  up
+---------------  ---------  --  --
+```
+
+#VSLIDE
+### headers
+
+Параметр headers позволяет передавать дополнительный аргумент, в котором указаны имена столбцов:
+```python
+In [8]: columns=['Interface', 'IP', 'Status', 'Protocol']
+
+In [9]: print(tabulate(sh_ip_int_br, headers=columns))
+Interface        IP         Status    Protocol
+---------------  ---------  --------  ----------
+FastEthernet0/0  15.0.15.1  up        up
+FastEthernet0/1  10.0.12.1  up        up
+FastEthernet0/2  10.0.13.1  up        up
+Loopback0        10.1.1.1   up        up
+Loopback100      100.0.0.1  up        up
+
+```
+
+#VSLIDE
+### headers
+
+Достаточно часто первый набор данных - это заголовки.
+Тогда достаточно указать headers равным "firstrow":
+```python
+In [18]: data
+Out[18]:
+[('Interface', 'IP', 'Status', 'Protocol'),
+ ('FastEthernet0/0', '15.0.15.1', 'up', 'up'),
+ ('FastEthernet0/1', '10.0.12.1', 'up', 'up'),
+ ('FastEthernet0/2', '10.0.13.1', 'up', 'up'),
+ ('Loopback0', '10.1.1.1', 'up', 'up'),
+ ('Loopback100', '100.0.0.1', 'up', 'up')]
+
+In [20]: print(tabulate(data, headers='firstrow'))
+Interface        IP         Status    Protocol
+---------------  ---------  --------  ----------
+FastEthernet0/0  15.0.15.1  up        up
+FastEthernet0/1  10.0.12.1  up        up
+FastEthernet0/2  10.0.13.1  up        up
+Loopback0        10.1.1.1   up        up
+Loopback100      100.0.0.1  up        up
+```
+
+#VSLIDE
+### headers
+
+Если данные в виде списка словарей, надо указать headers равным "keys":
+```python
+In [22]: list_of_dict
+Out[22]:
+[{'IP': '15.0.15.1',
+  'Interface': 'FastEthernet0/0',
+  'Protocol': 'up',
+  'Status': 'up'},
+ {'IP': '10.0.12.1',
+  'Interface': 'FastEthernet0/1',
+  'Protocol': 'up',
+  'Status': 'up'},
+ {'IP': '10.0.13.1',
+  'Interface': 'FastEthernet0/2',
+  'Protocol': 'up',
+  'Status': 'up'},
+ {'IP': '10.1.1.1',
+  'Interface': 'Loopback0',
+  'Protocol': 'up',
+  'Status': 'up'},
+ {'IP': '100.0.0.1',
+  'Interface': 'Loopback100',
+  'Protocol': 'up',
+  'Status': 'up'}]
+
+In [23]: print(tabulate(list_of_dict, headers='keys'))
+Interface        IP         Status    Protocol
+---------------  ---------  --------  ----------
+FastEthernet0/0  15.0.15.1  up        up
+FastEthernet0/1  10.0.12.1  up        up
+FastEthernet0/2  10.0.13.1  up        up
+Loopback0        10.1.1.1   up        up
+Loopback100      100.0.0.1  up        up
+```
+
+#VSLIDE
+### Стиль таблицы
+
+tabulate поддерживает разные стили отображения таблицы.
+
+Формат grid:
+```
+In [24]: print(tabulate(list_of_dict, headers='keys', tablefmt="grid"))
++-----------------+-----------+----------+------------+
+| Interface       | IP        | Status   | Protocol   |
++=================+===========+==========+============+
+| FastEthernet0/0 | 15.0.15.1 | up       | up         |
++-----------------+-----------+----------+------------+
+| FastEthernet0/1 | 10.0.12.1 | up       | up         |
++-----------------+-----------+----------+------------+
+| FastEthernet0/2 | 10.0.13.1 | up       | up         |
++-----------------+-----------+----------+------------+
+| Loopback0       | 10.1.1.1  | up       | up         |
++-----------------+-----------+----------+------------+
+| Loopback100     | 100.0.0.1 | up       | up         |
++-----------------+-----------+----------+------------+
+
+```
+
+#VSLIDE
+### Стиль таблицы
+
+Таблица в формате Markdown:
+```
+In [25]: print(tabulate(list_of_dict, headers='keys', tablefmt='pipe'))
+| Interface       | IP        | Status   | Protocol   |
+|:----------------|:----------|:---------|:-----------|
+| FastEthernet0/0 | 15.0.15.1 | up       | up         |
+| FastEthernet0/1 | 10.0.12.1 | up       | up         |
+| FastEthernet0/2 | 10.0.13.1 | up       | up         |
+| Loopback0       | 10.1.1.1  | up       | up         |
+| Loopback100     | 100.0.0.1 | up       | up         |
+
+```
+
+#VSLIDE
+### Стиль таблицы
+
+Таблица в формате HTML:
+```
+In [26]: print(tabulate(list_of_dict, headers='keys', tablefmt='html'))
+<table>
+<thead>
+<tr><th>Interface      </th><th>IP       </th><th>Status  </th><th>Protocol  </th></tr>
+</thead>
+<tbody>
+<tr><td>FastEthernet0/0</td><td>15.0.15.1</td><td>up      </td><td>up        </td></tr>
+<tr><td>FastEthernet0/1</td><td>10.0.12.1</td><td>up      </td><td>up        </td></tr>
+<tr><td>FastEthernet0/2</td><td>10.0.13.1</td><td>up      </td><td>up        </td></tr>
+<tr><td>Loopback0      </td><td>10.1.1.1 </td><td>up      </td><td>up        </td></tr>
+<tr><td>Loopback100    </td><td>100.0.0.1</td><td>up      </td><td>up        </td></tr>
+</tbody>
+</table>
+
+```
+
+#VSLIDE
+### Выравнивание столбцов
+
+Можно указывать выравнивание для столбцов:
+```python
+In [27]: print(tabulate(list_of_dict, headers='keys', tablefmt='pipe', stralign='center'))
+|    Interface    |    IP     |  Status  |  Protocol  |
+|:---------------:|:---------:|:--------:|:----------:|
+| FastEthernet0/0 | 15.0.15.1 |    up    |     up     |
+| FastEthernet0/1 | 10.0.12.1 |    up    |     up     |
+| FastEthernet0/2 | 10.0.13.1 |    up    |     up     |
+|    Loopback0    | 10.1.1.1  |    up    |     up     |
+|   Loopback100   | 100.0.0.1 |    up    |     up     |
+
+```
+
+Обратите внимание, что тут не только столбцы отобразились с выравниванием по центру, но и соответственно изменился синтаксис Markdown.
+
+
+#HSLIDE
 
 ## Модуль subprocess
 
