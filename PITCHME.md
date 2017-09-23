@@ -981,6 +981,326 @@ def clear_cfg_and_write_to_file(cfg, to_file, **kwargs):
 ## Полезные встроенные функции
 
 #HSLIDE
+## Функция print
+
+#VSLIDE
+### Функция print
+
+Функция print:
+```
+print(*items, sep=' ', end='\n', file=sys.stdout, flush=False)
+```
+
+Функция print выводит все элементы, разделяя их значением sep, и завершает вывод значением end.
+
+#VSLIDE
+### Функция print
+
+Все элементы, которые передаются как аргументы, конвертируются в строки:
+```python
+In [4]: def f(a):
+   ...:     return a
+   ...:
+
+In [5]: print(1, 2, f, range(10))
+1 2 <function f at 0xb4de926c> range(0, 10)
+```
+
+#VSLIDE
+### Функция print
+
+Для функций f и range результат равнозначен применению str():
+```python
+In [6]: str(f)
+Out[6]: '<function f at 0xb4de926c>'
+
+In [7]: str(range(10))
+Out[7]: 'range(0, 10)'
+```
+
+#VSLIDE
+### sep
+
+Параметр sep контролирует то, какой разделитель будет использоваться между элементами.
+
+По умолчанию используется пробел:
+```python
+In [8]: print(1, 2, 3)
+1 2 3
+```
+
+#VSLIDE
+### sep
+
+Но можно изменить значение sep на любую другую строку:
+```python
+In [9]: print(1, 2, 3, sep='|')
+1|2|3
+
+In [10]: print(1, 2, 3, sep='\n')
+1
+2
+3
+
+In [11]: print(1, 2, 3, sep='\n'+'-'*10+'\n')
+1
+----------
+2
+----------
+3
+
+```
+
+#VSLIDE
+### sep
+
+В некоторых ситуациях функция print может заменить метод join:
+```python
+In [12]: items = [1,2,3,4,5]
+
+In [13]: print(*items, sep=', ')
+1, 2, 3, 4, 5
+
+```
+
+#VSLIDE
+### end
+
+Параметр end контролирует то, какое значение выведется после вывода всех элементов.
+
+По умолчанию используется перевод строки:
+```python
+In [19]: print(1,2,3)
+1 2 3
+```
+
+Можно изменить значение end на любую другую строку:
+```python
+In [20]: print(1,2,3, end='\n'+'-'*10)
+1 2 3
+----------
+```
+
+
+#VSLIDE
+### flush
+
+По умолчанию при записи в файл или выводе на стандартный поток вывода вывод буферизируется.
+Функция print позволяет отключать буферизацию.
+
+Пример скрипта, который выводит число от 0 до 10 каждую секунду (файл print_nums.py):
+```python
+import time
+
+for num in range(10):
+    print(num)
+    time.sleep(1)
+```
+
+Попробуйте запустить скрипт и убедиться, что числа выводятся раз в секунду.
+
+#VSLIDE
+### flush
+
+Теперь, аналогичный скрипт, но числа будут выводиться в одной строке (файл print_nums_oneline.py):
+```python
+import time
+
+for num in range(10):
+    print(num, end=' ')
+    time.sleep(1)
+
+```
+
+#VSLIDE
+### flush
+
+Попробуйте запустить функцию.
+Числа не выводятся по одному в секунду, а выводятся все через 10 секунд.
+
+Это связано с тем, что при выводе на стандартный поток вывода flush выполняется после перевода строки.
+
+Чтобы скрипт отрабатывал как нужно, необходимо установить flush равным True (файл print_nums_oneline_fixed.py):
+```python
+import time
+
+for num in range(10):
+    print(num, end=' ', flush=True)
+    time.sleep(1)
+
+```
+
+#HSLIDE
+## Функция range
+
+
+#VSLIDE
+### Функция range
+
+Функция range возвращает неизменяемую последовательность чисел в виде объекта range.
+
+Синтаксис функции:
+```python
+range(stop)
+range(start, stop[, step])
+```
+
+Параметры функции:
+* **start** - с какого числа начинается последовательность. По умолчанию - 0
+* **stop** - до какого числа продолжается последовательность чисел. Указанное число не включается в диапазон
+* **step** - с каким шагом растут числа. По умолчанию 1
+
+#VSLIDE
+### Функция range
+
+Функция range хранит только информацию о значениях start, stop и step и вычисляет значения по мере необходимости.
+Это значит, что, независимо от размера диапазона, который описывает функция range, она всегда будет занимать фиксированный объем памяти.
+
+Самый простой вариант range - передать только значение stop:
+```python
+In [1]: range(5)
+Out[1]: range(0, 5)
+
+In [2]: list(range(5))
+Out[2]: [0, 1, 2, 3, 4]
+```
+
+#VSLIDE
+### Функция range
+
+Если передаются два аргумента, то первый используется как start, а второй - как stop:
+```python
+In [3]: list(range(1, 5))
+Out[3]: [1, 2, 3, 4]
+```
+
+И, чтобы указать шаг последовательности, надо передать три аргумента:
+```python
+In [4]: list(range(0, 10, 2))
+Out[4]: [0, 2, 4, 6, 8]
+
+In [5]: list(range(0, 10, 3))
+Out[5]: [0, 3, 6, 9]
+```
+
+#VSLIDE
+### Функция range
+
+С помощью range можно генерировать и убывающие последовательности чисел:
+```python
+In [6]: list(range(10, 0, -1))
+Out[6]: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+In [7]: list(range(5, -1, -1))
+Out[7]: [5, 4, 3, 2, 1, 0]
+```
+
+#VSLIDE
+### Функция range
+
+В убывающей последовательности шаг тоже может быть разным:
+```python
+In [8]: list(range(10, 0, -2))
+Out[8]: [10, 8, 6, 4, 2]
+```
+
+#VSLIDE
+### Функция range
+
+Функция поддерживает отрицательные значения start и stop:
+```python
+In [9]: list(range(-10, 0, 1))
+Out[9]: [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1]
+
+In [10]: list(range(0, -10, -1))
+Out[10]: [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+```
+
+#VSLIDE
+### Функция range
+
+Объект range поддерживает все [операции](https://docs.python.org/3.6/library/stdtypes.html#sequence-types-list-tuple-range), которые поддерживают последовательности в Python, кроме сложения и умножения.
+
+Проверка, входит ли число в диапазон, который описывает range:
+```python
+In [11]: nums = range(5)
+
+In [12]: nums
+Out[12]: range(0, 5)
+
+In [13]: 3 in nums
+Out[13]: True
+
+In [14]: 7 in nums
+Out[14]: False
+```
+
+#VSLIDE
+### Функция range
+
+Можно получить конкретный элемент диапазона:
+```python
+In [15]: nums = range(5)
+
+In [16]: nums[0]
+Out[16]: 0
+
+In [17]: nums[-1]
+Out[17]: 4
+```
+
+#VSLIDE
+### Функция range
+
+Range поддерживает срезы:
+```python
+In [18]: nums = range(5)
+
+In [19]: nums[1:]
+Out[19]: range(1, 5)
+
+In [20]: nums[:3]
+Out[20]: range(0, 3)
+```
+
+#VSLIDE
+### Функция range
+
+Можно получить длину диапазона:
+```python
+In [21]: nums = range(5)
+
+In [22]: len(nums)
+Out[22]: 5
+```
+
+#VSLIDE
+### Функция range
+
+А также минимальный и максимальный элемент:
+```python
+In [23]: nums = range(5)
+
+In [24]: min(nums)
+Out[24]: 0
+
+In [25]: max(nums)
+Out[25]: 4
+```
+
+#VSLIDE
+### Функция range
+
+Кроме того, объект range поддерживает метод index:
+```python
+In [26]: nums = range(1, 7)
+
+In [27]: nums.index(3)
+Out[27]: 2
+```
+
+
+#HSLIDE
 ## Функция sorted
 
 #VSLIDE
@@ -1046,78 +1366,6 @@ In [19]: list_of_tuples = [
 In [20]: sorted(list_of_tuples, key=itemgetter(1))
 Out[20]: [('DB_VLAN', 11), ('Mngmt_VLAN', 99), ('IT_VLAN', 320), ('User_VLAN', 1010)]```
 
-
-#HSLIDE
-## Анонимная функция lambda
-
-#VSLIDE
-### Анонимная функция lambda
-
-В анонимной функции lambda:
-* может содержаться только одно выражение
-* аргументов может передаваться сколько угодно
-
-```python
-In [1]: sum_arg = lambda a, b: a + b
-
-In [2]: sum_arg(1,2)
-Out[2]: 3
-
-In [3]: sum_arg(10,22)
-Out[3]: 32
-```
-
-#VSLIDE
-### Анонимная функция lambda
-
-```python
-In [1]: sum_arg = lambda a, b: a + b
-
-In [2]: sum_arg(1,2)
-Out[2]: 3
-
-In [3]: sum_arg(10,22)
-Out[3]: 32
-```
-
-Аналогичная обычная функция:
-```python
-In [4]: def sum_arg(a, b):
-  ....:     return a + b
-  ....:
-
-In [5]: sum_arg(1,5)
-Out[5]: 6
-```
-
-#VSLIDE
-### Анонимная функция lambda
-
-Сортировка элементов с помощью lambda:
-```
-list_of_lists = [
-['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
-['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
-['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
-['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
-['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
-
-In [6]: sorted(list_of_lists)
-Out[6]:
-[['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
- ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
- ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
- ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
- ['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
-
-In [7]: sorted(list_of_lists, key=lambda x: x[2])
-Out[7]:
-[['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255'],
- ['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
- ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
- ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
- ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0']]
-```
 
 #HSLIDE
 ## Функция zip()
@@ -1220,6 +1468,138 @@ Out[14]:
   'model': '3850',
   'vendor': 'Cisco'}}
 ```
+
+#HSLIDE
+## Функция all()
+
+#VSLIDE
+### Функция all()
+
+Функция all() возвращает True, если все элементы истина (или объект пустой).
+
+```python
+In [54]: all([False, True, True])
+Out[54]: False
+
+In [55]: all([True, True, True])
+Out[55]: True
+
+In [56]: all([])
+Out[56]: True
+```
+
+#VSLIDE
+### Функция all()
+
+```python
+In [57]: IP = '10.0.1.1'
+
+In [58]: digits = [ i for i in IP.split('.') if i.isdigit() ]
+
+In [59]: digits
+Out[59]: ['10', '0', '1', '1']
+
+In [60]: all( i.isdigit() for i in IP.split('.'))
+Out[60]: True
+
+In [61]: all( i.isdigit() for i in '10.1.1.a'.split('.'))
+Out[61]: False
+```
+
+#HSLIDE
+## Функция any()
+
+#VSLIDE
+### Функция any()
+
+Функция any() возвращает True, если хотя бы один элемент истина (или объект пустой).
+```python
+In [62]: any([False, True, True])
+Out[62]: True
+
+In [63]: any([False, False, False])
+Out[63]: False
+
+In [64]: any([])
+Out[64]: False
+
+In [65]: any( i.isdigit() for i in '10.1.1.a'.split('.'))
+Out[65]: True
+```
+
+
+#HSLIDE
+## Анонимная функция lambda
+
+#VSLIDE
+### Анонимная функция lambda
+
+В анонимной функции lambda:
+* может содержаться только одно выражение
+* аргументов может передаваться сколько угодно
+
+```python
+In [1]: sum_arg = lambda a, b: a + b
+
+In [2]: sum_arg(1,2)
+Out[2]: 3
+
+In [3]: sum_arg(10,22)
+Out[3]: 32
+```
+
+#VSLIDE
+### Анонимная функция lambda
+
+```python
+In [1]: sum_arg = lambda a, b: a + b
+
+In [2]: sum_arg(1,2)
+Out[2]: 3
+
+In [3]: sum_arg(10,22)
+Out[3]: 32
+```
+
+Аналогичная обычная функция:
+```python
+In [4]: def sum_arg(a, b):
+  ....:     return a + b
+  ....:
+
+In [5]: sum_arg(1,5)
+Out[5]: 6
+```
+
+#VSLIDE
+### Анонимная функция lambda
+
+Сортировка элементов с помощью lambda:
+```
+list_of_lists = [
+['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
+['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
+['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
+['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
+['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
+
+In [6]: sorted(list_of_lists)
+Out[6]:
+[['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
+ ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
+ ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
+ ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0'],
+ ['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']]
+
+In [7]: sorted(list_of_lists, key=lambda x: x[2])
+Out[7]:
+[['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255'],
+ ['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0'],
+ ['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0'],
+ ['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0'],
+ ['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0']]
+```
+
 
 #HSLIDE
 ## Функция map()
@@ -1413,63 +1793,5 @@ In [12]: list_of_words = ['one', 'two', 'list', '', 'dict']
 
 In [13]: [ word for word in list_of_words if len(word) > 2 ]
 Out[13]: ['one', 'two', 'list', 'dict']
-```
-
-#HSLIDE
-## Функция all()
-
-#VSLIDE
-### Функция all()
-
-Функция all() возвращает True, если все элементы истина (или объект пустой).
-
-```python
-In [54]: all([False, True, True])
-Out[54]: False
-
-In [55]: all([True, True, True])
-Out[55]: True
-
-In [56]: all([])
-Out[56]: True
-```
-
-#VSLIDE
-### Функция all()
-
-```python
-In [57]: IP = '10.0.1.1'
-
-In [58]: digits = [ i for i in IP.split('.') if i.isdigit() ]
-
-In [59]: digits
-Out[59]: ['10', '0', '1', '1']
-
-In [60]: all( i.isdigit() for i in IP.split('.'))
-Out[60]: True
-
-In [61]: all( i.isdigit() for i in '10.1.1.a'.split('.'))
-Out[61]: False
-```
-
-#HSLIDE
-## Функция any()
-
-#VSLIDE
-### Функция any()
-
-Функция any() возвращает True, если хотя бы один элемент истина (или объект пустой).
-```python
-In [62]: any([False, True, True])
-Out[62]: True
-
-In [63]: any([False, False, False])
-Out[63]: False
-
-In [64]: any([])
-Out[64]: False
-
-In [65]: any( i.isdigit() for i in '10.1.1.a'.split('.'))
-Out[65]: True
 ```
 
