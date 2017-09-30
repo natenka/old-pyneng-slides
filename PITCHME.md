@@ -17,6 +17,9 @@
 * ```compile()``` - компилирует регулярное выражение. К этому объекту затем можно применять все перечисленные функции
 * ```fullmatch()``` - вся строка должна соответствовать описанному регулярному выражению
 
+#VSLIDE
+## Модуль re
+
 Кроме функций для поиска совпадений, в модуле есть такие функции:
 
 * ```re.sub``` - для замены в строках
@@ -538,7 +541,7 @@ Management address(es):
 #VSLIDE
 ### Обработка вывода show cdp neighbors detail
 
-Первый вариант решения (файл parse_sh_cdp_neighbors_detail_ver1.py):
+Файл parse_sh_cdp_neighbors_detail_ver1.py
 ```python
 import re
 from pprint import pprint
@@ -589,7 +592,7 @@ $ python parse_sh_cdp_neighbors_detail_ver1.py
 #VSLIDE
 ### Обработка вывода show cdp neighbors detail
 
-Вторая версия решения (файл parse_sh_cdp_neighbors_detail_ver2.py):
+Файл parse_sh_cdp_neighbors_detail_ver2.py:
 ```python
 import re
 from pprint import pprint
@@ -630,6 +633,9 @@ pprint(parse_cdp('sh_cdp_neighbors_sw1.txt'))
   * если было найдено совпадение для группы device, в переменную device записывается значение, которое попало в эту группу
   * иначе в словарь записывается соответствие 'имя группы': соответствующее значение
 
+#VSLIDE
+### Обработка вывода show cdp neighbors detail
+
 У этого решения ограничение в том, что подразумевается, что в каждой строке может быть только одно совпадение. И в регулярных выражениях, которые записаны через знак ```|```, может быть только одна группа.
 Это можно исправить, расширив решение.
 
@@ -653,10 +659,10 @@ $ python parse_sh_cdp_neighbors_detail_ver2.py
 
 
 #HSLIDE
-##```re.match()```
+## ```re.match()```
 
 #VSLIDE
-###```re.match()```
+### ```re.match()```
 
 Функция ```match()```:
 * используется для поиска в начале строки подстроки, которая соответствует шаблону
@@ -664,7 +670,7 @@ $ python parse_sh_cdp_neighbors_detail_ver2.py
 * возвращает ```None```, если подстрока не найдена
 
 #VSLIDE
-###```re.match()```
+### ```re.match()```
 
 Функция match отличается от search тем, что match всегда ищет совпадение в начале строки.
 Например, если повторить пример, который использовался для функции search, но уже с match:
@@ -681,7 +687,7 @@ In [4]: match = re.match('Host \S+ '
 ```
 
 #VSLIDE
-###```re.match()```
+### ```re.match()```
 
 Результатом будет None:
 ```python
@@ -694,7 +700,7 @@ None
 Но это сообщение находится в середине.
 
 #VSLIDE
-###```re.match()```
+### ```re.match()```
 
 В данном случае можно легко исправить выражение, чтобы функция match находила совпадение:
 ```python
@@ -707,7 +713,7 @@ In [4]: match = re.match('\S+: Host \S+ '
 ```
 
 #VSLIDE
-###```re.match()```
+### ```re.match()```
 
 Перед словом Host добавлено выражение ```\S+: ```. Теперь совпадение будет найдено:
 ```python
@@ -719,7 +725,7 @@ Out[12]: ('10', 'Gi0/16', 'Gi0/24')
 ```
 
 #VSLIDE
-###```re.match()```
+### ```re.match()```
 
 Пример аналогичен тому, который использовался в функции search, с небольшими изменениями (файл parse_log_match.py):
 ```python
@@ -745,7 +751,7 @@ print('Петля между портами {} в VLAN {}'.format(', '.join(port
 ```
 
 #VSLIDE
-###```re.match()```
+### ```re.match()```
 
 Результат:
 ```
@@ -900,13 +906,10 @@ $ python parse_log_finditer.py
 #VSLIDE
 ### Обработка вывода show cdp neighbors detail
 
-С помощью finditer можно обработать вывод sh cdp neighbors detail, так же, как и в подразделе re.search.
-
-Скрипт почти полностью аналогичен варианту с re.search (файл parse_sh_cdp_neighbors_detail_finditer.py):
+Файл parse_sh_cdp_neighbors_detail_finditer.py:
 ```python
 import re
 from pprint import pprint
-
 
 def parse_cdp(filename):
     regex = ('Device ID: (?P<device>\S+)'
@@ -924,11 +927,9 @@ def parse_cdp(filename):
                 result[device] = {}
             elif device:
                 result[device][match.lastgroup] = match.group(match.lastgroup)
-
     return result
 
 pprint(parse_cdp('sh_cdp_neighbors_sw1.txt'))
-
 ```
 
 #VSLIDE
@@ -939,9 +940,6 @@ pprint(parse_cdp('sh_cdp_neighbors_sw1.txt'))
     with open('sh_cdp_neighbors_sw1.txt') as f:
         match_iter = re.finditer(regex, f.read())
 ```
-
-#VSLIDE
-### Обработка вывода show cdp neighbors detail
 
 Затем перебираются совпадения:
 ```python
@@ -1258,8 +1256,6 @@ regex = re.compile('Host \S+ '
                    '(\S+) and port (\S+)')
 ```
 
-#VSLIDE
-### ```re.compile()```
 
 И вызов finditer теперь выполняется как метод объекта regex:
 ```python
@@ -1363,8 +1359,6 @@ Out[95]: '00    a1b2.ac10.7000    DYNAMIC     Gi'
 * re.VERBOSE (re.X)
 * re.LOCALE (re.L)
 * re.DEBUG
-
-В этом подразделе для примера рассматривается флаг re.DOTALL. Информация об остальных флагах доступна в [документации](https://docs.python.org/3/library/re.html#re.A).
 
 #VSLIDE
 ### re.DOTALL
