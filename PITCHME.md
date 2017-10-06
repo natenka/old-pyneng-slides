@@ -42,7 +42,7 @@ ASCII (American standard code for information interchange) - описывает 
 
 ### Стандарт ASCII
 
-+++?image=https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg&size=auto 80%
++++?image=https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg&size=auto 50%
 
 +++
 
