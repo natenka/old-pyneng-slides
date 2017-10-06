@@ -13,17 +13,9 @@
     font-size: 32px !important;
 }
 
-
-.reveal h3, .reveal h4 {
+.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
     font-family: Consolas, Monaco, Arial, "Ubuntu Mono";
     text-align: center;
-    vertical-align: top !important;
-}
-
-.reveal h1, .reveal h2, .reveal h5, .reveal h6 {
-    font-family: Consolas, Monaco, Arial, "Ubuntu Mono";
-    text-align: center;
-    vertical-align: top !important;
 }
 
 .reveal .slides section>ul {

@@ -50,15 +50,11 @@ ASCII (American standard code for information interchange) - описывает 
 
 +++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=auto 80%
 
-### ISO Latin 1 (ISO 8859-1)
-
-
 +++
 
 ### Windows CP1252
 
 +++?image=http://rabbit.eng.miami.edu/info/cp1252.gif&size=auto 80%
-
 
 ---
 
@@ -479,15 +475,9 @@ Out[65]: 'gr��ezi'
 ---
 ### Unicode sandwich
 
-+++
-### Unicode sandwich
++++?image=http://engineering.cerner.com/assets/2014-08-02-the-plain-text-is-a-lie/unicode-sandwich.png&size=auto 80%
 
-![unicode-sandwich](http://engineering.cerner.com/assets/2014-08-02-the-plain-text-is-a-lie/unicode-sandwich.png)
-
-+++
-### Unicode sandwich
-
-![unicode-sandwich](https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg)
++++?image=https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg&size=auto 80%
 
 +++
 ### Работа с файлами
