@@ -1,15 +1,15 @@
 # Python для сетевых инженеров 
 
 
-#HSLIDE
+---
 
 # Unicode
 
-#HSLIDE
+---
 
 ### Зачем вообще нужна кодировка?
 
-#VSLIDE
++++
 
 ### Компьютеры работают с байтами
 
@@ -19,7 +19,7 @@
 * файлами
 
 
-#VSLIDE
++++
 
 ### Компьютеры работают с байтами
 
@@ -29,7 +29,7 @@
 * F - 0x46
 
 
-#VSLIDE
++++
 
 ### Стандарт ASCII
 
@@ -38,33 +38,33 @@ ASCII (American standard code for information interchange) - описывает 
 * коды от 32 до 127 описывали печатные символы
 * коды до 32 описывали специальные управляющие символы
 
-#VSLIDE
++++
 
 ### Стандарт ASCII
 
 ![ascii](https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg)
 
 
-#VSLIDE
++++
 
 ### ISO Latin 1 (ISO 8859-1)
 
 ![ISO-8859-1](http://rabbit.eng.miami.edu/info/asciiiso.gif)
 
 
-#VSLIDE
++++
 
 ### Windows CP1252
 
 ![Windows CP1252](http://rabbit.eng.miami.edu/info/cp1252.gif)
 
 
-#HSLIDE
+---
 
 ### Unicode &#129412;
 
 
-#VSLIDE
++++
 
 ### Unicode
 
@@ -73,39 +73,39 @@ ASCII (American standard code for information interchange) - описывает 
 * Стандарт Unicode версии 10.0 (Июнь 2017) определяет 136 690 символов  &#128519;
 
 
-#VSLIDE
++++
 ### Unicode
 
 * U+1F383 JACK-O-LANTERN &#127875;
 * U+2615 HOT BEVERAGE  &#9749;
 * U+1f600 GRINNING FACE &#128512;
 
-#VSLIDE
++++
 ### schön
 
 ### U+0073 U+0063 U+0068 U+00f6 U+006e
 
 
-#VSLIDE
++++
 ### &#128579; &#8238; Unicode, ты супер!
 
 ![U+202e](https://imgs.xkcd.com/comics/rtl_2x.png)
 
-#HSLIDE
+---
 ### Кодировки
 
 * UTF-8
 * UTF-16
 * UTF-32
 
-#VSLIDE
++++
 ### UTF-8
 
 * позволяет хранить символы Юникода
 * использует переменное количество байт
 * символы ASCII обозначаются такими же кодами
 
-#VSLIDE
++++
 ### UTF-8
 
 | H | i | &#128704; | &#128640; | &#9731; |
@@ -113,13 +113,13 @@ ASCII (American standard code for information interchange) - описывает 
 | 48|69 | 01 f6 c0  | 01 f6 80  | 26 03   |
 
 
-#HSLIDE
+---
 ### Unicode в Python 3
 
-#HSLIDE
+---
 ### str
 
-#VSLIDE
++++
 ### str
 
 Строка в Python 3 - это последовательность кодов Unicode.
@@ -134,7 +134,7 @@ In [3]: s.upper()
 Out[3]: 'ПРИВЕТ'
 ```
 
-#VSLIDE
++++
 ### str
 
 ```python
@@ -148,7 +148,7 @@ Out[6]: 6
 ```
 
 
-#VSLIDE
++++
 ### ord
 
 Функция ord возвращает значение кода Unicode для символа:
@@ -160,7 +160,7 @@ In [8]: hex(ord("a"))
 Out[8]: '0x61'
 ```
 
-#VSLIDE
++++
 ### chr
 
 Функция chr возвращает строку Unicode, которая символу, чем код был передан как аргумент:
@@ -177,11 +177,11 @@ Out[11]: '☃'
 ```
 
 
-#HSLIDE
+---
 ### bytes
 
 
-#VSLIDE
++++
 ### bytes
 
 ```python
@@ -201,7 +201,7 @@ Out[16]: 5
 
 ```
 
-#VSLIDE
++++
 ### bytes
 
 Можно работать с байтовыми строками, как с unicode строками:
@@ -221,7 +221,7 @@ KeyError: 'hi'
 
 ```
 
-#VSLIDE
++++
 ### bytes
 
 ```python
@@ -238,7 +238,7 @@ In [24]: type(output)
 Out[24]: bytes
 ```
 
-#VSLIDE
++++
 ### Non ASCII
 
 ```python
@@ -249,10 +249,10 @@ In [25]: test = b'привет'
 SyntaxError: bytes can only contain ASCII literal characters.
 ```
 
-#HSLIDE
+---
 ### encode vs decode
 
-#VSLIDE
++++
 
 #### unicode .encode() &#8594; bytes
 #### bytes .decode() &#8594; unicode
@@ -272,7 +272,7 @@ In [30]: hi_bytes.decode('utf-8')
 Out[30]: 'привет'
 ```
 
-#VSLIDE
++++
 ### encode vs decode
 
 ```python
@@ -284,7 +284,7 @@ In [33]: result.stdout
 Out[33]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
 ```
 
-#VSLIDE
++++
 ### encode vs decode
 
 ```python
@@ -294,7 +294,7 @@ In [35]: output_unicode
 Out[35]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
 ```
 
-#VSLIDE
++++
 ### encode vs decode
 
 ```python
@@ -304,7 +304,7 @@ In [37]: result.stdout
 Out[37]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
 ```
 
-#VSLIDE
++++
 ### encode vs decode
 
 
@@ -327,7 +327,7 @@ output = t.read_very_eager().decode('utf-8')
 print(output)
 ```
 
-#VSLIDE
++++
 ### encode vs decode
 
 
@@ -346,11 +346,11 @@ Out[41]: b'\xff\xfe\x00\x00g\x00\x00\x00r\x00\x00\x00\xfc\x00\x00\x00e\x00\x00\x
 ```
 
 
-#HSLIDE
+---
 ### Ошибки
 
 
-#VSLIDE
++++
 ### Ошибки
 
 ```python
@@ -365,7 +365,7 @@ UnicodeEncodeError         Traceback (most recent call last)
 UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: ordinal not in range(128)
 ```
 
-#VSLIDE
++++
 ### Ошибки
 
 ```python
@@ -382,7 +382,7 @@ UnicodeEncodeError: 'ascii' codec can't encode character '\xfc' in position 2: o
 ```
 
 
-#VSLIDE
++++
 ### Ошибки
 
 ```python
@@ -400,7 +400,7 @@ UnicodeDecodeError: 'ascii' codec can't decode byte 0xd0 in position 0: ordinal 
 
 ```
 
-#VSLIDE
++++
 ### Ошибки
 
 ```python
@@ -420,7 +420,7 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid 
 
 ```
 
-#VSLIDE
++++
 ### Надо знать какая кодировка использовалась
 
 
@@ -437,10 +437,10 @@ Out[56]: '뿐胑룐닐뗐苑'
 
 ```
 
-#HSLIDE
+---
 ### Обработка ошибок
 
-#VSLIDE
++++
 ### Обработка ошибок
 
 ```python
@@ -457,7 +457,7 @@ Out[60]: b'grezi'
 
 ```
 
-#VSLIDE
++++
 ### Обработка ошибок
 
 ```python
@@ -475,20 +475,20 @@ In [65]: de_utf8.decode('ascii', 'replace')
 Out[65]: 'gr��ezi'
 ```
 
-#HSLIDE
+---
 ### Unicode sandwich
 
-#VSLIDE
++++
 ### Unicode sandwich
 
 ![unicode-sandwich](http://engineering.cerner.com/assets/2014-08-02-the-plain-text-is-a-lie/unicode-sandwich.png)
 
-#VSLIDE
++++
 ### Unicode sandwich
 
 ![unicode-sandwich](https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg)
 
-#VSLIDE
++++
 ### Работа с файлами
 
 ```python
@@ -507,7 +507,7 @@ Out[70]: 'grüezi\n'
 
 ```
 
-#VSLIDE
++++
 ### Работа с файлами
 
 По умолчанию:
@@ -519,7 +519,7 @@ Out[72]: 'UTF-8'
 
 ```
 
-#VSLIDE
++++
 ### Работа с файлами
 
 ```python
@@ -537,7 +537,7 @@ Out[77]: 'grüezi\n'
 
 ```
 
-#VSLIDE
++++
 ### Работа с файлами
 
 
@@ -551,15 +551,15 @@ In [80]: file_content.decode('utf-8')
 Out[80]: 'grüezi\n'
 ```
 
-#HSLIDE
+---
 
 # &#128561;
 
-#VSLIDE
++++
 
 # &#9749; &#127829; &#127828;
 
-#VSLIDE
++++
 
 
 1. &#128013; [Pragmatic Unicode](https://nedbatchelder.com/text/unipain.html)
@@ -567,7 +567,7 @@ Out[80]: 'grüezi\n'
 3. &#128013; [Unicode HOWTO](https://docs.python.org/3/howto/unicode.html)
 
 
-#VSLIDE
++++
 
 # &#128564;
 
