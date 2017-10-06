@@ -23,6 +23,7 @@
 .reveal h1, .reveal h2, .reveal h5, .reveal h6 {
     font-family: Consolas, Monaco, Arial, "Ubuntu Mono";
     text-align: center;
+    vertical-align: top !important;
 }
 
 .reveal .slides section>ul {
