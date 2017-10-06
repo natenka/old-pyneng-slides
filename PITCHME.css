@@ -23,10 +23,3 @@
     margin-right: 0;
 }
 
-.reveal section img {
-    border: 0;
-    box-shadow: none;
-    align: center;
-    max-height: 500px;
-    text-align: center;
-}
