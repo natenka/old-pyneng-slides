@@ -50,12 +50,14 @@ ASCII (American standard code for information interchange) - описывает 
 
 +++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=auto 80%
 
+### ISO Latin 1 (ISO 8859-1)
+
+
 +++
 
 ### Windows CP1252
 
 +++?image=http://rabbit.eng.miami.edu/info/cp1252.gif&size=auto 80%
-@title[Step 1. Create 'PITCHME.md']
 
 
 ---
