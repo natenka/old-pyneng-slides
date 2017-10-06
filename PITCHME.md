@@ -42,27 +42,11 @@ ASCII (American standard code for information interchange) - описывает 
 
 ### Стандарт ASCII
 
-![ascii](https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg)
-
-+++
-
-+++?image=https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg&size=contain
-
-### Стандарт ASCII
++++?image=https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg&size=auto 80%
 
 +++
 
 ### ISO Latin 1 (ISO 8859-1)
-
-![ISO-8859-1](http://rabbit.eng.miami.edu/info/asciiiso.gif)
-
-+++
-
-### ISO Latin 1 (ISO 8859-1)
-
-+++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=contain
-
-+++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=auto 90%
 
 +++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=auto 80%
 
@@ -70,7 +54,7 @@ ASCII (American standard code for information interchange) - описывает 
 
 ### Windows CP1252
 
-![Windows CP1252](http://rabbit.eng.miami.edu/info/cp1252.gif)
++++?image=http://rabbit.eng.miami.edu/info/cp1252.gif&size=auto 80%
 
 
 ---
@@ -103,7 +87,7 @@ ASCII (American standard code for information interchange) - описывает 
 +++
 ### &#128579; &#8238; Unicode, ты супер!
 
-![U+202e](https://imgs.xkcd.com/comics/rtl_2x.png)
++++?image=https://imgs.xkcd.com/comics/rtl_2x.png&size=auto 80%
 
 ---
 ### Кодировки
