@@ -46,9 +46,9 @@ ASCII (American standard code for information interchange) - описывает 
 
 +++
 
-### Стандарт ASCII
-
 +++?image=https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg&size=contain
+
+### Стандарт ASCII
 
 +++
 
@@ -61,6 +61,10 @@ ASCII (American standard code for information interchange) - описывает 
 ### ISO Latin 1 (ISO 8859-1)
 
 +++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=contain
+
++++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=auto 90%
+
++++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=auto 80%
 
 +++
 
