@@ -38,23 +38,22 @@ ASCII (American standard code for information interchange) - описывает 
 * коды от 32 до 127 описывали печатные символы
 * коды до 32 описывали специальные управляющие символы
 
-+++
-
-### Стандарт ASCII
-
 +++?image=https://upload.wikimedia.org/wikipedia/commons/4/4f/ASCII_Code_Chart.svg&size=auto 50%
+@title[ASCII code chart]
 
 +++
 
 ### ISO Latin 1 (ISO 8859-1)
 
 +++?image=http://rabbit.eng.miami.edu/info/asciiiso.gif&size=auto 80%
+@title[ISO Latin 1 code chart]
 
 +++
 
 ### Windows CP1252
 
 +++?image=http://rabbit.eng.miami.edu/info/cp1252.gif&size=auto 80%
+@title[Windows CP1252 code chart]
 
 ---
 
@@ -63,7 +62,7 @@ ASCII (American standard code for information interchange) - описывает 
 
 +++
 
-### Unicode
+### Стандарт Unicode
 
 * 1,114,112 кодов &#129318;
 * диапазон 0x0 - 0x10FFFF &#129365;
@@ -71,22 +70,26 @@ ASCII (American standard code for information interchange) - описывает 
 
 
 +++
-### Unicode
+### Примеры символов
 
 * U+1F383 JACK-O-LANTERN &#127875;
 * U+2615 HOT BEVERAGE  &#9749;
 * U+1f600 GRINNING FACE &#128512;
 
 +++
+@title[schön в Unicode]
+
 ### schön
 
 ### U+0073 U+0063 U+0068 U+00f6 U+006e
 
 
 +++
+
 ### &#128579; &#8238; Unicode, ты супер!
 
 +++?image=https://imgs.xkcd.com/comics/rtl_2x.png&size=auto 80%
+@title[U+202e переворачивает текст]
 
 ---
 ### Кодировки
@@ -103,7 +106,7 @@ ASCII (American standard code for information interchange) - описывает 
 * символы ASCII обозначаются такими же кодами
 
 +++
-### UTF-8
+### Примеры символов
 
 | H | i | &#128704; | &#128640; | &#9731; |
 |:-:|:-:|:---------:|:---------:|:-------:|
