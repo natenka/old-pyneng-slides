@@ -583,17 +583,22 @@ ip ssh version 2
 ---
 ### Ошибки при конвертации
 
++++
+### Ошибки при конвертации
+
+При конвертации между строками и байтами очень важно точно знать, какая кодировка используется, а также знать о возможностях разных кодировок.
 
 +++
 ### Ошибки
 
+Например, кодировка ASCII не м ожет преобразовать в байты кириллицу:
 ```python
-In [42]: hi_unicode = 'привет'
+In [32]: hi_unicode = 'привет'
 
-In [43]: hi_unicode.encode('ascii')
-------------------------------------------------------------
-UnicodeEncodeError         Traceback (most recent call last)
-<ipython-input-211-ec69c9fd2dae> in <module>()
+In [33]: hi_unicode.encode('ascii')
+---------------------------------------------------------------------------
+UnicodeEncodeError                        Traceback (most recent call last)
+<ipython-input-33-ec69c9fd2dae> in <module>()
 ----> 1 hi_unicode.encode('ascii')
 
 UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: ordinal not in range(128)
@@ -602,73 +607,55 @@ UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-5: ordin
 +++
 ### Ошибки
 
+Аналогично, если строка "привет" преобразована в байты, и попробовать преобразовать ее в строку с помощью ascii, тоже получим ошибку:
 ```python
-In [44]: de_hi_unicode = 'grüezi'
+In [34]: hi_unicode = 'привет'
 
-In [45]: de_hi_unicode.encode('ascii')
-------------------------------------------------------------
-UnicodeEncodeError         Traceback (most recent call last)
-<ipython-input-216-31c172a5bbb1> in <module>()
-----> 1 de_hi_unicode.encode('ascii')
+In [35]: hi_bytes = hi_unicode.encode('utf-8')
 
-UnicodeEncodeError: 'ascii' codec can't encode character '\xfc' in position 2: ordinal not in range(128)`:w
-
-```
-
-
-+++
-### Ошибки
-
-```python
-In [46]: hi_unicode = 'привет'
-
-In [47]: hi_bytes = hi_unicode.encode('utf-8')
-
-In [48]: hi_bytes.decode('ascii')
-------------------------------------------------------------
-UnicodeDecodeError         Traceback (most recent call last)
-<ipython-input-219-aa0ada5e44e9> in <module>()
+In [36]: hi_bytes.decode('ascii')
+---------------------------------------------------------------------------
+UnicodeDecodeError                        Traceback (most recent call last)
+<ipython-input-36-aa0ada5e44e9> in <module>()
 ----> 1 hi_bytes.decode('ascii')
 
 UnicodeDecodeError: 'ascii' codec can't decode byte 0xd0 in position 0: ordinal not in range(128)
-
 ```
 
 +++
 ### Ошибки
 
+Еще один вариант ошибки, когда используются разные кодировки для преобразований:
 ```python
-In [49]: utf_16 = de_hi_unicode.encode('utf-16')
+In [37]: de_hi_unicode = 'grüezi'
 
-In [50]: de_hi_unicode = 'grüezi'
+In [38]: utf_16 = de_hi_unicode.encode('utf-16')
 
-In [51]: utf_16 = de_hi_unicode.encode('utf-16')
-
-In [52]: utf_16.decode('utf-8')
-------------------------------------------------------------
-UnicodeDecodeError         Traceback (most recent call last)
-<ipython-input-226-4b4c731e69e4> in <module>()
+In [39]: utf_16.decode('utf-8')
+---------------------------------------------------------------------------
+UnicodeDecodeError                        Traceback (most recent call last)
+<ipython-input-39-4b4c731e69e4> in <module>()
 ----> 1 utf_16.decode('utf-8')
 
 UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
-
 ```
 
 +++
 ### Надо знать какая кодировка использовалась
 
+Но на самом деле, предыдущие ошибки - это хорошо. Они явно говорят, в чем проблема.
 
+Хуже, когда получается так:
 ```python
-In [53]: hi_unicode = 'привет'
+In [40]: hi_unicode = 'привет'
 
-In [54]: hi_bytes = hi_unicode.encode('utf-8')
+In [41]: hi_bytes = hi_unicode.encode('utf-8')
 
-In [55]: hi_bytes
-Out[55]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
+In [42]: hi_bytes
+Out[42]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
 
-In [56]: hi_bytes.decode('utf-16')
-Out[56]: '뿐胑룐닐뗐苑'
-
+In [43]: hi_bytes.decode('utf-16')
+Out[43]: '뿐胑룐닐뗐苑'
 ```
 
 ---
@@ -677,36 +664,75 @@ Out[56]: '뿐胑룐닐뗐苑'
 +++
 ### Обработка ошибок
 
+У методов encode и decode есть режимы обработки ошибок, которые указывают, как реагировать на ошибку преобразования.
+
++++
+### encode replace
+
+По умолчанию encode использует режим 'strict' - при возникновении ошибок кодировки генерируется исключение UnicodeError. Примеры такого поведения были выше.
+
+Режим replace заменит символ знаком вопроса:
 ```python
-In [57]: de_hi_unicode = 'grüezi'
+In [44]: de_hi_unicode = 'grüezi'
 
-In [58]: de_hi_unicode.encode('ascii', 'replace')
-Out[58]: b'gr?ezi'
-
-In [59]: de_hi_unicode.encode('ascii', 'namereplace')
-Out[59]: b'gr\\N{LATIN SMALL LETTER U WITH DIAERESIS}ezi'
-
-In [60]: de_hi_unicode.encode('ascii', 'ignore')
-Out[60]: b'grezi'
-
+In [45]: de_hi_unicode.encode('ascii', 'replace')
+Out[45]: b'gr?ezi'
 ```
 
 +++
-### Обработка ошибок
+### encode namereplace
 
+Или namereplace, чтобы заменить символ именем:
 ```python
-In [61]: de_hi_unicode = 'grüezi'
+In [46]: de_hi_unicode = 'grüezi'
 
-In [62]: de_utf8 = de_hi_unicode.encode('utf-8')
+In [47]: de_hi_unicode.encode('ascii', 'namereplace')
+Out[47]: b'gr\\N{LATIN SMALL LETTER U WITH DIAERESIS}ezi'
+```
 
-In [63]: de_utf8
-Out[63]: b'gr\xc3\xbcezi'
++++
+### encode ignore
 
-In [64]: de_utf8.decode('ascii', 'ignore')
-Out[64]: 'grezi'
+Кроме того, можно полностью игнорировать символы, которые нельзя закодировать:
+```python
+In [48]: de_hi_unicode = 'grüezi'
 
-In [65]: de_utf8.decode('ascii', 'replace')
-Out[65]: 'gr��ezi'
+In [49]: de_hi_unicode.encode('ascii', 'ignore')
+Out[49]: b'grezi'
+```
+
++++
+### Параметр errors в decode
+
+В методе decode по умолчанию тоже используется режим strict и генерируется исключение UnicodeDecodeError.
+
++++
+### decode ignore
+
+Если изменить режим на ignore, как и в encode, символы будут просто игнорироваться:
+```python
+In [50]: de_hi_unicode = 'grüezi'
+
+In [51]: de_hi_utf8 = de_hi_unicode.encode('utf-8')
+
+In [52]: de_hi_utf8
+Out[52]: b'gr\xc3\xbcezi'
+
+In [53]: de_hi_utf8.decode('ascii', 'ignore')
+Out[53]: 'grezi'
+```
+
++++
+### decode ignore
+
+Режим replace заменит символы:
+```python
+In [54]: de_hi_unicode = 'grüezi'
+
+In [55]: de_hi_utf8 = de_hi_unicode.encode('utf-8')
+
+In [56]: de_hi_utf8.decode('ascii', 'replace')
+Out[56]: 'gr��ezi'
 ```
 
 ---
