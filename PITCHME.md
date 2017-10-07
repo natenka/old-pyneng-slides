@@ -558,10 +558,30 @@ In [3]: f
 Out[3]: <_io.TextIOWrapper name='r1.txt' mode='r' encoding='UTF-8'>
 ```
 
++++
+### Явное задание кодировки
+
+При работе с файлами лучше явно указывать кодировку, так как в разных ОС она может отличаться:
+```python
+In [4]: with open('r1.txt', encoding='utf-8') as f:
+   ...:     for line in f:
+   ...:         print(line, end='')
+   ...:
+!
+service timestamps debug datetime msec localtime show-timezone year
+service timestamps log datetime msec localtime show-timezone year
+service password-encryption
+service sequence-numbers
+!
+no ip domain lookup
+!
+ip ssh version 2
+!
+```
 
 
 ---
-### Ошибки
+### Ошибки при конвертации
 
 
 +++
