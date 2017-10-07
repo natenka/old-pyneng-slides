@@ -723,7 +723,7 @@ Out[53]: 'grezi'
 ```
 
 +++
-### decode ignore
+### decode replace
 
 Режим replace заменит символы:
 ```python
