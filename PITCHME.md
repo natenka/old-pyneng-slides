@@ -7,11 +7,23 @@
 
 ---
 
-### Зачем вообще нужна кодировка?
+### Зачем нужна кодировка?
 
 +++
-
 ### Компьютеры работают с байтами
+
+Программы, которые мы пишем, не изолированы в себе. Они скачивают данные из Интернета, читают и записывают данные на диск, передают данные через сеть.
+
+Поэтому очень важно понимать разницу между тем, как компьютер хранит и передает данные, и как эти данные воспринимает человек. Мы воспринимаем текст, а компьютер - байты.
+
++++
+### Компьютеры работают с байтами
+
+
+В Python 3, соответственно, есть две концепции:
+
+* текст - неизменяемая последовательность Unicode символов. Для хранения этих символов используется тип строка (str)
+* данные - неизменяемая последовательность байтов. Для хранения используется тип bytes
 
 Мы получаем байты при работе с:
 
@@ -20,8 +32,7 @@
 
 
 +++
-
-### Компьютеры работают с байтами
+### Зачем нужна кодировка?
 
 Для записи символов в байты, нужна определенная договоренность как они будут выглядеть:
 
@@ -30,7 +41,6 @@
 
 
 +++
-
 ### Стандарт ASCII
 
 ASCII (American standard code for information interchange) - описывает соответствие между символом и его числовым кодом. Изначально описывал только 127 символов:
@@ -66,8 +76,9 @@ ASCII (American standard code for information interchange) - описывает 
 
 * 1,114,112 кодов &#129318;
 * диапазон 0x0 - 0x10FFFF &#129365;
-* Стандарт Unicode версии 10.0 (Июнь 2017) определяет 136 690 символов  &#128519;
-
+* стандарт Unicode версии 10.0 (Июнь 2017) определяет 136 690 символов  &#128519;
+* каждый код - это номер, который соответствует определенному символу
+* стандарт также определяет кодировки - способ представления кода символа в байтах
 
 +++
 ### Примеры символов
@@ -116,8 +127,16 @@ ASCII (American standard code for information interchange) - описывает 
 ---
 ### Unicode в Python 3
 
++++
+### Unicode в Python 3
+
+В Python 3 есть:
+
+* строки - неизменяемая последовательность Unicode символов. Для хранения этих символов используется тип строка (str)
+* байты - неизменяемая последовательность байтов. Для хранения используется тип bytes
+
 ---
-### str
+### Строки
 
 +++
 ### str
@@ -125,26 +144,50 @@ ASCII (American standard code for information interchange) - описывает 
 Строка в Python 3 - это последовательность кодов Unicode.
 
 ```python
-In [1]: s = 'привет'
+In [1]: hi = 'привет'
 
-In [2]: type(s)
+In [2]: type(hi)
 Out[2]: str
 
-In [3]: s.upper()
+In [3]: hi.upper()
 Out[3]: 'ПРИВЕТ'
 ```
 
 +++
 ### str
 
+Так как строки - это последовательность кодов Юникод, можно записать строку разными способами.
+
+Символ Юникод можно записать, используя его имя:
 ```python
-In [4]: hi = '\u043f\u0440\u0438\u0432\u0435\u0442'
+In [1]: "\N{LATIN SMALL LETTER O WITH DIAERESIS}"
+Out[1]: 'ö'
+```
 
-In [5]: print(hi)
-привет
+Или использовав такой формат:
+```python
+In [4]: "\u00F6"
+Out[4]: 'ö'
+```
 
-In [6]: len(hi)
-Out[6]: 6
++++
+### str
+
+Строку можно записать как последовательность кодов Unicode
+
+```python
+In [19]: hi1 = 'привет'
+
+In [20]: hi2 = '\u043f\u0440\u0438\u0432\u0435\u0442'
+
+In [21]: hi2
+Out[21]: 'привет'
+
+In [22]: hi1 == hi2
+Out[22]: True
+
+In [23]: len(hi2)
+Out[23]: 6
 ```
 
 
@@ -180,25 +223,59 @@ Out[11]: '☃'
 ---
 ### bytes
 
++++
+### bytes
+
+Тип bytes - это неизменяемая последовательность байтов.
+
+Байты обозначаются так же, как строки, но с добавлением буквы "b" перед строкой
 
 +++
 ### bytes
 
 ```python
-In [12]: hi_bytes = b"Hello"
+In [30]: b1 = b'\xd0\xb4\xd0\xb0'
 
-In [13]: type(hi_bytes)
-Out[13]: bytes
+In [31]: b2 = b"\xd0\xb4\xd0\xb0"
 
-In [14]: hi_bytes.upper()
-Out[14]: b'HELLO'
+In [32]: b3 = b'''\xd0\xb4\xd0\xb0'''
 
-In [15]: hi_bytes.find(b'l')
-Out[15]: 2
+In [36]: type(b1)
+Out[36]: bytes
 
-In [16]: len(hi_bytes)
-Out[16]: 5
+In [37]: len(b1)
+Out[37]: 4
+```
 
++++
+### ASCII в bytes
+
+В Python байты, которые соответствуют символам ASCII, отображаются как эти символы, а не как соответствующие им байты. Это может немного путать, но всегда можно распознать тип bytes по букве b:
+```python
+In [38]: bytes1 = b'hello'
+
+In [39]: bytes1
+Out[39]: b'hello'
+
+In [40]: len(bytes1)
+Out[40]: 5
+
+In [42]: bytes2 = b'\x68\x65\x6c\x6c\x6f'
+
+In [43]: bytes2
+Out[43]: b'hello'
+```
+
++++
+### Non ASCII
+
+Если попытаться написать не ASCII символ в байтовом литерале, возникнет ошибка:
+```python
+In [44]: bytes3 = b'привет'
+  File "<ipython-input-44-dc8b23504fa7>", line 1
+    bytes3 = b'привет'
+            ^
+SyntaxError: bytes can only contain ASCII literal characters.
 ```
 
 +++
@@ -221,105 +298,194 @@ KeyError: 'hi'
 
 ```
 
-+++
-### bytes
 
-```python
-In [20]: import subprocess
-
-In [21]: result = subprocess.run('ls', stdout=subprocess.PIPE)
-
-In [22]: output = result.stdout
-
-In [23]: output
-Out[23]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
-
-In [24]: type(output)
-Out[24]: bytes
-```
-
-+++
-### Non ASCII
-
-```python
-In [25]: test = b'привет'
-  File "<ipython-input-39-e8b153ea3e66>", line 1
-    test = b'привет'
-          ^
-SyntaxError: bytes can only contain ASCII literal characters.
-```
 
 ---
-### encode vs decode
+### Конвертация между байтами и строками
 
 +++
+### encode vs decode
+
+Избежать работы с байтами нельзя. Например, при работе с сетью или файловой системой, чаще всего, результат возвращается в байтах.
+
+Соответственно, надо знать, как выполнять преобразование байтов в строку и наоборот. Для этого и нужна кодировка.
 
 #### unicode .encode() &#8594; bytes
 #### bytes .decode() &#8594; unicode
 
-```python
-In [26]: hi_unicode = 'привет'
-
-In [27]: hi_bytes = hi_unicode.encode('utf-8')
-
-In [28]: hi_bytes
-Out[28]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
-
-In [29]: len(hi_bytes)
-Out[29]: 12
-
-In [30]: hi_bytes.decode('utf-8')
-Out[30]: 'привет'
-```
-
 +++
 ### encode vs decode
 
+Кодировку можно представлять как ключ шифрования, который указывает:
+
+* как "зашифровать" строку в байты (str -> bytes). Используется метод encode (похож на encrypt)
+* как "расшифровать" байты в строку (bytes -> str). Используется метод decode (похож на decrypt)
+
+Эта аналогия позволяет понять, что преобразования строка-байты и байты-строка должны использовать одинаковую кодировку.
+
++++
+### encode
+
+Для преобразования строки в байты используется метод encode:
 ```python
-In [31]: import subprocess
+In [1]: hi = 'привет'
 
-In [32]: result = subprocess.run('ls', stdout=subprocess.PIPE)
+In [2]: hi.encode('utf-8')
+Out[2]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
 
-In [33]: result.stdout
-Out[33]: b'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+In [3]: hi_bytes = hi.encode('utf-8')
 ```
 
 +++
-### encode vs decode
+### decode
 
+Чтобы получить строку из байт, используется метод decode:
 ```python
-In [34]: output_unicode = result.stdout.decode('utf-8')
+In [4]: hi_bytes
+Out[4]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
 
-In [35]: output_unicode
-Out[35]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+In [5]: hi_bytes.decode('utf-8')
+Out[5]: 'привет'
 ```
 
 +++
-### encode vs decode
+### str.encode
 
+Метод encode есть также в классе str:
 ```python
-In [36]: result = subprocess.run('ls', stdout=subprocess.PIPE, encoding='utf-8')
+In [6]: hi
+Out[6]: 'привет'
 
-In [37]: result.stdout
-Out[37]: 'about.md\nacknowledgments.md\nbook\nbook.json\ncourse_presentations\ncourse_presentations.zip\ncover.jpg\nexamples\nexamples.tar.gz\nexamples.zip\nexercises\nexercises.tar.gz\nexercises.zip\nfaq.md\nhowto.md\nimages\nLICENSE.md\nREADME.md\nresources\nschedule.md\nSUMMARY.md\ntestimonials.md\nToDo.md\n'
+In [7]: str.encode(hi, encoding='utf-8')
+Out[7]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
 ```
 
 +++
-### encode vs decode
+### bytes.decode
+
+Метод decode есть у класса bytes (как и другие методы):
+```python
+In [8]: hi_bytes
+Out[8]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
+
+In [9]: bytes.decode(hi_bytes, encoding='utf-8')
+Out[9]: 'привет'
+```
+
++++
+### str.encode, bytes.decode
+
+В этих методах кодировка может указываться как ключевой аргумент (примеры выше) или как позиционный:
+```
+In [10]: hi_bytes
+Out[10]: b'\xd0\xbf\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82'
+
+In [11]: bytes.decode(hi_bytes, 'utf-8')
+Out[11]: 'привет'
+```
+
+---
+### Как работать с Юникод и байтами
+
++++
+### Unicode sandwich
+
+Есть очень простое правило, придерживаясь которого, можно избежать, как минимум, части проблем. Оно называется "Юникод сендвич":
+
+* байты, которые программа считывает, надо как можно раньше преобразовать в юникод (строку)
+* внутри программы работать с юникод
+* юникод надо преобразовать в байты как можно позже, перед передачей
+
++++?image=http://engineering.cerner.com/assets/2014-08-02-the-plain-text-is-a-lie/unicode-sandwich.png&size=auto 80%
+
++++?image=https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg&size=auto 80%
 
 
+---
+### Примеры конвертации между байтами и строками
+
+---
+### subprocess
+
++++
+### subprocess
+
+Модуль subprocess возвращает результат команды в виде байт:
+```python
+In [1]: import subprocess
+
+In [2]: result = subprocess.run(['ping', '-c', '3', '-n', '8.8.8.8'],
+   ...:                         stdout=subprocess.PIPE)
+   ...:
+
+In [3]: result.stdout
+Out[3]: b'PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=59.4 ms\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=54.4 ms\n64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=55.1 ms\n\n--- 8.8.8.8 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 2002ms\nrtt min/avg/max/mdev = 54.470/56.346/59.440/2.220 ms\n'
+```
+
++++
+### subprocess
+
+Если дальше необходимо работать с этим выводом, надо сразу конвертировать его в строку:
+```python
+In [4]: output = result.stdout.decode('utf-8')
+
+In [5]: print(output)
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=59.4 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=54.4 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=55.1 ms
+
+--- 8.8.8.8 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2002ms
+rtt min/avg/max/mdev = 54.470/56.346/59.440/2.220 ms
+```
+
++++
+### subprocess encoding
+
+Модуль subprocess поддерживает еще один вариант преобразования - параметр encoding.
+
+Если указать его при вызове функции run, результат будет получен в виде строки:
+```python
+In [6]: result = subprocess.run(['ping', '-c', '3', '-n', '8.8.8.8'],
+   ...:                         stdout=subprocess.PIPE, encoding='utf-8')
+   ...:
+
+In [7]: result.stdout
+Out[7]: 'PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=55.5 ms\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=54.6 ms\n64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=53.3 ms\n\n--- 8.8.8.8 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 2003ms\nrtt min/avg/max/mdev = 53.368/54.534/55.564/0.941 ms\n'
+
+In [8]: print(result.stdout)
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=43 time=55.5 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=43 time=54.6 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=43 time=53.3 ms
+
+--- 8.8.8.8 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 53.368/54.534/55.564/0.941 ms
+```
+
+---
+### telnetlib
+
++++
+### telnetlib
+
+В зависимости от модуля, преобразование между строками и байтами может выполняться автоматически, а может требоваться явно.
+
+Например, в модуле telnetlib необходимо передавать байты в методах read_until и write:
 ```python
 import telnetlib
 import time
 
 t = telnetlib.Telnet('192.168.100.1')
 
-t.read_until(b"Username:")
+t.read_until(b'Username:')
 t.write(b'cisco\n')
 
-t.read_until(b"Password:")
+t.read_until(b'Password:')
 t.write(b'cisco\n')
-t.write(b'sh ip int br')
+t.write(b'sh ip int br\n')
 
 time.sleep(5)
 
@@ -327,23 +493,71 @@ output = t.read_very_eager().decode('utf-8')
 print(output)
 ```
 
+---
+### pexpect
+
 +++
-### encode vs decode
+### pexpect
 
-
+Модуль pexpect как аргумент ожидает строку, а возвращает байты:
 ```python
-In [38]: de_hi_unicode = 'grüezi'
+In [9]: import pexpect
 
-In [39]: bytes(de_hi_unicode, encoding='utf-8')
-Out[39]: b'gr\xc3\xbcezi'
+In [10]: output = pexpect.run('ls -ls')
 
-In [40]: bytes(de_hi_unicode, encoding='utf-16')
-Out[40]: b'\xff\xfeg\x00r\x00\xfc\x00e\x00z\x00i\x00'
+In [11]: output
+Out[11]: b'total 8\r\n4 drwxr-xr-x 2 vagrant vagrant 4096 Aug 28 12:16 concurrent_futures\r\n4 drwxr-xr-x 2 vagrant vagrant 4096 Aug  3 07:59 iterator_generator\r\n'
 
-In [41]: bytes(de_hi_unicode, encoding='utf-32')
-Out[41]: b'\xff\xfe\x00\x00g\x00\x00\x00r\x00\x00\x00\xfc\x00\x00\x00e\x00\x00\x00z\x00\x00\x00i\x00\x00\x00'
-
+In [12]: output.decode('utf-8')
+Out[12]: 'total 8\r\n4 drwxr-xr-x 2 vagrant vagrant 4096 Aug 28 12:16 concurrent_futures\r\n4 drwxr-xr-x 2 vagrant vagrant 4096 Aug  3 07:59 iterator_generator\r\n'
 ```
+
++++
+### pexpect encoding
+
+И также поддерживает вариант передачи кодировки через параметр encoding:
+```python
+In [13]: output = pexpect.run('ls -ls', encoding='utf-8')
+
+In [14]: output
+Out[14]: 'total 8\r\n4 drwxr-xr-x 2 vagrant vagrant 4096 Aug 28 12:16 concurrent_futures\r\n4 drwxr-xr-x 2 vagrant vagrant 4096 Aug  3 07:59 iterator_generator\r\n'
+```
+
+---
+### Работа с файлами
+
++++
+### Работа с файлами
+
+До сих пор при работе с файлами использовалась такая конструкция:
+```python
+with open(filename) as f:
+    for line in f:
+        print(line)
+```
+
++++
+### Кодировка по умолчанию
+
+При чтении файла происходит конвертация байт в строки. И при этом использовалась кодировка по умолчанию:
+```python
+In [1]: import locale
+
+In [2]: locale.getpreferredencoding()
+Out[2]: 'UTF-8'
+```
+
++++
+### Кодировка по умолчанию
+
+Кодировка по умолчанию в файле:
+```python
+In [2]: f = open('r1.txt')
+
+In [3]: f
+Out[3]: <_io.TextIOWrapper name='r1.txt' mode='r' encoding='UTF-8'>
+```
+
 
 
 ---
@@ -473,76 +687,6 @@ Out[64]: 'grezi'
 
 In [65]: de_utf8.decode('ascii', 'replace')
 Out[65]: 'gr��ezi'
-```
-
----
-### Unicode sandwich
-
-+++?image=http://engineering.cerner.com/assets/2014-08-02-the-plain-text-is-a-lie/unicode-sandwich.png&size=auto 80%
-
-+++?image=https://astrodsg.github.io/static/img/blog/unicode_sandwich.jpg&size=auto 80%
-
-+++
-### Работа с файлами
-
-```python
-
-In [66]: de_hi_unicode = 'grüezi'
-
-In [67]: f = open('test_unicode.txt', 'w')
-
-In [68]: f.write(de_hi_unicode+'\n')
-Out[68]: 7
-
-In [69]: f.close()
-
-In [70]: open('test_unicode.txt').read()
-Out[70]: 'grüezi\n'
-
-```
-
-+++
-### Работа с файлами
-
-По умолчанию:
-```python
-In [71]: import locale
-
-In [72]: locale.getpreferredencoding()
-Out[72]: 'UTF-8'
-
-```
-
-+++
-### Работа с файлами
-
-```python
-In [73]: de_hi_unicode = 'grüezi'
-
-In [74]: f = open('test_unicode.txt', 'w', encoding='utf-8')
-
-In [75]: f.write(de_hi_unicode+'\n')
-Out[75]: 7
-
-In [76]: f.close()
-
-In [77]: open('test_unicode.txt',  encoding='utf-8').read()
-Out[77]: 'grüezi\n'
-
-```
-
-+++
-### Работа с файлами
-
-
-```python
-In [78]: file_content = open('test_unicode.txt', 'rb').read()
-
-In [79]: file_content
-Out[79]: b'gr\xc3\xbcezi\n'
-
-In [80]: file_content.decode('utf-8')
-Out[80]: 'grüezi\n'
 ```
 
 ---
