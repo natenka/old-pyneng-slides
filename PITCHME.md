@@ -252,10 +252,14 @@ with open('sw_data_new.csv') as f:
 
 В целом DictWriter работает так же, как writer,
 но так как словари не упорядочены, надо указывать явно в каком порядке будут идти столбцы в файле.
-Для этого используется параметр fieldnames (файл csv_write_dict.py):
+Для этого используется параметр fieldnames.
+
++++
+### DictWriter
+
+Файл csv_write_dict.py:
 ```python
 import csv
-
 
 data = [{'hostname': 'sw1',
          'location': 'London',
