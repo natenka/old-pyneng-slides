@@ -245,7 +245,42 @@ with open('sw_data_new.csv') as f:
     print(f.read())
 ```
 
++++
+### DictWriter
 
+С помощью DictWriter можно записать словари в формат csv.
+
+В целом DictWriter работает так же, как writer,
+но так как словари не упорядочены, надо указывать явно в каком порядке будут идти столбцы в файле.
+Для этого используется параметр fieldnames (файл csv_write_dict.py):
+```python
+import csv
+
+
+data = [{'hostname': 'sw1',
+         'location': 'London',
+         'model': '3750',
+         'vendor': 'Cisco'},
+        {'hostname': 'sw2',
+         'location': 'Liverpool',
+         'model': '3850',
+         'vendor': 'Cisco'},
+        {'hostname': 'sw3',
+         'location': 'Liverpool',
+         'model': '3650',
+         'vendor': 'Cisco'},
+        {'hostname': 'sw4',
+         'location': 'London',
+         'model': '3650',
+         'vendor': 'Cisco'}]
+
+with open('csv_write_dictwriter.csv', 'w') as f:
+    writer = csv.DictWriter(f, fieldnames=list(data[0].keys()),
+                            quoting=csv.QUOTE_NONNUMERIC)
+    writer.writeheader()
+    for d in data:
+        writer.writerow(d)
+```
 
 +++
 
