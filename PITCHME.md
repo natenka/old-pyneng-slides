@@ -1,1282 +1,6 @@
 # Python для сетевых инженеров 
 
-
 ---
-
-# Подключение к оборудованию
-
----
-
-## Ввод пароля
-
-+++
-### Ввод пароля
-
-При подключении к оборудованию вручную, как правило, пароль также вводится вручную.
-
-При автоматизизации подключения, надо решить каким образом будет передаваться пароль:
-* запрашивать пароль при старте скрипта и считывать ввод пользователя
- * минус в том, что будет видно какие символы вводит пользователь
-* записывать логин и пароль в каком-то файле
- * это не очень безопасно
-
-+++
-### Модуль getpass
-
-Модуль getpass позволяет запрашивать пароль, не отображая вводимые символы:
-```python
-In [1]: import getpass
-
-In [2]: password = getpass.getpass()
-Password:
-
-In [3]: print(password)
-testpass
-```
-
-+++
-### Переменные окружения
-
-Еще один вариант хранения пароля (а можно и пользователя) - переменные окружения.
-
-Например, таким образом логин и пароль записываются в переменные:
-```
-$ export SSH_USER=user
-$ export SSH_PASSWORD=userpass
-```
-
-А затем, в Python, считываются значения в переменные в скрипте:
-```python
-import os
-
-USERNAME = os.environ.get('SSH_USER')
-PASSWORD = os.environ.get('SSH_PASSWORD')
-```
-
----
-## Модуль pexpect
-
-+++
-### Модуль pexpect
-
-Модуль pexpect позволяет автоматизировать интерактивные подключения, такие как:
-* telnet
-* ssh
-* ftp
-
-Для начала, модуль pexpect нужно установить:
-```
-pip install pexpect
-```
-
-+++
-### Модуль pexpect
-
-Логика работы pexpect такая:
-* запускается какая-то программа
-* pexpect ожидает определенный вывод (приглашение, запрос пароля и подобное)
-* получив вывод, он отправляет команды/данные
-* последние два действия повторяются столько, сколько нужно
-
-При этом, сам pexpect не реализует различные утилиты, а использует уже готовые.
-
-+++
-### Модуль pexpect
-
-В pexpect есть два основных инструмента:
-* функция ```run()```
-* класс ```spawn```
-
-+++
-### ```pexpect.run()```
-
-Функция ```run()``` позволяет вызвать какую-то программу и вернуть её вывод.
-
-```python
-In [1]: import pexpect
-
-In [2]: output = pexpect.run('ls -ls')
-
-In [3]: print(output)
-b'total 44\r\n4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py\r\n4 -rw-r--r-- 1 vagrant vagrant 3393 Jul 14 07:15 2_telnetlib.py\r\n4 -rw-r--r-- 1 vagrant vagrant 3452 Jul 14 07:15 3_paramiko.py\r\n'
-
-In [4]: print(output.decode('utf-8'))
-total 44
-4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py
-4 -rw-r--r-- 1 vagrant vagrant 3393 Jul 14 07:15 2_telnetlib.py
-4 -rw-r--r-- 1 vagrant vagrant 3452 Jul 14 07:15 3_paramiko.py
-
-```
-
-+++
-### ```pexpect.spawn```
-
-Класс ```spawn``` поддерживает больше возможностей. Он позволяет взаимодействовать с вызванной программой, отправляя данные и ожидая ответ.
-
-```python
-s = pexpect.spawn('ssh user@10.1.1.1')
- 
-s.expect('Password:')
-s.sendline('userpass')
-s.expect('>')
-```
-
-+++
-### ```pexpect.spawn```
-
-Например, таким образом можно инициировать соединение SSH:
-```python
-In [5]: ssh = pexpect.spawn('ssh cisco@192.168.100.1')
-```
-
-После выполнения этой строки, подключение готово.
-
-+++
-### pexpect.expect
-
-В pexpect.expect как шаблон может использоваться:
-* регулярное выражение
-* EOF - этот шаблон позволяет среагировать на исключение EOF
-* TIMEOUT - исключение timeout (по умолчанию значение timeout = 30 секунд)
-* compiled re
-
-
-+++
-### pexpect.expect
-
-```python
-In [6]: ssh.expect('[Pp]assword')
-Out[6]: 0
-```
-
-Обратите внимание как описана строка, которую ожидает pexpect: ```[Pp]assword```.
-Это регулярное выражение, которое описывает строку password или Password.
-То есть, методу expect можно передавать регулярное выражение как аргумент.
-
-+++
-### pexpect.expect
-
-Метод expect вернул число 0 в результате работы.
-Это число указывает, что совпадение было найдено и что это элемент с индексом ноль.
-Индекс тут фигурирует из-за того, что expect можно передавать список строк.
-
-Например, можно передать список с двумя элементами:
-```python
-In [7]: ssh = pexpect.spawn('ssh cisco@192.168.100.1')
-
-In [8]: ssh.expect(['password', 'Password'])
-Out[8]: 1
-```
-
-+++
-### pexpect.sendline
-
-Для отправки команд используется команда sendline:
-```python
-In [9]: ssh.sendline('cisco')
-Out[9]: 6
-```
-
-Команда sendline отправляет строку, автоматически добавляет к ней перевод строки на основе значения os.linesep, а затем возвращает число указывающее сколько байт было записано.
-
-+++
-### expect-sendline
-
-Для того чтобы попасть в режим enable цикл expect-sendline повторяется:
-```python
-In [10]: ssh.expect('[>#]')
-Out[10]: 0
-
-In [11]: ssh.sendline('enable')
-Out[11]: 7
-
-In [12]: ssh.expect('[Pp]assword')
-Out[12]: 0
-
-In [13]: ssh.sendline('cisco')
-Out[13]: 6
-
-In [14]: ssh.expect('[>#]')
-Out[14]: 0
-```
-
-+++
-### Отправка команды
-
-Теперь можно отправлять команду:
-```python
-In [15]: ssh.sendline('sh ip int br')
-Out[15]: 13
-```
-
-После отправки команды, pexpect надо указать до какого момента считать вывод.
-Указываем, что считать надо до #:
-```python
-In [16]: ssh.expect('#')
-Out[16]: 0
-```
-
-+++
-### Получение вывода с before
-
-Вывод команды находится в атрибуте before:
-```python
-In [17]: ssh.before
-Out[17]: b'sh ip int br\r\nInterface                  IP-Address      OK? Method Status                Protocol\r\nEthernet0/0                192.168.100.1   YES NVRAM  up                    up      \r\nEthernet0/1                192.168.200.1   YES NVRAM  up                    up      \r\nEthernet0/2                19.1.1.1        YES NVRAM  up                    up      \r\nEthernet0/3                192.168.230.1   YES NVRAM  up                    up      \r\nEthernet0/3.100            10.100.0.1      YES NVRAM  up                    up      \r\nEthernet0/3.200            10.200.0.1      YES NVRAM  up                    up      \r\nEthernet0/3.300            10.30.0.1       YES NVRAM  up                    up      \r\nR1'
-```
-
-+++
-### Получение вывода с before
-
-Так как результат выводится в виде последовательности байтов, надо конвертировать ее в строку:
-```python
-In [18]: show_output = ssh.before.decode('utf-8')
-
-In [19]: print(show_output)
-sh ip int br
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                192.168.100.1   YES NVRAM  up                    up
-Ethernet0/1                192.168.200.1   YES NVRAM  up                    up
-Ethernet0/2                19.1.1.1        YES NVRAM  up                    up
-Ethernet0/3                192.168.230.1   YES NVRAM  up                    up
-Ethernet0/3.100            10.100.0.1      YES NVRAM  up                    up
-Ethernet0/3.200            10.200.0.1      YES NVRAM  up                    up
-Ethernet0/3.300            10.30.0.1       YES NVRAM  up                    up
-R1
-```
-
-+++
-### Завершение сессии
-
-Завершается сессия вызовом метода close:
-```python
-In [20]: ssh.close()
-
-In [21]: ssh.closed
-Out[21]: False
-```
-
-+++
-### Специальные символы в shell
-
-Pexpect не интерпретирует специальные символы shell, такие как ```>```, ```|```, ```*```.
-
-Для того, чтобы, например, команда ```ls -ls | grep SUMMARY``` отработала, нужно запустить shell таким образом:
-```python
-In [1]: import pexpect
-
-In [2]: p = pexpect.spawn('/bin/bash -c "ls -ls | grep pexpect"')
-
-In [3]: p.expect(pexpect.EOF)
-Out[3]: 0
-
-In [4]: print(p.before)
-b'4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py\r\n'
-
-In [5]: print(p.before.decode('utf-8'))
-4 -rw-r--r-- 1 vagrant vagrant 3203 Jul 14 07:15 1_pexpect.py
-
-```
-
-+++
-### pexpect.EOF
-
-В предыдущем примере встретилось использование pexpect.EOF.
-
-Это специальное значение, которое позволяет отреагировать на завершение исполнения команды или сессии, которая была запущена в spawn.
-
-При вызове команды ```ls -ls``` pexpect не получает интерактивный сеанс.
-Команда выполняется и всё, на этом завершается её работа.
-
-+++
-### pexpect.EOF
-
-Поэтому если запустить её и указать в expect приглашение, возникнет ошибка:
-```python
-In [5]: p = pexpect.spawn('/bin/bash -c "ls -ls | grep SUMMARY"')
-
-In [6]: p.expect('nattaur')
----------------------------------------------------------------------------
-EOF                                       Traceback (most recent call last)
-<ipython-input-9-9c71777698c2> in <module>()
-----> 1 p.expect('nattaur')
-...
-```
-
-Но, если передать в expect EOF, ошибки не будет.
-
-+++
-### Метод pexpect.expect
-
-В pexpect.expect как шаблон может использоваться:
-* регулярное выражение
-* EOF - этот шаблон позволяет среагировать на исключение EOF
-* TIMEOUT - исключение timeout (по умолчанию значение timeout = 30 секунд)
-* compiled re
-
-+++
-### Метод pexpect.expect
-
-Еще одна очень полезная возможность pexpect.expect: можно передавать не одно значение, а список:
-```python
-In [7]: p = pexpect.spawn('/bin/bash -c "ls -ls | grep netmiko"')
-
-In [8]: p.expect(['py3_convert', pexpect.TIMEOUT, pexpect.EOF])
-Out[8]: 2
-
-```
-
-+++
-### Метод pexpect.expect
-
-Тут несколько важных моментов:
-* когда pexpect.expect вызывается со списком, можно указывать разные ожидаемые строки
-* кроме строк, можно указывать исключения
-* pexpect.expect возвращает номер элемента списка, который сработал
- * в данном случае номер 2, так как исключение EOF находится в списке под номером два
-* за счет такого формата можно делать ответвления в программе, в зависимости от того, с каким элементом было совпадение
-
-#VSLIDE
-### Пример использования pexpect
-
-Пример использования pexpect для подключения к оборудованию и передачи команды show (файл 1_pexpect.py):
-```python
-import pexpect
-import getpass
-import sys
-
-COMMAND = sys.argv[1]
-USER = input("Username: ")
-PASSWORD = getpass.getpass()
-ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
-
-DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
-```
-
-+++
-### Пример использования pexpect
-
-Файл 1_pexpect.py:
-```python
-for IP in DEVICES_IP:
-    print("Connection to device {}".format( IP ))
-    t = pexpect.spawn('ssh {}@{}'.format( USER, IP ))
-
-    t.expect('Password:')
-    t.sendline(PASSWORD)
-
-    t.expect('>')
-    t.sendline('enable')
-
-    t.expect('Password:')
-    t.sendline(ENABLE_PASS)
-
-    t.expect('#')
-    t.sendline("terminal length 0")
-
-    t.expect('#')
-    t.sendline(COMMAND)
-
-    t.expect('#')
-    print(t.before.decode('utf-8'))
-
-```
-
-+++
-### Пример использования pexpect
-
-Выполнение скрипта выглядит так:
-```python
-$ python 1_pexpect.py "sh ip int br"
-Username: cisco
-Password:
-Enter enable secret:
-Connection to device 192.168.100.1
-sh ip int br
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.1   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.1.10.1       YES manual up                    up
-FastEthernet0/1.20     10.1.20.1       YES manual up                    up
-FastEthernet0/1.30     10.1.30.1       YES manual up                    up
-FastEthernet0/1.40     10.1.40.1       YES manual up                    up
-FastEthernet0/1.50     10.1.50.1       YES manual up                    up
-FastEthernet0/1.60     10.1.60.1       YES manual up                    up
-FastEthernet0/1.70     10.1.70.1       YES manual up                    up
-R1
-Connection to device 192.168.100.2
-sh ip int br
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.2   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.2.10.1       YES manual up                    up
-FastEthernet0/1.20     10.2.20.1       YES manual up                    up
-FastEthernet0/1.30     10.2.30.1       YES manual up                    up
-FastEthernet0/1.40     10.2.40.1       YES manual up                    up
-FastEthernet0/1.50     10.2.50.1       YES manual up                    up
-FastEthernet0/1.60     10.2.60.1       YES manual up                    up
-FastEthernet0/1.70     10.2.70.1       YES manual up                    up
-R2
-Connection to device 192.168.100.3
-sh ip int br
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.3   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.3.10.1       YES manual up                    up
-FastEthernet0/1.20     10.3.20.1       YES manual up                    up
-FastEthernet0/1.30     10.3.30.1       YES manual up                    up
-FastEthernet0/1.40     10.3.40.1       YES manual up                    up
-FastEthernet0/1.50     10.3.50.1       YES manual up                    up
-FastEthernet0/1.60     10.3.60.1       YES manual up                    up
-FastEthernet0/1.70     10.3.70.1       YES manual up                    up
-R3
-```
-
----
-
-## Модуль telnetlib
-
-+++
-### telnetlib
-
-Модуль telnetlib входит в стандартную библиотеку Python. Это реализация клиента telnet.
-
-Принцип работы telnetlib напоминает pexpect, но есть несколько отличий.
-Самое заметное отличие в том, что telnetlib требует передачи байтовой строки, а не обычной.
-
-+++
-### Подключение
-
-Подключение выполняется таким образом:
-```python
-In [1]: telnet = telnetlib.Telnet('192.168.100.1')
-```
-
-+++
-### Метод read_until
-
-С помощью метода read_until указывается до какой строки считать вывод.
-При этом, как аргумент надо передавать не обычную строку, а байты:
-```python
-In [2]: telnet.read_until(b'Username')
-Out[2]: b'\r\n\r\nUser Access Verification\r\n\r\nUsername'
-```
-
-Метод read_until возвращает все, что он считал до указанной строки.
-
-+++
-### Метод write
-
-Для передачи данных используется метод write. Ему нужно передавать байтовую строку:
-```python
-In [3]: telnet.write(b'cisco\n')
-```
-
-+++
-### Ввод пароля
-
-Читаем вывод до слова Password и передаем пароль:
-```python
-In [4]: telnet.read_until(b'Password')
-Out[4]: b': cisco\r\nPassword'
-
-In [5]: telnet.write(b'cisco\n')
-```
-
-+++
-### Ввод команды
-
-Теперь можно указать, что надо считать вывод до приглашения, а затем отправить команду:
-```python
-In [6]: telnet.read_until(b'>')
-Out[6]: b': \r\nR1>'
-
-In [7]: telnet.write(b'sh ip int br\n')
-
-```
-
-+++
-### Получение вывода команды с read_until
-
-После отправки команды можно продолжать использовать метод read_until:
-```python
-In [8]: telnet.read_until(b'>')
-Out[8]: b'sh ip int br\r\nInterface                  IP-Address      OK? Method Status                Protocol\r\nEthernet0/0                192.168.100.1   YES NVRAM  up                    up      \r\nEthernet0/1                192.168.200.1   YES NVRAM  up                    up      \r\nEthernet0/2                19.1.1.1        YES NVRAM  up                    up      \r\nEthernet0/3                192.168.230.1   YES NVRAM  up                    up      \r\nEthernet0/3.100            10.100.0.1      YES NVRAM  up                    up      \r\nEthernet0/3.200            10.200.0.1      YES NVRAM  up                    up      \r\nEthernet0/3.300            10.30.0.1       YES NVRAM  up                    up      \r\nR1>'
-```
-
-+++
-### Получение вывода команды с read_very_eager
-
-При использовании метода read_very_eager, можно отправить несколько команд, а затем считать весь доступный вывод:
-```python
-In [9]: telnet.write(b'sh arp\n')
-
-In [10]: telnet.write(b'sh clock\n')
-
-In [11]: telnet.write(b'sh ip int br\n')
-
-In [12]: all_result = telnet.read_very_eager().decode('utf-8')
-
-In [13]: print(all_result)
-sh arp
-Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  10.30.0.1               -   aabb.cc00.6530  ARPA   Ethernet0/3.300
-Internet  10.100.0.1              -   aabb.cc00.6530  ARPA   Ethernet0/3.100
-Internet  10.200.0.1              -   aabb.cc00.6530  ARPA   Ethernet0/3.200
-Internet  19.1.1.1                -   aabb.cc00.6520  ARPA   Ethernet0/2
-Internet  192.168.100.1           -   aabb.cc00.6500  ARPA   Ethernet0/0
-Internet  192.168.100.2         124   aabb.cc00.6600  ARPA   Ethernet0/0
-Internet  192.168.100.3         143   aabb.cc00.6700  ARPA   Ethernet0/0
-Internet  192.168.100.100       160   aabb.cc80.c900  ARPA   Ethernet0/0
-Internet  192.168.200.1           -   0203.e800.6510  ARPA   Ethernet0/1
-Internet  192.168.200.100        13   0800.27ac.16db  ARPA   Ethernet0/1
-Internet  192.168.230.1           -   aabb.cc00.6530  ARPA   Ethernet0/3
-R1>sh clock
-*19:18:57.980 UTC Fri Nov 3 2017
-R1>sh ip int br
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                192.168.100.1   YES NVRAM  up                    up
-Ethernet0/1                192.168.200.1   YES NVRAM  up                    up
-Ethernet0/2                19.1.1.1        YES NVRAM  up                    up
-Ethernet0/3                192.168.230.1   YES NVRAM  up                    up
-Ethernet0/3.100            10.100.0.1      YES NVRAM  up                    up
-Ethernet0/3.200            10.200.0.1      YES NVRAM  up                    up
-Ethernet0/3.300            10.30.0.1       YES NVRAM  up                    up
-R1>
-```
-
-+++
-### Получение вывода нескольких команд с read_until
-
-С read_until будет немного другой подход.
-Можно выполнить те же три команды, но затем получать вывод по одной за счет чтения до строки с приглашением:
-```python
-In [14]: telnet.write(b'sh arp\n')
-
-In [15]: telnet.write(b'sh clock\n')
-
-In [16]: telnet.write(b'sh ip int br\n')
-
-In [17]: telnet.read_until(b'>')
-Out[17]: b'sh arp\r\nProtocol  Address          Age (min)  Hardware Addr   Type   Interface\r\nInternet  10.30.0.1               -   aabb.cc00.6530  ARPA   Ethernet0/3.300\r\nInternet  10.100.0.1              -   aabb.cc00.6530  ARPA   Ethernet0/3.100\r\nInternet  10.200.0.1              -   aabb.cc00.6530  ARPA   Ethernet0/3.200\r\nInternet  19.1.1.1                -   aabb.cc00.6520  ARPA   Ethernet0/2\r\nInternet  192.168.100.1           -   aabb.cc00.6500  ARPA   Ethernet0/0\r\nInternet  192.168.100.2         126   aabb.cc00.6600  ARPA   Ethernet0/0\r\nInternet  192.168.100.3         145   aabb.cc00.6700  ARPA   Ethernet0/0\r\nInternet  192.168.100.100       162   aabb.cc80.c900  ARPA   Ethernet0/0\r\nInternet  192.168.200.1           -   0203.e800.6510  ARPA   Ethernet0/1\r\nInternet  192.168.200.100        15   0800.27ac.16db  ARPA   Ethernet0/1\r\nInternet  192.168.230.1           -   aabb.cc00.6530  ARPA   Ethernet0/3\r\nR1>'
-
-In [18]: telnet.read_until(b'>')
-Out[18]: b'sh clock\r\n*19:20:39.388 UTC Fri Nov 3 2017\r\nR1>'
-
-In [19]: telnet.read_until(b'>')
-Out[19]: b'sh ip int br\r\nInterface                  IP-Address      OK? Method Status                Protocol\r\nEthernet0/0                192.168.100.1   YES NVRAM  up                    up      \r\nEthernet0/1                192.168.200.1   YES NVRAM  up                    up      \r\nEthernet0/2                19.1.1.1        YES NVRAM  up                    up      \r\nEthernet0/3                192.168.230.1   YES NVRAM  up                    up      \r\nEthernet0/3.100            10.100.0.1      YES NVRAM  up                    up      \r\nEthernet0/3.200            10.200.0.1      YES NVRAM  up                    up      \r\nEthernet0/3.300            10.30.0.1       YES NVRAM  up                    up      \r\nR1>'
-
-```
-
-+++
-### read_until vs read_very_eager
-
-Важное отличие между read_until и read_very_eager заключается в том, как они реагируют на отсутствие вывода.
-
-Метод read_until ждет определенную строку. По умолчанию, если ее нет, метод "зависнет".
-Опциональный параметр timeout позволяет указать сколько ждать нужную строку:
-```python
-In [20]: telnet.read_until(b'>', timeout=5)
-Out[20]: b''
-```
-
-Если за указанное время строка не появилась, возвращается пустая строка.
-
-Метод read_very_eager просто вернет пустую строку, если вывода нет:
-```python
-In [21]: telnet.read_very_eager()
-Out[21]: b''
-```
-
-+++
-### Метод expect
-
-Метод expect позволяет указывать список с регулярными выражениями.
-Он работает похоже на pexpect, но в модуле telnetlib всегда надо передавать список регулярных выражений.
-
-```python
-In [22]: telnet.write(b'sh clock\n')
-
-In [23]: telnet.expect([b'[>#]'])
-Out[23]:
-(0,
- <_sre.SRE_Match object; span=(46, 47), match=b'>'>,
- b'sh clock\r\n*19:35:10.984 UTC Fri Nov 3 2017\r\nR1>')
-```
-
-+++
-### Метод expect
-
-Метод expect возвращает кортеж их трех элементов:
-* индекс выражения, которое совпало
-* объект Match
-* байтовая строка, которая содержит все считанное до регулярного  выражения и включая его
-
-+++
-### Метод expect
-
-```python
-In [24]: telnet.write(b'sh clock\n')
-
-In [25]: regex_idx, match, output = telnet.expect([b'[>#]'])
-
-In [26]: regex_idx
-Out[26]: 0
-
-In [27]: match.group()
-Out[27]: b'>'
-
-In [28]: match
-Out[28]: <_sre.SRE_Match object; span=(46, 47), match=b'>'>
-
-In [29]: match.group()
-Out[29]: b'>'
-
-In [30]: output
-Out[30]: b'sh clock\r\n*19:37:21.577 UTC Fri Nov 3 2017\r\nR1>'
-
-In [31]: output.decode('utf-8')
-Out[31]: 'sh clock\r\n*19:37:21.577 UTC Fri Nov 3 2017\r\nR1>'
-```
-
-+++
-### Закрытие соединения
-
-Закрывается соединение методом close:
-```python
-In [32]: telnet.close()
-```
-
-+++
-### Пример использования telnetlib
-
-Файл 2_telnetlib.py:
-```python
-import telnetlib
-import time
-import getpass
-import sys
-
-COMMAND = sys.argv[1].encode('utf-8')
-USER = input("Username: ").encode('utf-8')
-PASSWORD = getpass.getpass().encode('utf-8')
-ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ').encode('utf-8')
-
-DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
-
-```
-
-+++
-### Пример использования telnetlib
-
-Файл 2_telnetlib.py:
-```python
-for IP in DEVICES_IP:
-    print("Connection to device {}".format( IP ))
-    t = telnetlib.Telnet(IP)
-
-    t.read_until(b"Username:")
-    t.write(USER + b'\n')
-
-    t.read_until(b"Password:")
-    t.write(PASSWORD + b'\n')
-    t.write(b"enable\n")
-
-    t.read_until(b"Password:")
-    t.write(ENABLE_PASS + b'\n')
-    t.write(b"terminal length 0\n")
-    t.write(COMMAND + b'\n')
-
-    time.sleep(5)
-
-    output = t.read_very_eager().decode('utf-8')
-    print(output)
-```
-
-+++
-### Пример использования telnetlib
-
-Выполнение скрипта:
-```
-$ python 2_telnetlib.py "sh ip int br"
-Username: cisco
-Password:
-Enter enable secret:
-Connection to device 192.168.100.1
-
-R1#terminal length 0
-R1#sh ip int br
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.1   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.1.10.1       YES manual up                    up
-FastEthernet0/1.20     10.1.20.1       YES manual up                    up
-FastEthernet0/1.30     10.1.30.1       YES manual up                    up
-FastEthernet0/1.40     10.1.40.1       YES manual up                    up
-FastEthernet0/1.50     10.1.50.1       YES manual up                    up
-FastEthernet0/1.60     10.1.60.1       YES manual up                    up
-FastEthernet0/1.70     10.1.70.1       YES manual up                    up
-R1#
-Connection to device 192.168.100.2
-
-R2#terminal length 0
-R2#sh ip int br
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.2   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.2.10.1       YES manual up                    up
-FastEthernet0/1.20     10.2.20.1       YES manual up                    up
-FastEthernet0/1.30     10.2.30.1       YES manual up                    up
-FastEthernet0/1.40     10.2.40.1       YES manual up                    up
-FastEthernet0/1.50     10.2.50.1       YES manual up                    up
-FastEthernet0/1.60     10.2.60.1       YES manual up                    up
-FastEthernet0/1.70     10.2.70.1       YES manual up                    up
-R2#
-Connection to device 192.168.100.3
-
-R3#terminal length 0
-R3#sh ip int br
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.3   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.3.10.1       YES manual up                    up
-FastEthernet0/1.20     10.3.20.1       YES manual up                    up
-FastEthernet0/1.30     10.3.30.1       YES manual up                    up
-FastEthernet0/1.40     10.3.40.1       YES manual up                    up
-FastEthernet0/1.50     10.3.50.1       YES manual up                    up
-FastEthernet0/1.60     10.3.60.1       YES manual up                    up
-FastEthernet0/1.70     10.3.70.1       YES manual up                    up
-R3#
-```
-
-
----
-## Модуль paramiko
-
-+++
-### Модуль paramiko
-
-Paramiko это реализация протокола SSHv2 на Python.
-Paramiko предоставляет функциональность клиента и сервера.
-
-Так как Paramiko не входит в стандартную библиотеку модулей Python, его нужно установить:
-```
-pip install paramiko
-```
-
-+++
-### Модуль paramiko
-
-Пример использования Paramiko (файл 3_paramiko.py):
-```python
-import paramiko
-import getpass
-import sys
-import time
-
-COMMAND = sys.argv[1]
-USER = input("Username: ")
-PASSWORD = getpass.getpass()
-ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
-
-DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
-
-```
-
-+++
-### Модуль paramiko
-
-Пример использования Paramiko (файл 3_paramiko.py):
-```python
-for IP in DEVICES_IP:
-    print("Connection to device {}".format( IP ))
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    client.connect(hostname=IP, username=USER, password=PASSWORD,
-                   look_for_keys=False, allow_agent=False)
-    ssh = client.invoke_shell()
-
-    ssh.send("enable\n")
-    ssh.send(ENABLE_PASS + '\n')
-    time.sleep(1)
-
-    ssh.send("terminal length 0\n")
-    time.sleep(1)
-    print(ssh.recv(1000).decode('utf-8'))
-
-    ssh.send(COMMAND + "\n")
-    time.sleep(2)
-    result = ssh.recv(5000).decode('utf-8')
-    print(result)
-
-```
-
-+++
-### Модуль paramiko
-
-* ```client = paramiko.SSHClient()``` - этот класс представляет соединение к SSH-серверу. Он выполняет аутентификацию клиента.
-* ```client.set_missing_host_key_policy(paramiko.AutoAddPolicy())```
- * ```set_missing_host_key_policy``` - устанавливает какую политику использовать, когда выполнятся подключение к серверу, ключ которого неизвестен.
- * ```paramiko.AutoAddPolicy()``` - политика, которая автоматически добавляет новое имя хоста и ключ в локальный объект HostKeys.
-
-+++
-### Модуль paramiko
-
-* ```client.connect``` - метод, который выполняет подключение к SSH-серверу и аутентифицирует подключение
-  * ```hostname``` - имя хоста или IP-адрес
-  * ```username``` - имя пользователя
-  * ```password``` - пароль
-  * ```look_for_keys``` - по умолчанию paramiko выполняет аутентификацию по ключам. Чтобы отключить это, надо поставить поставив False
-  * ```allow_agent``` - paramiko может подключаться к локальному SSH агенту ОС. Это нужно при работе с ключами, а так как, в данном случае, аутентификация выполняется по логину/паролю, это нужно отключить.
-
-+++
-### Модуль paramiko
-
-* ```ssh = client.invoke_shell()``` - после выполнения предыдущей команды уже есть подключение к серверу. Метод ```invoke_shell``` позволяет установить интерактивную сессию SSH с сервером.
-   
-+++
-### Модуль paramiko
-
-* Внутри установленной сессии выполняются команды и получаются данные:
- * ```ssh.send``` - отправляет указанную строку в сессию
- * ```ssh.recv``` - получает данные из сессии. В скобках указывается максимальное значение в байтах, которое можно получить. Этот метод возвращает считанную строку
-* Кроме этого, между отправкой команды и считыванием, кое-где стоит строка ```time.sleep```
- * с помощью неё указывается пауза - сколько времени подождать, прежде чем скрипт продолжит выполняться. Это делается для того, чтобы дождаться выполнения команды на оборудовании
-
-+++
-### Модуль paramiko
-
-Так выглядит результат выполнения скрипта:
-```
-$ python 3_paramiko.py "sh ip int br"
-Username: cisco
-Password:
-Enter enable secret:
-Connection to device 192.168.100.1
-
-R1>enable
-Password:
-R1#terminal length 0
-
-
-R1#
-sh ip int br
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.1   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.1.10.1       YES manual up                    up
-FastEthernet0/1.20     10.1.20.1       YES manual up                    up
-FastEthernet0/1.30     10.1.30.1       YES manual up                    up
-FastEthernet0/1.40     10.1.40.1       YES manual up                    up
-FastEthernet0/1.50     10.1.50.1       YES manual up                    up
-FastEthernet0/1.60     10.1.60.1       YES manual up                    up
-FastEthernet0/1.70     10.1.70.1       YES manual up                    up
-R1#
-Connection to device 192.168.100.2
-
-R2>enable
-Password:
-R2#terminal length 0
-R2#
-sh ip int br
-FastEthernet0/0        192.168.100.2   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.2.10.1       YES manual up                    up
-FastEthernet0/1.20     10.2.20.1       YES manual up                    up
-FastEthernet0/1.30     10.2.30.1       YES manual up                    up
-FastEthernet0/1.40     10.2.40.1       YES manual up                    up
-FastEthernet0/1.50     10.2.50.1       YES manual up                    up
-FastEthernet0/1.60     10.2.60.1       YES manual up                    up
-FastEthernet0/1.70     10.2.70.1       YES manual up                    up
-R2#
-Connection to device 192.168.100.3
-
-R3>enable
-Password:
-R3#terminal length 0
-R3#
-sh ip int br
-Interface                  IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.3   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.3.10.1       YES manual up                    up
-FastEthernet0/1.20     10.3.20.1       YES manual up                    up
-FastEthernet0/1.30     10.3.30.1       YES manual up                    up
-FastEthernet0/1.40     10.3.40.1       YES manual up                    up
-FastEthernet0/1.50     10.3.50.1       YES manual up                    up
-FastEthernet0/1.60     10.3.60.1       YES manual up                    up
-FastEthernet0/1.70     10.3.70.1       YES manual up                    up
-R3#
-
-```
-
-+++
-### Модуль paramiko
-
-Обратите внимание, что в вывод попал и процесс ввода пароля enable и команда terminal length.
-
-Это связано с тем, что paramiko собирает весь вывод в буфер.
-И, при вызове метода ```recv``` (например, ```ssh.recv(1000)```), paramiko возвращает всё, что есть в буфере.
-После выполнения ```recv```, буфер пуст.
-
-+++
-### Модуль paramiko
-
-Поэтому, если нужно получить только вывод команды sh ip int br, то надо оставить ```recv```, но не делать print:
-```python
-    ssh.send("enable\n")
-    ssh.send(ENABLE_PASS + '\n')
-    time.sleep(1)
-
-    ssh.send("terminal length 0\n")
-    time.sleep(1)
-    #Тут мы вызываем recv, но не выводим содержимое буфера
-    ssh.recv(1000)
-
-    ssh.send(COMMAND + "\n")
-    time.sleep(3)
-    result = ssh.recv(5000).decode('utf-8')
-    print(result)
-```
-
----
-
-## Модуль netmiko
-
-+++
-### Модуль netmiko
-
-Netmiko это модуль, который позволяет упростить использование paramiko для сетевых устройств.
-
-Грубо говоря, netmiko это такая "обертка" для paramiko.
-
-Сначала netmiko нужно установить:
-```
-pip install netmiko
-```
-
-+++
-### Модуль netmiko
-
-Пример использования netmiko (файл 4_netmiko.py):
-```python
-from netmiko import ConnectHandler
-import getpass
-import sys
-
-
-COMMAND = sys.argv[1]
-USER = input("Username: ")
-PASSWORD = getpass.getpass()
-ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
-
-DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
-
-```
-
-+++
-### Модуль netmiko
-
-Пример использования netmiko (файл 4_netmiko.py):
-```python
-for IP in DEVICES_IP:
-    print("Connection to device {}".format( IP ))
-    DEVICE_PARAMS = {'device_type': 'cisco_ios',
-                     'ip': IP,
-                     'username':USER,
-                     'password':PASSWORD,
-                     'secret':ENABLE_PASS }
-
-    ssh = ConnectHandler(**DEVICE_PARAMS)
-    ssh.enable()
-
-    result = ssh.send_command(COMMAND)
-    print(result)
-```
-
-+++
-### Модуль netmiko
-
-* DEVICE_PARAMS - это словарь, в котором указываются параметры устройства
- * device_type - это предопределенные значения, которые понимает netmiko
-    * в данном случае, так как подключение выполняется к устройству с Cisco IOS, используется значение 'cisco_ios'
-
-+++
-### Модуль netmiko
-
-* ```ssh = ConnectHandler(**DEVICE_PARAMS)``` - устанавливается соединение с устройством, на основе параметров, которые находятся в словаре
-* ```ssh.enable()``` - переход в режим enable
- * пароль передается автоматически
- * используется значение ключа secret, который указан в словаре DEVICE_PARAMS
-* ```result = ssh.send_command(COMMAND)``` - отправка команды и получение вывода
-
-В этом примере не передается команда terminal length, так как netmiko по умолчанию, выполняет эту команду.
-
-+++
-### Модуль netmiko
-
-Так выглядит результат выполнения скрипта:
-```
-$ python 4_netmiko.py "sh ip int br"
-Username: cisco
-Password:
-Enter enable password:
-Connection to device 192.168.100.1
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.1   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.1.10.1       YES manual up                    up
-FastEthernet0/1.20     10.1.20.1       YES manual up                    up
-FastEthernet0/1.30     10.1.30.1       YES manual up                    up
-FastEthernet0/1.40     10.1.40.1       YES manual up                    up
-FastEthernet0/1.50     10.1.50.1       YES manual up                    up
-FastEthernet0/1.60     10.1.60.1       YES manual up                    up
-FastEthernet0/1.70     10.1.70.1       YES manual up                    up
-Connection to device 192.168.100.2
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.2   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.2.10.1       YES manual up                    up
-FastEthernet0/1.20     10.2.20.1       YES manual up                    up
-FastEthernet0/1.30     10.2.30.1       YES manual up                    up
-FastEthernet0/1.40     10.2.40.1       YES manual up                    up
-FastEthernet0/1.50     10.2.50.1       YES manual up                    up
-FastEthernet0/1.60     10.2.60.1       YES manual up                    up
-FastEthernet0/1.70     10.2.70.1       YES manual up                    up
-Connection to device 192.168.100.3
-Interface              IP-Address      OK? Method Status                Protocol
-FastEthernet0/0        192.168.100.3   YES NVRAM  up                    up
-FastEthernet0/1        unassigned      YES NVRAM  up                    up
-FastEthernet0/1.10     10.3.10.1       YES manual up                    up
-FastEthernet0/1.20     10.3.20.1       YES manual up                    up
-FastEthernet0/1.30     10.3.30.1       YES manual up                    up
-FastEthernet0/1.40     10.3.40.1       YES manual up                    up
-FastEthernet0/1.50     10.3.50.1       YES manual up                    up
-FastEthernet0/1.60     10.3.60.1       YES manual up                    up
-FastEthernet0/1.70     10.3.70.1       YES manual up                    up
-```
-
-+++
-## Поддерживаемые типы устройств
-
-Netmiko поддерживает несколько типов устройств:
-* Arista vEOS
-* Cisco ASA
-* Cisco IOS
-* Cisco IOS-XR
-* Cisco SG300
-* HP Comware7
-* HP ProCurve
-* Juniper Junos
-* Linux
-* и другие
-
-Актуальный список можно посмотреть в [репозитории](https://github.com/ktbyers/netmiko) модуля.
-
-+++
-
-## Словарь, определяющий параметры устройств
-
-В словаре могут указываться такие параметры:
-```python
-cisco_router = {'device_type': 'cisco_ios', # предопределенный тип устройства
-                'ip': '192.168.1.1', # адрес устройства
-                'username': 'user', # имя пользователя
-                'password': 'userpass', # пароль пользователя
-                'secret': 'enablepass', # пароль режима enable
-                'port': 20022, # порт SSH, по умолчанию 22
-                 }
-```
-
-+++
-## Подключение по SSH
-
-```python
-ssh = ConnectHandler(**cisco_router)
-```
-
-+++
-## Режим enable
-
-Перейти в режим enable:
-```python
-ssh.enable()
-```
-
-Выйти из режима enable:
-```python
-ssh.exit_enable_mode()
-```
-
-+++
-## Отправка команд
-
-В netmiko есть несколько способов отправки команд:
-* ```send_command``` - отправить одну команду
-* ```send_config_set``` - отправить список команд
-* ```send_config_from_file``` - отправить команды из файла (использует внутри метод ```send_config_set```)
-* ```send_command_timing``` - отправить команду и подождать вывод на основании таймера
-
-+++
-### ```send_command```
-
-Метод send_command позволяет отправить одну команду на устройство.
-
-Например:
-```python
-result = ssh.send_command("show ip int br")
-```
-
-+++
-### ```send_command```
-
-Метод работает таким образом:
-* отправляет команду на устройство и получает вывод до строки с приглашением или до указанной строки
- * приглашение определяется автоматически
- * если на вашем устройстве оно не определилось, можно просто указать строку, до которой считывать вывод
- * ранее так работал метод ```send_command_expect```, но с версии 1.0.0 так работает ```send_command```, а метод ```send_command_expect``` оставлен для совместимости
-* метод возвращает вывод команды
-
-+++
-### ```send_command```
-
-* методу можно передавать такие параметры:
- * ```command_string``` - команда
- * ```expect_string``` - до какой строки считывать вывод
- * ```delay_factor - параметр позволяет увеличить задержку до начала поиска строки
- * ```max_loops``` - количество итераций, до того как метод выдаст ошибку (исключение). По умолчанию 500
- * ```strip_prompt``` - удалить приглашение из вывода. По умолчанию удаляется
- * ```strip_command``` - удалить саму команду из вывода
-
-В большинстве случаев, достаточно будет указать только команду.
-
-+++
-### ```send_config_set```
-
-Метод ```send_config_set``` позволяет отправить несколько команд конфигурационного режима.
-
-Пример использования:
-```python
-commands = ["router ospf 1",
-            "network 10.0.0.0 0.255.255.255 area 0",
-            "network 192.168.100.0 0.0.0.255 area 1"]
-
-result = ssh.send_config_set(commands)
-```
-
-+++
-### ```send_config_set```
-
-Метод работает таким образом:
-* заходит в конфигурационный режим,
-* затем передает все команды
-* и выходит из конфигурационного режима 
- * в зависимости от типа устройства, выхода из конфигурационного режима может и не быть. Например, для IOS-XR выхода не будет, так как сначала надо закомитить изменения
-
-+++
-### ```send_config_from_file```
-
-Метод ```send_config_from_file``` отправляет команды из указанного файла в конфигурационный режим.
-
-Пример использования:
-```python
-result = ssh.send_config_from_file("config_ospf.txt")
-```
-
-Метод открывает файл, считывает команды и передает их методу ```send_config_set```.
-
-+++
-### Дополнительные методы
-
-Кроме перечисленных методов для отправки команд, netmiko поддерживает такие методы:
-* ```config_mode``` - перейти в режим конфигурации
- * ```ssh.config_mode()```
-* ```exit_config_mode``` - выйти из режима конфигурации
- * ```ssh.exit_config_mode()```
-
-+++
-### Дополнительные методы
-
-* check_config_mode - проверить находится ли netmiko в режиме конфигурации (возвращает True, если в режиме конфигурации и False - если нет)
- * ```ssh.check_config_mode()```
-* ```find_prompt``` - возвращает текущее приглашение устройства
- * ```ssh.find_prompt()```
-* ```commit``` - выполнить commit на IOS-XR и Juniper
- * ```ssh.commit()```
-* ```disconnect``` - завершить соединение SSH
-
-
-+++
-### Telnet
-
-С версии 1.0.0 netmiko поддерживает подключения по Telnet.
-Пока что, только для Cisco IOS устройств.
-
-Внутри, netmiko использует telnetlib, для подключения по Telnet. Но, при этом, предоставляет тот же интерфейс дял работы, что и подключение по SSH.
-
-+++
-### Telnet
-Для того, чтобы подключиться по Telnet, достаточно в словаре, который определяет параметры подключения, указать тип устройства 'cisco_ios_telnet':
-```python
-DEVICE_PARAMS = {'device_type': 'cisco_ios_telnet',
-                 'ip': IP,
-                 'username':USER,
-                 'password':PASSWORD,
-                 'secret':ENABLE_PASS }
-```
-
-+++
-### Telnet
-В остальном, методы, которые применимы к SSH, применимы и к Telnet. Пример, аналогичный примеру с SSH (файл 4_netmiko_telnet.py):
-```python
-from netmiko import ConnectHandler
-import getpass
-import sys
-import time
-
-COMMAND = sys.argv[1]
-USER = input("Username: ")
-PASSWORD = getpass.getpass()
-ENABLE_PASS = getpass.getpass(prompt='Enter enable password: ')
-
-DEVICES_IP = ['192.168.100.1','192.168.100.2','192.168.100.3']
-
-```
-
-+++
-### Telnet
-
-Файл 4_netmiko_telnet.py:
-```python
-for IP in DEVICES_IP:
-    print("Connection to device {}".format( IP ))
-    DEVICE_PARAMS = {'device_type': 'cisco_ios_telnet',
-                     'ip': IP,
-                     'username':USER,
-                     'password':PASSWORD,
-                     'secret':ENABLE_PASS,
-                     'verbose': True}
-    ssh = ConnectHandler(**DEVICE_PARAMS)
-    ssh.enable()
-
-    result = ssh.send_command(COMMAND)
-    print(result)
-```
-
-+++
-### Telnet
-
-Аналогично работают и методы:
-* ```send_command_timing()```
-* ```find_prompt()```
-* ```send_config_set()```
-* ```send_config_from_file()```
-* ```check_enable_mode()```
-* ```disconnect()```
-
----
-
 ## Параллельные сессии
 
 +++
@@ -1286,9 +10,10 @@ for IP in DEVICES_IP:
 Конечно, это будет быстрее, чем подключение вручную.
 Но, хотелось бы получать отклик как можно быстрее.
 
-Для параллельного подключения к устройствам в Python есть два модуля:
+Для параллельного подключения к устройствам в курсе используются модули:
 * threading
 * multiprocessing
+* concurrent.futures
 
 +++
 ### Измерение времени выполнения скрипта
@@ -1344,11 +69,59 @@ $ python test.py
 ```
 
 ---
+## Процессы и потоки в Python (CPython)
+
+* процесс (process) - это, грубо говоря, запущенная программа. Процессу выделяются отдельные ресурсы: память, процессорное время
+* поток (thread) - это единица исполнения в процессе. Потоки разделяют ресурсы процесса, к которому они относятся.
+
++++
+### Процессы и потоки в Python (CPython)
+
+Python (а точнее, CPython - реализация, которая используется в курсе) оптимизирован для работы в однопоточном режиме. Это хорошо, если в программе используется только один поток.
+
+И, в то же время, у Python есть определенные нюансы работы в многопоточном режиме. Связаны они с тем, что CPython использует GIL (global interpreter lock).
+
++++
+### GIL
+
+GIL не дает нескольким потокам исполнять одновременно код Python.
+GIL можно представить как некий переходящий флаг, который разрешает потокам выполняться.
+У кого флаг, тот может выполнять работу.
+
+Флаг передается либо каждые сколько-то инструкций Python, либо, например, когда выполняются какие-то операции ввода-вывода.
+
+Поэтому получается, что разные потоки не будут выполняться параллельно, а программа просто будет между ними переключаться, выполняя их в разное время.
+
++++
+### IO bound task
+
+Но не всё так плохо. Если в программе есть некое "ожидание": пакетов из сети, запроса пользователя, пауза типа sleep - то в такой программе потоки будут выполняться как будто параллельно.
+А всё потому, что во время таких пауз флаг (GIL) можно передать другому потоку.
+
+Но тут также нужно быть осторожным, так как такой результат может наблюдаться на небольшом количестве сессий, но может ухудшиться с ростом количества сессий.
+
+Потоки отлично подходят для задач, которые связаны с операциями ввода-вывода.
+Подключение к оборудованию входит в число подобных задач.
+
+
++++
+### Процессы
+
+Процессы позволяют выполнять задачи на разных ядрах компьютера.
+Это важно для задач, которые не завязаны на операции ввода-вывода.
+
+Для каждого процесса создается своя копия ресурсов, выделяется память, у каждого процесса свой GIL.
+Это же делает процессы более тяжеловесными, по сравнению с потоками.
+
+Кроме того, количество процессов, которые запускаются параллельно, зависит от количества ядер и CPU и обычно исчисляется в десятках, тогда как количество потоков для операций ввода-вывода может исчисляться в сотнях.
+
+
+---
 
 ## Модуль threading
 
 +++
-## Модуль threading
+### Модуль threading
 
 Модуль threading может быть полезен для таких задач:
 * фоновое выполнение каких-то задач:
@@ -1360,7 +133,7 @@ $ python test.py
  * например, паузы с помощью sleep
 
 +++
-## Модуль threading
+### Модуль threading
 
 Следует учитывать, что в ситуациях, когда требуется повышение производительности, засчет использования нескольких процессоров или ядер, нужно использовать модуль multiprocessing, а не модуль threading.
 
@@ -1371,7 +144,7 @@ $ python test.py
 * параметры устройств перенесены в отдельный файл в формате YAML
 
 +++
-## Модуль threading
+### Модуль threading
 
 Файл netmiko_function.py:
 ```python
@@ -1397,7 +170,7 @@ for router in devices['routers']:
 ```
 
 +++
-## Модуль threading
+### Модуль threading
 
 Файл devices.yaml с параметрами подключения к устройствам:
 ```yaml
@@ -1420,7 +193,7 @@ routers:
 ```
 
 +++
-## Модуль threading
+### Модуль threading
 
 Время выполнения скрипта (вывод скрипта удален):
 ```
@@ -1432,7 +205,7 @@ sys     0m0.080s
 ```
 
 +++
-## Модуль threading
+### Модуль threading
 
 Пример использования модуля threading для подключения по SSH с помощью netmiko (файл netmiko_threading.py):
 ```python
@@ -1454,7 +227,7 @@ def connect_ssh(device_dict, command):
 ```
 
 +++
-## Модуль threading
+### Модуль threading
 
 Файл netmiko_threading.py:
 ```python
@@ -1473,7 +246,7 @@ conn_threads(connect_ssh, devices['routers'], COMMAND)
 ```
 
 +++
-## Модуль threading
+### Модуль threading
 
 Время выполнения кода:
 ```
@@ -1489,7 +262,7 @@ sys     0m0.068s
 Но, надо учесть, что такая ситуация не будет повторяться при большом количестве подключений.
 
 +++
-## Модуль threading
+### Модуль threading
 
 * ```threading.Thread``` - класс, который создает поток. Ему передается функция, которую надо выполнить, и её аргументы
 * ```th.start()``` - запуск потока
@@ -1719,4 +492,655 @@ multiprocessing:  2.365s
 Но это связано с тем, что на создание процессов уходит больше времени, чем на создание потоков.
 Если бы скрипт был сложнее и выполнялось больше задач, или было бы больше подключений, тогда бы multiprocessing начал бы существенно выигрывать у модуля threading.
 
+
+---
+## Модуль concurrent.futures
+
+Модуль concurrent.futures предоставляет высокоуровневый интерфейс для работы с процессами и потоками.
+При этом и для потоков, и для процессов используется одинаковый интерфейс, что позволяет легко переключаться между ними.
+
+Если сравнивать этот модуль с threading или multiprocessing, то у него меньше возможностей.
+Но зато с concurrent.futures работать проще и интерфейс более понятный.
+
++++
+### Модуль concurrent.futures
+
+Модуль concurrent.futures позволяет легко решить задачу запуска нескольких потоков/процессов и получения из них данных.
+
+Модуль предоставляет два класса:
+
+* **ThreadPoolExecutor** - для работы с потоками
+* **ProcessPoolExecutor** - для работы с процессами
+
+
+Оба класса используют одинаковый интерфейс, поэтому достаточно разобраться с одним и затем просто переключиться на другой при необходимости.
+
++++
+## Future
+
+Модуль использует понятие future.
+[Future](https://en.wikipedia.org/wiki/Futures_and_promises) - это объект, который представляет отложенное вычисление.
+Этот объект можно запрашивать о состоянии (завершена работа или нет), можно получать результаты или исключения, которые возникли в процессе работы, по мере возникновения.
+
+При этом нет необходимости создавать их вручную.
+Эти объекты создаются ThreadPoolExecutor и ProcessPoolExecutor.
+
++++
+### Метод map
+
+Метод map - это самый простой вариант работы с concurrent.futures.
+
+Пример использования функции map с ThreadPoolExecutor (файл netmiko_threads_map_ver1.py):
+```python
+from concurrent.futures import ThreadPoolExecutor
+from pprint import pprint
+
+import yaml
+from netmiko import ConnectHandler
+
+
+def connect_ssh(device_dict, command='sh clock'):
+    print('Connection to device: {}'.format(device_dict['ip']))
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+    return {device_dict['ip']: result}
+
+
+def threads_conn(function, devices, limit=2):
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        f_result = executor.map(function, devices)
+    return list(f_result)
+
+
+if __name__ == '__main__':
+    devices = yaml.load(open('devices.yaml'))
+    all_done = threads_conn(connect_ssh, devices['routers'])
+    pprint(all_done)
+
+```
+
+
++++
+### Метод map
+
+```python
+def threads_conn(function, devices, limit=2):
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        f_result = executor.map(function, devices)
+    return list(f_result)
+```
+
+Обратите внимание, что функция занимает всего 4 строки, и для получения данных не надо создавать очередь и передавать ее в функцию connect_ssh.
+
++++
+### Метод map
+
+* ```with ThreadPoolExecutor(max_workers=limit) as executor:``` - класс ThreadPoolExecutor инициируется в блоке with с указанием количества потоков
+* ```f_result = executor.map(function, devices)``` - метод map похож на функцию map, но тут функция function вызывается в разных потоках. При этом в разных потоках функция будет вызываться с разными аргументами - элементами итерируемого объекта devices.
+* метод map возвращает генератор. В этом генераторе содержатся результаты выполнения функций
+
++++
+### Метод map
+
+Результат выполнения:
+```
+$ python netmiko_threads_map_ver1.py
+Connection to device: 192.168.100.1
+Connection to device: 192.168.100.2
+Connection to device: 192.168.100.3
+[{'192.168.100.1': '*04:43:01.629 UTC Mon Aug 28 2017'},
+ {'192.168.100.2': '*04:43:01.648 UTC Mon Aug 28 2017'},
+ {'192.168.100.3': '*04:43:07.291 UTC Mon Aug 28 2017'}]
+
+```
+
++++
+### Метод map
+
+Важная особенность метода map - он возвращает результаты в том же порядке, в котором они указаны в итерируемом объекте.
+
+Для демонстрации этой особенности в функции connect_ssh добавлены сообщения с выводом информации о том, когда функция начала работать и когда закончила.
+
++++
+### Метод map
+
+Файл netmiko_threads_map_ver2.py:
+```python
+from concurrent.futures import ThreadPoolExecutor
+from pprint import pprint
+from datetime import datetime
+import time
+
+import yaml
+from netmiko import ConnectHandler
+
+
+start_msg = '===> {} Connection to device: {}'
+received_msg = '<=== {} Received result from device: {}'
+```
+
++++
+### Метод map
+
+```python
+def connect_ssh(device_dict, command='sh clock'):
+    print(start_msg.format(datetime.now().time(), device_dict['ip']))
+    if device_dict['ip'] == '192.168.100.1':
+        time.sleep(10)
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+        print(received_msg.format(datetime.now().time(), device_dict['ip']))
+    return {device_dict['ip']: result}
+
+
+def threads_conn(function, devices, limit=2):
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        f_result = executor.map(function, devices)
+    return list(f_result)
+
+
+if __name__ == '__main__':
+    devices = yaml.load(open('devices.yaml'))
+    all_done = threads_conn(connect_ssh, devices['routers'])
+    pprint(all_done)
+
+```
+
++++
+### Метод map
+
+Результат выполнения:
+```
+$ python netmiko_threads_map_ver2.py
+===> 04:50:50.175076 Connection to device: 192.168.100.1
+===> 04:50:50.175553 Connection to device: 192.168.100.2
+<=== 04:50:55.582707 Received result from device: 192.168.100.2
+===> 04:50:55.689248 Connection to device: 192.168.100.3
+<=== 04:51:01.135640 Received result from device: 192.168.100.3
+<=== 04:51:05.568037 Received result from device: 192.168.100.1
+[{'192.168.100.1': '*04:51:05.395 UTC Mon Aug 28 2017'},
+ {'192.168.100.2': '*04:50:55.411 UTC Mon Aug 28 2017'},
+ {'192.168.100.3': '*04:51:00.964 UTC Mon Aug 28 2017'}]
+```
+
++++
+### Метод map
+
+Обратите внимание на фактический порядок выполнения задач: 192.168.100.2, 192.168.100.3, 192.168.100.1.
+Но в итоговом списке все равно соблюдается порядок на основе списка devices['routers'].
+
++++
+### Метод map
+
+Еще один момент, который тут хорошо заметен, это то, что как только одна задача выполнилась, сразу берется следующая.
+То есть, ограничение в два потока влияет на количество потоков, которые выполняются одновременно.
+
++++
+### Метод map
+
+Осталось изменить функцию таким образом, чтобы ей можно было передавать команду как аргумент.
+
+Для этого мы воспользуемся функцией repeat из модуля itertools.
+Функция repeat тут нужна для того, чтобы команда передавалась при каждом вызове функции connect_ssh.
+
++++
+### Метод map
+
+Файл netmiko_threads_map_final.py
+
+```python
+from concurrent.futures import ThreadPoolExecutor
+from pprint import pprint
+from datetime import datetime
+import time
+from itertools import repeat
+
+import yaml
+from netmiko import ConnectHandler
+
+
+start_msg = '===> {} Connection to device: {}'
+received_msg = '<=== {} Received result from device: {}'
+```
+
++++
+### Метод map
+
+Файл netmiko_threads_map_final.py
+```python
+def connect_ssh(device_dict, command):
+    print(start_msg.format(datetime.now().time(), device_dict['ip']))
+    if device_dict['ip'] == '192.168.100.1':
+        time.sleep(10)
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+        print(received_msg.format(datetime.now().time(), device_dict['ip']))
+    return {device_dict['ip']: result}
+
+
+
+def threads_conn(function, devices, limit=2, command=''):
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        f_result = executor.map(function, devices, repeat(command))
+    return list(f_result)
+
+
+if __name__ == '__main__':
+    devices = yaml.load(open('devices.yaml'))
+    all_done = threads_conn(connect_ssh,
+                            devices['routers'],
+                            command='sh clock')
+    pprint(all_done)
+
+```
+
++++
+### Метод map
+
+Результат выполнения:
+```
+$ python netmiko_threads_map_final.py
+===> 05:01:08.314962 Connection to device: 192.168.100.1
+===> 05:01:08.315114 Connection to device: 192.168.100.2
+<=== 05:01:13.693083 Received result from device: 192.168.100.2
+===> 05:01:13.799002 Connection to device: 192.168.100.3
+<=== 05:01:19.363250 Received result from device: 192.168.100.3
+<=== 05:01:23.685859 Received result from device: 192.168.100.1
+[{'192.168.100.1': '*05:01:23.513 UTC Mon Aug 28 2017'},
+ {'192.168.100.2': '*05:01:13.522 UTC Mon Aug 28 2017'},
+ {'192.168.100.3': '*05:01:19.189 UTC Mon Aug 28 2017'}]
+```
+
++++
+### Использование ProcessPoolExecutor с map
+
+Для того чтобы предыдущий пример использовал процессы вместо потоков, достаточно сменить ThreadPoolExecutor на ProcessPoolExecutor:
+```python
+from concurrent.futures import ProcessPoolExecutor
+from pprint import pprint
+from datetime import datetime
+import time
+from itertools import repeat
+
+import yaml
+from netmiko import ConnectHandler
+
+
+start_msg = '===> {} Connection to device: {}'
+received_msg = '<=== {} Received result from device: {}'
+```
+
++++
+### Использование ProcessPoolExecutor с map
+
+```python
+def connect_ssh(device_dict, command):
+    print(start_msg.format(datetime.now().time(), device_dict['ip']))
+    if device_dict['ip'] == '192.168.100.1':
+        time.sleep(10)
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+        print(received_msg.format(datetime.now().time(), device_dict['ip']))
+    return {device_dict['ip']: result}
+
+
+
+def threads_conn(function, devices, limit=2, command=''):
+    with ProcessPoolExecutor(max_workers=limit) as executor:
+        f_result = executor.map(function, devices, repeat(command))
+    return list(f_result)
+
+
+if __name__ == '__main__':
+    devices = yaml.load(open('devices.yaml'))
+    all_done = threads_conn(connect_ssh,
+                            devices['routers'],
+                            command='sh clock')
+    pprint(all_done)
+
+```
+
++++
+### Использование ProcessPoolExecutor с map
+
+Результат выполнения:
+```
+$ python netmiko_processes_map_final.py
+===> 05:26:42.974505 Connection to device: 192.168.100.1
+===> 05:26:42.975733 Connection to device: 192.168.100.2
+<=== 05:26:48.389420 Received result from device: 192.168.100.2
+===> 05:26:48.495598 Connection to device: 192.168.100.3
+<=== 05:26:54.104585 Received result from device: 192.168.100.3
+<=== 05:26:58.367981 Received result from device: 192.168.100.1
+[{'192.168.100.1': '*05:26:58.195 UTC Mon Aug 28 2017'},
+ {'192.168.100.2': '*05:26:48.218 UTC Mon Aug 28 2017'},
+ {'192.168.100.3': '*05:26:53.932 UTC Mon Aug 28 2017'}]
+```
+
+---
+## Метод submit и работа с futures
+
+
++++
+### Метод submit и работа с futures
+
+При использовании метода map объект future использовался внутри, но в итоге мы получали уже готовый результат функции.
+
+Метод submit позволяет запускать future, а функция as_completed, которая ожидает как аргумент итерируемый объект с futures и возвращает future по мере завершения.
+В этом случае порядок не будет соблюдаться, как с map.
+
++++
+### Метод submit и работа с futures
+
+Файл netmiko_threads_submit.py:
+```python
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pprint import pprint
+from datetime import datetime
+import time
+from itertools import repeat
+
+import yaml
+from netmiko import ConnectHandler
+
+
+start_msg = '===> {} Connection to device: {}'
+received_msg = '<=== {} Received result from device: {}'
+```
+
++++
+### Метод submit и работа с futures
+
+```python
+def connect_ssh(device_dict, command):
+    print(start_msg.format(datetime.now().time(), device_dict['ip']))
+    if device_dict['ip'] == '192.168.100.1':
+        time.sleep(10)
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+        print(received_msg.format(datetime.now().time(), device_dict['ip']))
+    return {device_dict['ip']: result}
+```
+
++++
+### Метод submit и работа с futures
+
+Теперь функция threads_conn выглядит немного по-другому:
+```python
+def threads_conn(function, devices, limit=2, command=''):
+    all_results = []
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        future_ssh = [executor.submit(function, device, command)
+                      for device in devices]
+        for f in as_completed(future_ssh):
+            all_results.append(f.result())
+    return all_results
+
+
+if __name__ == '__main__':
+    devices = yaml.load(open('devices.yaml'))
+    all_done = threads_conn(connect_ssh,
+                            devices['routers'],
+                            command='sh clock')
+    pprint(all_done)
+```
+
++++
+### Метод submit и работа с futures
+
+Остальной код не изменился, поэтому разобраться надо только с функцией threads_conn:
+```python
+def threads_conn(function, devices, limit=2, command=''):
+    all_results = []
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        future_ssh = [executor.submit(function, device, command)
+                      for device in devices]
+        for f in as_completed(future_ssh):
+            all_results.append(f.result())
+    return all_results
+```
+
++++
+### Метод submit и работа с futures
+
+В блоке with два цикла:
+* ```future_ssh``` - это список объектов future, который создается с помощью list comprehensions
+* для создания future используется функция submit
+  * ей как аргументы передаются: имя функции, которую надо выполнить, и ее аргументы
+* следующий цикл проходится по списку future с помощью функции as_completed. Эта функция возвращает future только когда они завершили работу или были отменены. При этом future возвращаются по мере завершения работы
+
++++
+### Метод submit и работа с futures
+
+Результат выполнения:
+```
+$ python netmiko_threads_submit.py
+===> 06:02:14.582011 Connection to device: 192.168.100.1
+===> 06:02:14.582155 Connection to device: 192.168.100.2
+<=== 06:02:20.155865 Received result from device: 192.168.100.2
+===> 06:02:20.262584 Connection to device: 192.168.100.3
+<=== 06:02:25.864270 Received result from device: 192.168.100.3
+<=== 06:02:29.962225 Received result from device: 192.168.100.1
+[{'192.168.100.2': '*06:02:19.983 UTC Mon Aug 28 2017'},
+ {'192.168.100.3': '*06:02:25.691 UTC Mon Aug 28 2017'},
+ {'192.168.100.1': '*06:02:29.789 UTC Mon Aug 28 2017'}]
+
+```
+
+Обратите внимание, что порядок не сохраняется и зависит от того, какие функции раньше завершили работу.
+
+
+---
+### Обработка исключений
+
++++
+### Обработка исключений
+
+Если при выполнении функции возникло исключение, оно будет сгенерировано при получении результата
+
+Например, в файле devices.yaml пароль для устройства 192.168.100.2 изменен на неправильный:
+```
+$ python netmiko_threads_submit.py
+===> 06:29:40.871851 Connection to device: 192.168.100.1
+===> 06:29:40.872888 Connection to device: 192.168.100.2
+===> 06:29:43.571296 Connection to device: 192.168.100.3
+<=== 06:29:48.921702 Received result from device: 192.168.100.3
+<=== 06:29:56.269284 Received result from device: 192.168.100.1
+Traceback (most recent call last):
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/base_connection.py", line 491, in establish_connection
+    self.remote_conn_pre.connect(**ssh_connect_params)
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/client.py", line 394, in connect
+    look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host)
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/client.py", line 649, in _auth
+    raise saved_exception
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/client.py", line 636, in _auth
+    self._transport.auth_password(username, password)
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/transport.py", line 1329, in auth_password
+    return self.auth_handler.wait_for_response(my_event)
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/auth_handler.py", line 217, in wait_for_response
+    raise e
+paramiko.ssh_exception.AuthenticationException: Authentication failed.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "netmiko_threads_submit.py", line 40, in <module>
+    command='sh clock')
+  File "netmiko_threads_submit.py", line 32, in threads_conn
+    all_results.append(f.result())
+  File "/usr/local/lib/python3.6/concurrent/futures/_base.py", line 398, in result
+    return self.__get_result()
+  File "/usr/local/lib/python3.6/concurrent/futures/_base.py", line 357, in __get_result
+    raise self._exception
+  File "/usr/local/lib/python3.6/concurrent/futures/thread.py", line 55, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "netmiko_threads_submit.py", line 19, in connect_ssh
+    with ConnectHandler(**device_dict) as ssh:
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/ssh_dispatcher.py", line 122, in ConnectHandler
+    return ConnectionClass(*args, **kwargs)
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/base_connection.py", line 145, in __init__
+    self.establish_connection()
+  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/base_connection.py", line 500, in establish_connection
+    raise NetMikoAuthenticationException(msg)
+netmiko.ssh_exception.NetMikoAuthenticationException: Authentication failure: unable to connect cisco_ios 192.168.100.2:22
+Authentication failed.
+```
+
++++
+### Обработка исключений
+
+Так как исключение возникает при получении результата, легко добавить обработку исключений (файл netmiko_threads_submit_exception.py):
+```python
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pprint import pprint
+from datetime import datetime
+import time
+from itertools import repeat
+
+import yaml
+from netmiko import ConnectHandler
+from netmiko.ssh_exception import NetMikoAuthenticationException
+
+
+start_msg = '===> {} Connection to device: {}'
+received_msg = '<=== {} Received result from device: {}'
+
+
+def connect_ssh(device_dict, command):
+    print(start_msg.format(datetime.now().time(), device_dict['ip']))
+    if device_dict['ip'] == '192.168.100.1':
+        time.sleep(10)
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+        print(received_msg.format(datetime.now().time(), device_dict['ip']))
+    return {device_dict['ip']: result}
+```
+
++++
+### Обработка исключений
+
+```python
+def threads_conn(function, devices, limit=2, command=''):
+    all_results = {}
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        future_ssh = [executor.submit(function, device, command)
+                      for device in devices]
+        for f in as_completed(future_ssh):
+            try:
+                result = f.result()
+            except NetMikoAuthenticationException as e:
+                print(e)
+            else:
+                all_results.update(result)
+    return all_results
+
+
+if __name__ == '__main__':
+    devices = yaml.load(open('devices.yaml'))
+    all_done = threads_conn(connect_ssh,
+                            devices['routers'],
+                            command='sh clock')
+    pprint(all_done)
+
+```
+
++++
+### Обработка исключений
+
+Результат выполнения:
+```
+$ python netmiko_threads_submit_exception.py
+===> 06:45:56.327892 Connection to device: 192.168.100.1
+===> 06:45:56.328190 Connection to device: 192.168.100.2
+===> 06:45:58.964806 Connection to device: 192.168.100.3
+Authentication failure: unable to connect cisco_ios 192.168.100.2:22
+Authentication failed.
+<=== 06:46:04.325812 Received result from device: 192.168.100.3
+<=== 06:46:11.731541 Received result from device: 192.168.100.1
+{'192.168.100.1': '*06:46:11.556 UTC Mon Aug 28 2017',
+ '192.168.100.3': '*06:46:04.154 UTC Mon Aug 28 2017'}
+```
+
+
++++
+### ProcessPoolExecutor
+
+Так как все работает аналогичным образом и для процессов, тут приведет последний вариант (файл netmiko_processes_submit_exception.py):
+```python
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from pprint import pprint
+from datetime import datetime
+import time
+from itertools import repeat
+
+import yaml
+from netmiko import ConnectHandler
+from netmiko.ssh_exception import NetMikoAuthenticationException
+
+
+start_msg = '===> {} Connection to device: {}'
+received_msg = '<=== {} Received result from device: {}'
+
+
+def connect_ssh(device_dict, command):
+    print(start_msg.format(datetime.now().time(), device_dict['ip']))
+    if device_dict['ip'] == '192.168.100.1':
+        time.sleep(10)
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+        print(received_msg.format(datetime.now().time(), device_dict['ip']))
+    return {device_dict['ip']: result}
+```
+
++++
+### ProcessPoolExecutor
+
+```python
+def processes_conn(function, devices, limit=2, command=''):
+    all_results = {}
+    with ProcessPoolExecutor(max_workers=limit) as executor:
+        future_ssh = [executor.submit(function, device, command)
+                      for device in devices]
+        for f in as_completed(future_ssh):
+            try:
+                result = f.result()
+            except NetMikoAuthenticationException as e:
+                print(e)
+            else:
+                all_results.update(result)
+    return all_results
+
+
+if __name__ == '__main__':
+    devices = yaml.load(open('devices.yaml'))
+    all_done = processes_conn(connect_ssh,
+                              devices['routers'],
+                              command='sh clock')
+    pprint(all_done)
+
+```
+
++++
+### ProcessPoolExecutor
+
+Результат выполнения:
+```
+$ python netmiko_processes_submit_exception.py
+===> 06:40:43.828249 Connection to device: 192.168.100.1
+===> 06:40:43.828664 Connection to device: 192.168.100.2
+Authentication failure: unable to connect cisco_ios 192.168.100.2:22
+Authentication failed.
+===> 06:40:46.292613 Connection to device: 192.168.100.3
+<=== 06:40:51.890816 Received result from device: 192.168.100.3
+<=== 06:40:59.231330 Received result from device: 192.168.100.1
+{'192.168.100.1': '*06:40:59.056 UTC Mon Aug 28 2017',
+ '192.168.100.3': '*06:40:51.719 UTC Mon Aug 28 2017'}
+```
 
