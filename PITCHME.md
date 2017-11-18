@@ -38,9 +38,8 @@ Ansible довольно часто обновляется, поэтому лу�
 
 Установить Ansible можно [по-разному](http://docs.ansible.com/ansible/intro_installation.html#).
 
-Так как в книге используется ветка devel, надо установить Ansible таким образом с помощью pip:
 ```
-$ pip install git+git://github.com/ansible/ansible.git@devel
+$ pip install ansible
 ```
 
 #VSLIDE
