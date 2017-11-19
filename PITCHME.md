@@ -3387,8 +3387,7 @@ $ ansible-playbook 11_ios_config_src_jinja.yml -v
 * save (но у самого save в Ansible 2.2 проблемы с работой) 
 
 #HSLIDE
-### Модуль ios_config
-### Параметр ntc-ansible
+### Модуль ntc-ansible
 
 #VSLIDE
 ### ntc-ansible
