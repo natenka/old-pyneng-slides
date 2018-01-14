@@ -228,7 +228,7 @@ class Switch:
         return 'Hostname: {}, Model: {}'.format(hostname, model)
 
     def __str__(self):
-        return self._Switch__get_display_str()
+        return self.__get_display_str()
 ```
 
 +++
