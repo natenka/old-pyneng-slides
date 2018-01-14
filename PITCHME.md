@@ -191,3 +191,107 @@ In [55]: str(sw1)
 Out[55]: 'Hostname: sw1, Model: Cisco 3850'
 ```
 
++++
+### Одно подчеркивание перед именем
+
+Одно подчеркивание перед именем указывает, что имя используется как внутреннее, что этот объект является внутренней особенностью реализации и не стоит его использовать напрямую.
+
+```python
+class Switch:
+    def _get_display_str(self):
+        hostname = getattr(self, 'hostname', None)
+        model = getattr(self, 'model', None)
+        return 'Hostname: {}, Model: {}'.format(hostname, model)
+
+    def __str__(self):
+        return self._get_display_str()
+```
+
++++
+### Два подчеркивания перед именем
+
+Два подчеркивания перед именем метода или аргумента используются не просто как договоренность. Такие имена трансформируются в формат "имя класса + имя метода". Это позволяет создавать уникальные методы и атрибуты классов.
+
+> Такое преобразование выполняется только в том случае, если в конце менее двух подчеркиваний или нет подчеркиваний
+
+
++++
+### Два подчеркивания перед именем
+
+```python
+class Switch:
+    def __get_display_str(self):
+        hostname = getattr(self, 'hostname', None)
+        model = getattr(self, 'model', None)
+        return 'Hostname: {}, Model: {}'.format(hostname, model)
+
+    def __str__(self):
+        return self._Switch__get_display_str()
+```
+
++++
+### Два подчеркивания перед именем
+
+```python
+In [1]: sw1 = Switch()
+
+In [2]: dir(sw1)
+Out[2]:
+['_Switch__get_display_str',
+ '__class__',
+ '__delattr__',
+ '__dict__',
+ '__dir__',
+ '__doc__',
+...
+ '__weakref__']
+
+In [3]: print(sw1)
+Hostname: None, Model: None
+
+```
+
++++
+### Два подчеркивания перед и после имени
+
+Таким образом обозначаются специальные переменные и методы.
+
+Эти методы вызываются при использовании функций и операторов Python и позволяют реализовать определенный функционал.
+
+Как правило, такие методы не нужно вызывать напрямую. Но, например, при создании своего класса может понадобиться описать такой метод, чтобы объект поддерживал какие-то операции в Python.
+
+
++++
+### Два подчеркивания перед и после имени
+
+```python
+class Switch:
+    def __init__(self, hostname, model):
+        self.hostname = hostname
+        self.model = model
+
+    def __str__(self):
+        return 'Hostname: {}, Model: {}'.format(self.hostname, self.model)
+
+    def __del__(self):
+        print("Я умираю....")
+```
+
++++
+### Два подчеркивания перед и после имени
+
+```python
+In [2]: sw1 = Switch('sw1', 'cisco')
+
+In [3]: del sw1
+Я умираю....
+
+In [4]: sw1
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-4-924218d7093c> in <module>()
+----> 1 sw1
+
+NameError: name 'sw1' is not defined
+```
+
