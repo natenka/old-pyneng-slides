@@ -47,6 +47,7 @@ html:-moz-full-screen-ancestor {
   opacity: 0.75 !important;
   border-radius: 15px;
   display: none;
+  text-align: left;
 }
 
 .reveal a {
@@ -75,3 +76,8 @@ html:-moz-full-screen-ancestor {
 .gp-contact { font-size : 1.4em; }
 
 .gp-download { margin-left: 10px; }
+
+
+.reveal .slides {
+    font-family: Consolas, Monaco, Arial, "Ubuntu Mono";
+}
