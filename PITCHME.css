@@ -18,3 +18,9 @@
     text-align: center;
 }
 
+.reveal section img {
+    border: 0;
+    box-shadow: none;
+    max-height: 500px;
+    text-align: center;
+}
