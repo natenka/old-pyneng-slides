@@ -19,7 +19,7 @@
 * pyneng-4-talk - тут можно говорить о чем угодно
 
 +++
-### Код (snippet)
+### Snippet
 
 
 ![alt](https://pyneng.github.io/assets/images/slack_snippet_select.png)
