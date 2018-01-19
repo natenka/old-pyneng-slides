@@ -64,7 +64,6 @@ code to paste
 * выпущен под лицензией GNU GPL v2
 
 +++
-### Git
 
 ![stream of snapshots](https://git-scm.com/figures/18333fig0105-tn.png)
 
