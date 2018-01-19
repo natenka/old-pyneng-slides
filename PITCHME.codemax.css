@@ -57,10 +57,6 @@ html:-moz-full-screen-ancestor {
     text-align: center;
 }
 
-.reveal div img {
-    text-align: center;
-}
-
 
 .reveal p span.slide-title {
   color: black;
