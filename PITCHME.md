@@ -19,39 +19,30 @@
 * pyneng-4-talk - тут можно говорить о чем угодно
 
 +++
-### Код
+### Код (snippet)
 
-Код можно выложить с помощью snippet.
-Для этого надо нажать плюс в строке набора сообщения и выбрать вариант "Code or text snippet".
 
 ![alt](https://pyneng.github.io/assets/images/slack_snippet_select.png)
 
 +++
-### Код
-
-В открывшемся окне можно набирать код.
-В snippet есть возможность выбрать язык кода и тогда код будет с подсветкой синтаксиса.
+### Подсветка синтаксиса
 
 ![alt](https://pyneng.github.io/assets/images/slack_snippet.png)
 
 +++
-### Код
-
-В итоге, в чате snippet выглядит так:
+### Snippet
 
 ![alt](https://pyneng.github.io/assets/images/slack_snippet_done.png)
 
 +++
-### Код
+### Код в сообщении
 
-Кроме того, выложить код можно напрямую в сообщении, взяв его в тройные обратные кавычки:
 <pre>
 ```
 code to paste
 ```
 </pre>
 
-Но такой вариант больше подходит для небольших кусков кода.
 
 ---
 ### Git
