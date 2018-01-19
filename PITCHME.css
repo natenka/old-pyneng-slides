@@ -23,3 +23,8 @@
     margin-right: 0;
 }
 
+.reveal section img {
+    box-shadow: none;
+    max-height: 500px;
+    align: center;
+}
