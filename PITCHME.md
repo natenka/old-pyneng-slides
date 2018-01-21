@@ -281,8 +281,12 @@ class CiscoSSH:
             return self.sh_version
         else:
             raise AttributeError("'CiscoSSH' object has no attribute '{}'".format(attr))
+```
 
++++
+### Метод `__getattr__`
 
+```python
 In [3]: r1 = CiscoSSH(**DEVICE_PARAMS)
 
 In [4]: r1.sh_version
