@@ -11,6 +11,9 @@
 ---
 ### Специальные методы
 
+---
+### `__str__`
+
 +++
 ### `__str__`
 
@@ -33,6 +36,9 @@ Swicth: sw1
 In [7]: str(sw1)
 Out[7]: 'Swicth: sw1'
 ```
+
+---
+### `__del__`
 
 +++
 ### `__del__`
@@ -87,6 +93,9 @@ In [4]: r1 = CiscoSSH(**DEVICE_PARAMS)
 In [5]: del r1
 Закрываю сессию
 ```
+
+---
+### Менеджер контекста
 
 +++
 ### Менеджер контекста
@@ -212,6 +221,10 @@ Ethernet0/3.200            10.200.0.1      YES NVRAM  up                    up
 Ethernet0/3.300            10.30.0.1       YES NVRAM  up                    up
 CiscoSSH __exit__ called
 ```
+
+---
+### Метод `__getattr__`
+
 
 +++
 ### Метод `__getattr__`
