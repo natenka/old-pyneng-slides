@@ -79,9 +79,52 @@ class CiscoRouter(CiscoSSH):
 
 In [13]: r1 = CiscoRouter(**DEVICE_PARAMS)
 
-In [14]: r1.send_show_command('sh ip int  br')
+In [15]: r1.send_show_command('sh clock')
 У меня тут командочка
-Out[14]: 'Interface                  IP-Address      OK? Method Status                Protocol\nEthernet0/0                192.168.100.1   YES NVRAM  up                    up      \nEthernet0/1                192.168.200.1   YES NVRAM  up                    up      \nEthernet0/2                190.16.200.1    YES NVRAM  up                    up      \nEthernet0/3                192.168.230.1   YES NVRAM  up                    up      \nEthernet0/3.100            10.100.0.1      YES NVRAM  up                    up      \nEthernet0/3.200            10.200.0.1      YES NVRAM  up                    up      \nEthernet0/3.300            10.30.0.1       YES NVRAM  up                    up      '
+Out[15]: '*12:27:27.279 UTC Sun Jan 21 2018'
+```
+
++++
+### Варианты вызова родительского метода
+
+```python
+class CiscoRouter(CiscoSSH):
+    def say_hello(self):
+        print("Hello from {}".format(self.ssh.ip))
+
+    def send_show_command(self, command):
+        print('У меня тут командочка')
+        command_result = super().send_show_command(command)
+        #command_result = super(CiscoRouter, self).send_show_command(command)
+        #command_result = CiscoSSH.send_show_command(self, command)
+        return command_result
+```
+
++++
+### `__init__` в дочернем классе
+
+```python
+class CiscoRouter(CiscoSSH):
+    def __init__(self, hostname, **device_params):
+        self.hostname = hostname
+        super().__init__(**device_params)
+
+    def say_hello(self):
+        print("Hello from {}".format(self.ssh.ip))
+
+    def send_show_command(self, command):
+        print('У меня тут командочка')
+        command_result = super().send_show_command(command)
+        return command_result
+
+In [18]: r1 = CiscoRouter('r1', **DEVICE_PARAMS)
+
+In [19]: r1.send_show_command('sh clock')
+У меня тут командочка
+Out[19]: '*12:31:13.603 UTC Sun Jan 21 2018'
+
+In [20]: r1.hostname
+Out[20]: 'r1'
 ```
 
 
