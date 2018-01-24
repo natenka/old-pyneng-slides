@@ -156,44 +156,6 @@ Model: Cisco 3850
 ### Специальные методы
 
 +++
-### `__str__`
-
-```python
-In [45]: class Switch:
-    ...:     def __init__(self, hostname, model):
-    ...:         self.hostname = hostname
-    ...:         self.model = model
-    ...:
-
-In [46]: sw1 = Switch('sw1', 'Cisco 3850')
-
-In [47]: print(sw1)
-<__main__.Switch object at 0xb4e47d8c>
-```
-
-+++
-### `__str__`
-
-```python
-In [52]: class Switch:
-    ...:     def __init__(self, hostname, model):
-    ...:         self.hostname = hostname
-    ...:         self.model = model
-    ...:
-    ...:     def __str__(self):
-    ...:         return 'Hostname: {}, Model: {}'.format(self.hostname, self.model)
-    ...:
-
-In [53]: sw1 = Switch('sw1', 'Cisco 3850')
-
-In [54]: print(sw1)
-Hostname: sw1, Model: Cisco 3850
-
-In [55]: str(sw1)
-Out[55]: 'Hostname: sw1, Model: Cisco 3850'
-```
-
-+++
 ### Одно подчеркивание перед именем
 
 Одно подчеркивание перед именем указывает, что имя используется как внутреннее, что этот объект является внутренней особенностью реализации и не стоит его использовать напрямую.
@@ -294,3 +256,71 @@ NameError                                 Traceback (most recent call last)
 NameError: name 'sw1' is not defined
 ```
 
+---
+### `__str__`
+
++++
+### `__str__`
+
+```python
+In [45]: class Switch:
+    ...:     def __init__(self, hostname, model):
+    ...:         self.hostname = hostname
+    ...:         self.model = model
+    ...:
+
+In [46]: sw1 = Switch('sw1', 'Cisco 3850')
+
+In [47]: print(sw1)
+<__main__.Switch object at 0xb4e47d8c>
+```
+
++++
+### `__str__`
+
+```python
+In [52]: class Switch:
+    ...:     def __init__(self, hostname, model):
+    ...:         self.hostname = hostname
+    ...:         self.model = model
+    ...:
+    ...:     def __str__(self):
+    ...:         return 'Hostname: {}, Model: {}'.format(self.hostname, self.model)
+    ...:
+
+In [53]: sw1 = Switch('sw1', 'Cisco 3850')
+
+In [54]: print(sw1)
+Hostname: sw1, Model: Cisco 3850
+
+In [55]: str(sw1)
+Out[55]: 'Hostname: sw1, Model: Cisco 3850'
+```
+
+---
+### `__add__`
+
++++
+### `__add__`
+
+Метод __add__ вызывается, когда в выражениии используется +.
+Например, выражение `a + b` преобразуется в `a.__add__(b)`
+
+```python
+In [5]: class MyNum:
+   ...:     def __init__(self, num):
+   ...:         self.num = num
+   ...:
+   ...:     def __add__(self, other):
+   ...:         return MyNum(self.num + other.num)
+   ...:
+
+In [6]: a = MyNum(5)
+
+In [7]: b = MyNum(10)
+
+In [8]: c = a + b
+
+In [9]: c.num
+Out[9]: 15
+```
