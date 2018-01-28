@@ -1,11 +1,8 @@
 # Python для сетевых инженеров 
 
 ---
-## Welcome to продленка :)
 
----
-
-## Объектно-ориентированное программирование
+## Объектно-ориентированное программирование. Часть 3
 
 ---
 ## Named Tuple
@@ -13,7 +10,7 @@
 +++
 ### Named Tuple
 
-Именованные кортежи присваивают имена каждому элементу кортежа и код выглядит более понятным, так кка вместо индексов используются имена.
+Именованные кортежи присваивают имена каждому элементу кортежа и код выглядит более понятным, так как вместо индексов используются имена.
 При этом, все возможности обычных кортежей остаются.
 
 +++
@@ -91,6 +88,47 @@ In [22]: RouterClass._make(['r3', '10.3.3.3', '15.2'])
 Out[22]: Router(hostname='r3', ip='10.3.3.3', ios='15.2')
 
 In [23]: r3 = RouterClass._make(['r3', '10.3.3.3', '15.2'])
+```
+
++++
+### ```_make```
+
+```python
+import sqlite3
+from collections import namedtuple
+
+
+key = 'vlan'
+value = 10
+db_filename = 'dhcp_snooping.db'
+
+keys = ['mac', 'ip', 'vlan', 'interface', 'switch']
+DhcpSnoopRecord = namedtuple('DhcpSnoopRecord', keys)
+
+conn = sqlite3.connect(db_filename)
+query = 'select {} from dhcp where {} = ?'.format(','.join(keys), key)
+
+print('-' * 40)
+for row in map(DhcpSnoopRecord._make, conn.execute(query, (value,))):
+    print(row.mac, row.ip, row.interface, sep='\n')
+    print('-' * 40)
+
+```
+
++++
+### ```_make```
+
+```
+$ python get_data.py
+----------------------------------------
+00:09:BB:3D:D6:58
+10.1.10.2
+FastEthernet0/1
+----------------------------------------
+00:07:BC:3F:A6:50
+10.1.10.6
+FastEthernet0/3
+----------------------------------------
 ```
 
 +++
