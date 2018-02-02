@@ -1,692 +1,1068 @@
 # Python для сетевых инженеров 
 
 ---
-## Работа с файлами
+## Распаковка переменных
+
 
 +++
-### Работа с файлами
+### Распаковка переменных
 
-При работе с сетевым оборудованием (и не только), файлами могут быть:
-* конфигурации (простые, не структурированные текстовые файлы)
-* шаблоны конфигураций
-* файлы с параметрами подключений
-* другие скрипты Python
+Распаковка переменных - это специальный синтаксис, который позволяет присваивать переменным элементы итерируемого объекта.
+
+> Достаточно часто этот функционал встречается под именем tuple unpacking. Но распаковка работает на любом итерируемом объекте, не только с кортежами
 
 +++
-### Работа с файлами
+### Распаковка переменных
 
-В работе с файлами есть несколько аспектов:
-* открытие/закрытие
-* чтение
-* запись
-
----
-## Открытие файлов
-
-+++
-### Открытие файлов
-
-Для открытия файлов, чаще всего, используется функция `open()`:
+Пример распаковки переменных:
 ```python
-file = open('file_name.txt', 'r')
+In [1]: interface = ['FastEthernet0/1', '10.1.1.1', 'up', 'up']
+
+In [2]: intf, ip, status, protocol = interface
+
+In [3]: intf
+Out[3]: 'FastEthernet0/1'
+
+In [4]: ip
+Out[4]: '10.1.1.1'
 ```
 
-+++
-### `open()`
-
-В функции open\(\):
-
-* `'file_name.txt'` - имя файла
-  * тут можно указывать не только имя, но и путь \(абсолютный или относительный\) 
-* `'r'` - режим открытия файла
-
-Функция `open()` создает объект file, к которому потом можно применять различные методы, для работы с ним.
-
-+++
-### Режимы открытия файлов:
-
-* `r` - открыть файл только для чтения \(значение по умолчанию\)
-* `r+` - открыть файл для чтения и записи
-* `w` - открыть файл для записи
-  * если файл существует, то его содержимое удаляется
-  * если файл не существует, то создается новый
-* `w+` - открыть файл для чтения и записи
-  * если файл существует, то его содержимое удаляется
-  * если файл не существует, то создается новый
-* `a` - открыть файл для дополнения записи. Данные добавляются в конец файла
-* `a+` - открыть файл для чтения и записи. Данные добавляются в конец файла
-
----
-### Чтение файлов
-
-+++
-### Чтение файлов
-
-В Python есть несколько методов чтения файла:
-* ```read()``` - считывает содержимое файла в строку
-* ```readline()``` - считывает файл построчно
-* ```readlines()``` - считывает строки файла и создает список из строк
-
-+++
-### ```read()```
-
-Метод ```read()``` - считывает весь файл в одну строку.
-
-Пример использования метода ```read()```:
+Такой вариант намного удобней использовать, чем использование индексов:
 ```python
-In [1]: f = open('r1.txt')
-
-In [2]: f.read()
-Out[2]: '!\nservice timestamps debug datetime msec localtime show-timezone year\nservice timestamps log datetime msec localtime show-timezone year\nservice password-encryption\nservice sequence-numbers\n!\nno ip domain lookup\n!\nip ssh version 2\n!\n'
-
-In [3]: f.read()
-Out[3]: ''
+In [5]: intf, ip, status, protocol = interface[0], interface[1], interface[2], interface[3]
 ```
 
 +++
-### ```read()```
+### Распаковка переменных
 
-При повторном чтении файла в 3 строке, отображается пустая строка.
-Так происходит из-за того, что при вызове метода ```read()```, считывается весь файл. 
-И после того, как файл был считан, курсор остается в конце файла.
-Управлять положением курсора можно с помощью метода ```seek()```.
+При распаковке переменных каждый элемент списка попадает в соответствующую переменную.
+Но важно учитывать, что переменных слева должно быть ровно столько, сколько элементов в списке.
 
-+++
-### ```readline()```
-
-Построчно файл можно считать с помощью метода ```readline()```:
+Если переменных больше или меньше, возникнет исключение:
 ```python
-In [4]: f = open('r1.txt')
+In [6]: intf, ip, status = interface
+------------------------------------------------------------
+ValueError                 Traceback (most recent call last)
+<ipython-input-11-a304c4372b1a> in <module>()
+----> 1 intf, ip, status = interface
 
-In [5]: f.readline()
-Out[5]: '!\n'
+ValueError: too many values to unpack (expected 3)
 
-In [6]: f.readline()
-Out[6]: 'service timestamps debug datetime msec localtime show-timezone year\n'
+In [7]: intf, ip, status, protocol, other = interface
+------------------------------------------------------------
+ValueError                 Traceback (most recent call last)
+<ipython-input-12-ac93e78b978c> in <module>()
+----> 1 intf, ip, status, protocol, other = interface
+
+ValueError: not enough values to unpack (expected 5, got 4)
+
 ```
 
 +++
-### ```readline()```
+### Замена ненужных элементов ```_```
 
-Но, чаще всего, проще пройтись по объекту file в цикле, не используя методы ```read...```:
+Достаточно часто из всех элементов итерируемого объекта нужны только некоторые.
+Но выше был пример того, что синтаксис распаковки требует указать ровно столько переменных, сколько элементов в итерируемом объекте.
+
+Если, например, из строки line надо получить только VLAN, MAC и интерфейс, надо все равно указать переменную для типа записи:
 ```python
-In [7]: f = open('r1.txt')
+In [8]: line = '100    01bb.c580.7000    DYNAMIC     Gi0/1'
 
-In [8]: for line in f:
-   ...:     print(line)
-   ...:
-!
+In [9]: vlan, mac, item_type, intf = line.split()
 
-service timestamps debug datetime msec localtime show-timezone year
+In [10]: vlan
+Out[10]: '100'
 
-service timestamps log datetime msec localtime show-timezone year
-
-service password-encryption
-
-service sequence-numbers
-
-!
-
-no ip domain lookup
-
-!
-
-ip ssh version 2
-
-!
-
+In [11]: intf
+Out[11]: 'Gi0/1'
 ```
-
 +++
-### ```readlines()```
+### Замена ненужных элементов ```_```
 
-Еще один полезный метод - ```readlines()```. Он считывает строки файла в список:
+Но, если тип записи не нужен в дальнейшем, можно заменить переменную item_type нижним подчеркиванием:
 ```python
-In [9]: f = open('r1.txt')
-
-In [10]: f.readlines()
-Out[10]:
-['!\n',
- 'service timestamps debug datetime msec localtime show-timezone year\n',
- 'service timestamps log datetime msec localtime show-timezone year\n',
- 'service password-encryption\n',
- 'service sequence-numbers\n',
- '!\n',
- 'no ip domain lookup\n',
- '!\n',
- 'ip ssh version 2\n',
- '!\n']
+In [12]: vlan, mac, _, intf = line.split()
 ```
+
+Таким образом явно указывается то, что этот элемент не нужен.
 
 +++
-### ```readlines()```
+### Замена ненужных элементов ```_```
 
-Если нужно получить строки файла, но без перевода строки в конце, можно воспользоваться методом ```split``` и как разделитель, указать символ ```\n```:
-```
-In [11]: f = open('r1.txt')
-
-In [12]: f.read().split('\n')
-Out[12]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- 'ip ssh version 2',
- '!',
- '']
-```
-
-+++
-### ```readlines()```
-
-Если перед выполнением ```split()```, воспользоваться методом ```rstrip()```, список будет без пустой строки в конце:
+Нижнее подчеркивание можно использовать и несколько раз:
 ```python
-In [13]: f = open('r1.txt')
+In [13]: dhcp = '00:09:BB:3D:D6:58   10.1.10.2        86250       dhcp-snooping   10    FastEthernet0/1'
 
-In [14]: f.read().rstrip().split('\n')
-Out[14]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- 'ip ssh version 2',
- '!']
+In [14]: mac, ip, _, _, vlan, intf = dhcp.split()
+
+In [15]: mac
+Out[15]: '00:09:BB:3D:D6:58'
+
+In [16]: vlan
+Out[16]: '10'
+
 ```
 
 +++
-### ```seek()```
+### Использование ```*```
 
-До сих пор, файл каждый раз приходилось открывать заново, чтобы снова его считать.
-Так происходит из-за того, что после методов чтения, курсор находится в конце файла.
-И повторное чтение возвращает пустую строку.
-
-Чтобы ещё раз считать информацию из файла, нужно воспользоваться методом ```seek```, который перемещает курсор в необходимое положение.
+Распаковка переменных поддерживает специальный синтаксис, который позволяет распаковывать несколько элементов в один.
+Если поставить ```*``` перед именем переменной, в нее запишутся все элементы, кроме тех, что присвоены явно.
 
 +++
-### ```seek()```
+### Использование ```*```
 
-Пример открытия файла и считывания содержимого:
+Например, так можно получить первый элемент в переменную first, а остальные в rest:
 ```python
-In [15]: f = open('r1.txt')
+In [18]: vlans = [10, 11, 13, 30]
 
-In [16]: print(f.read())
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
+In [19]: first, *rest = vlans
+
+In [20]: first
+Out[20]: 10
+
+In [21]: rest
+Out[21]: [11, 13, 30]
 ```
 
 +++
-### ```seek()```
+### Использование ```*```
 
-Если вызывать ещё раз метод ```read```, возвращается пустая строка:
+При этом переменная со звездочкой всегда будет содержать список:
 ```python
-In [17]: print(f.read())
-```
+In [22]: vlans = (10, 11, 13, 30)
 
-Но, с помощью метода ```seek```, можно перейти в начало файла (0 означает начало файла):
-```python
-In [18]: f.seek(0)
-```
+In [22]: first, *rest = vlans
 
-+++
-### ```seek()```
+In [23]: first
+Out[23]: 10
 
-После того, как, с помощью ```seek```, курсор был переведен в начало файла, можно опять считывать содержимое:
-```python
-In [19]: print(f.read())
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
----
-## Запись файлов
-
-+++
-### Запись файлов
-
-При записи, очень важно определиться с режимом открытия файла, чтобы случайно его не удалить:
-* `w` - открыть файл для записи. Если файл существует, то его содержимое удаляется
-* `a` - открыть файл для дополнения записи. Данные добавляются в конец файла
-
-При этом, оба режима создают файл, если он не существует
-
-Для записи в файл используются такие методы:
-
-* `write()` - записать в файл одну строку
-* `writelines()` - позволяет передавать в качестве аргумента список строк
-
-+++
-### `write()`
-
-```python
-In [1]: cfg_lines = ['!',
-   ...:  'service timestamps debug datetime msec localtime show-timezone year',
-   ...:  'service timestamps log datetime msec localtime show-timezone year',
-   ...:  'service password-encryption',
-   ...:  'service sequence-numbers',
-   ...:  '!',
-   ...:  'no ip domain lookup',
-   ...:  '!',
-   ...:  'ip ssh version 2',
-   ...:  '!']
+In [24]: rest
+Out[24]: [11, 13, 30]
 ```
 
 +++
-### `write()`
+### Использование ```*```
 
-Открытие файла r2.txt в режиме для записи:
-
+Если элемент всего один, распаковка все равно отработает:
 ```python
-In [2]: f = open('r2.txt', 'w')
+In [25]: first, *rest = vlans
+
+In [26]: first
+Out[26]: 55
+
+In [27]: rest
+Out[27]: []
 ```
 
 +++
-### `write()`
+### Использование ```*```
 
-Преобразуем список команд в одну большую строку с помощью `join`:
-
+Такая переменная со звездочкой в выражении распаковки может быть только одна.
 ```python
-In [3]: cfg_lines_as_string = '\n'.join(cfg_lines)
+In [28]: vlans = (10, 11, 13, 30)
 
-In [4]: cfg_lines_as_string
-Out[4]: '!\nservice timestamps debug datetime msec localtime show-timezone year\nservice timestamps log datetime msec localtime show-timezone year\nservice password-encryption\nservice sequence-numbers\n!\nno ip domain lookup\n!\nip ssh version 2\n!'
+In [29]: first, *rest, *others = vlans
+  File "<ipython-input-37-dedf7a08933a>", line 1
+    first, *rest, *others = vlans
+                                 ^
+SyntaxError: two starred expressions in assignment
 ```
 
 +++
-### `write()`
+### Использование ```*```
 
-Запись строки в файл:
-
+Такая переменная может находиться не только в конце выражения:
 ```python
-In [5]: f.write(cfg_lines_as_string)
-```
+In [30]: vlans = (10, 11, 13, 30)
 
-Аналогично можно добавить строку вручную:
+In [31]: *rest, last = vlans
 
-```python
-In [6]: f.write('\nhostname r2')
-```
+In [32]: rest
+Out[32]: [10, 11, 13]
 
-+++
-### `write()`
-
-После завершения работы с файлом, его необходимо закрыть:
-
-```python
-In [7]: f.close()
+In [33]: last
+Out[33]: 30
 ```
 
 +++
-### `writelines()`
+### Использование ```*```
 
-Метод `writelines()` ожидает список строк, как аргумент.
+Таким образом можно указать, что нужен первый, второй и последний элемент:
 ```python
-In [1]: cfg_lines = ['!',
-   ...:  'service timestamps debug datetime msec localtime show-timezone year',
-   ...:  'service timestamps log datetime msec localtime show-timezone year',
-   ...:  'service password-encryption',
-   ...:  'service sequence-numbers',
-   ...:  '!',
-   ...:  'no ip domain lookup',
-   ...:  '!',
-   ...:  'ip ssh version 2',
-   ...:  '!']
+In [34]: cdp = 'SW1              Eth 0/0           140          S I      WS-C3750-  Eth 0/1'
 
-In [9]: f = open('r2.txt', 'w')
+In [35]: name, l_intf, *other, r_intf = cdp.split()
 
-In [10]: f.writelines(cfg_lines)
+In [36]: name
+Out[36]: 'SW1'
 
-In [11]: f.close()
+In [37]: l_intf
+Out[37]: 'Eth'
 
-In [12]: cat r2.txt
-!service timestamps debug datetime msec localtime show-timezone yearservice timestamps log datetime msec localtime show-timezone yearservice password-encryptionservice sequence-numbers!no ip domain lookup!ip ssh version 2!
+In [38]: r_intf
+Out[38]: '0/1'
 ```
 
 +++
-### `writelines()`
+### Примеры распаковки
 
-Добавить перевод строки: 
++++
+### Распаковка итерируемых объектов
+
+Эти примеры показывают, что распаковывать можно не только списки, кортежи и строки, но и любой другой итерируемый объект.
+
+Распаковка range:
 ```python
-In [13]: cfg_lines2 = []
+In [39]: first, *rest = range(1,6)
 
-In [14]: for line in cfg_lines:
-   ....:     cfg_lines2.append( line + '\n' )
-   ....:
+In [40]: first
+Out[40]: 1
 
-In [15]: cfg_lines2
-Out[15]:
-['!\n',
- 'service timestamps debug datetime msec localtime show-timezone year\n',
- 'service timestamps log datetime msec localtime show-timezone year\n',
- 'service password-encryption\n',
- 'service sequence-numbers\n',
- '!\n',
- 'no ip domain lookup\n',
- '!\n',
- 'ip ssh version 2\n',
+In [41]: rest
+Out[41]: [2, 3, 4, 5]
 ```
 
 +++
-### `writelines()`
+### Распаковка итерируемых объектов
 
-Вариант с list comprehensions:
+Распаковка zip:
 ```python
-In [16]: cfg_lines3 = [ line + '\n' for line in cfg_lines ]
+In [42]: a = [1,2,3,4,5]
 
-In [17]: cfg_lines3
-Out[17]:
-['!\n',
- 'service timestamps debug datetime msec localtime show-timezone year\n',
- 'service timestamps log datetime msec localtime show-timezone year\n',
- 'service password-encryption\n',
- 'service sequence-numbers\n',
- '!\n',
- 'no ip domain lookup\n',
- '!\n',
- 'ip ssh version 2\n',
- '!\n']
+In [43]: b = [100,200,300,400,500]
+
+In [44]: zip(a, b)
+Out[44]: <zip at 0xb4df4fac>
+
+In [45]: list(zip(a, b))
+Out[45]: [(1, 100), (2, 200), (3, 300), (4, 400), (5, 500)]
+
+In [46]: first, *rest, last = zip(a, b)
+
+In [47]: first
+Out[47]: (1, 100)
+
+In [48]: rest
+Out[48]: [(2, 200), (3, 300), (4, 400)]
+
+In [49]: last
+Out[49]: (5, 500)
 ```
 
 +++
-### `writelines()`
+### Пример распаковки в цикле for
 
-Если любой, из получившихся списков записать заново в файл, то в нем уже будут переводы строк:
-
+Пример цикла, который проходится по ключам:
 ```python
-In [18]: f = open('r2.txt', 'w')
+In [50]: access_template = ['switchport mode access',
+    ...:                    'switchport access vlan',
+    ...:                    'spanning-tree portfast',
+    ...:                    'spanning-tree bpduguard enable']
+    ...:
 
-In [19]: f.writelines(cfg_lines3)
+In [51]: access = {'0/12':10,
+    ...:           '0/14':11,
+    ...:           '0/16':17}
+    ...:
 
-In [20]: f.close()
+In [52]: for intf in access:
+    ...:     print('interface FastEthernet' + intf)
+    ...:     for command in access_template:
+    ...:         if command.endswith('access vlan'):
+    ...:             print(' {} {}'.format(command, access[intf]))
+    ...:         else:
+    ...:             print(' {}'.format(command))
+    ...:
+interface FastEthernet0/12
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+interface FastEthernet0/14
+ switchport mode access
+ switchport access vlan 11
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+interface FastEthernet0/16
+ switchport mode access
+ switchport access vlan 17
+ spanning-tree portfast
+ spanning-tree bpduguard enable
 
-In [21]: cat r2.txt
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
+```
+
++++
+### Распаковка итерируемых объектов
+
+Вместо этого можно проходиться по парам ключ-значение и сразу же распаковывать их в разные переменные:
+```python
+In [53]: for intf, vlan in access.items():
+    ...:     print('interface FastEthernet' + intf)
+    ...:     for command in access_template:
+    ...:         if command.endswith('access vlan'):
+    ...:             print(' {} {}'.format(command, vlan))
+    ...:         else:
+    ...:             print(' {}'.format(command))
+    ...:
+```
+
++++
+### Распаковка итерируемых объектов
+
+Пример распаковки элементов списка в цикле:
+```python
+In [54]: table
+Out[54]:
+[['100', 'a1b2.ac10.7000', 'DYNAMIC', 'Gi0/1'],
+ ['200', 'a0d4.cb20.7000', 'DYNAMIC', 'Gi0/2'],
+ ['300', 'acb4.cd30.7000', 'DYNAMIC', 'Gi0/3'],
+ ['100', 'a2bb.ec40.7000', 'DYNAMIC', 'Gi0/4'],
+ ['500', 'aa4b.c550.7000', 'DYNAMIC', 'Gi0/5'],
+ ['200', 'a1bb.1c60.7000', 'DYNAMIC', 'Gi0/6'],
+ ['300', 'aa0b.cc70.7000', 'DYNAMIC', 'Gi0/7']]
+
+
+In [55]: for line in table:
+    ...:     vlan, mac, _, intf = line
+    ...:     print(vlan, mac, intf)
+    ...:
+100 a1b2.ac10.7000 Gi0/1
+200 a0d4.cb20.7000 Gi0/2
+300 acb4.cd30.7000 Gi0/3
+100 a2bb.ec40.7000 Gi0/4
+500 aa4b.c550.7000 Gi0/5
+200 a1bb.1c60.7000 Gi0/6
+300 aa0b.cc70.7000 Gi0/7
+```
+
++++
+### Распаковка итерируемых объектов
+
+Но еще лучше сделать так:
+```python
+In [56]: for vlan, mac, _, intf in table:
+    ...:     print(vlan, mac, intf)
+    ...:
+100 a1b2.ac10.7000 Gi0/1
+200 a0d4.cb20.7000 Gi0/2
+300 acb4.cd30.7000 Gi0/3
+100 a2bb.ec40.7000 Gi0/4
+500 aa4b.c550.7000 Gi0/5
+200 a1bb.1c60.7000 Gi0/6
+300 aa0b.cc70.7000 Gi0/7
 ```
 
 ---
-## Закрытие файлов
+## List, dict, set comprehensions
 
 +++
-### Закрытие файлов
+### List, dict, set comprehensions
 
-После завершения работы с файлом, его нужно закрыть.  
-В некоторых случаях, Python может самостоятельно закрыть файл.  
-Но лучше на это не рассчитывать и закрывать файл явно.
+Python поддерживает специальные выражения, которые позволяют компактно создавать списки, словари и множества.
+
+На английском эти выражения называются, соответственно:
+
+* List comprehensions
+* Dict comprehensions
+* Set comprehensions
+
+Эти выражения не только позволяют более компактно создавать соответствующие объекты, но и создают их быстрее.
+И хотя поначалу они требуют определенной привычки использования и понимания, они очень часто используются.
 
 +++
-### `close()`
+### List comprehensions (генераторы списков)
 
+Генератор списка - это выражение вида:
 ```python
-In [1]: f = open('r1.txt', 'r')
+In [1]: vlans = ['vlan {}'.format(num) for num in range(10,16)]
 
-In [2]: print(f.read())
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
-+++
-### `close()`
-
-У объекта file есть специальный атрибут `closed`, который позволяет проверить закрыт файл или нет.  
-Если файл открыт, он возвращает `False`:
-
-```python
-In [3]: f.closed
-Out[3]: False
-```
-
-Теперь закрываем файл и снова проверяем `closed`:
-
-```python
-In [4]: f.close()
-
-In [5]: f.closed
-Out[5]: True
-```
-
-+++
-### `close()`
-
-Если попробовать прочитать файл, возникнет исключение:
-
-```python
-In [6]: print(f.read())
-------------------------------------------------------------------
-ValueError                       Traceback (most recent call last)
-<ipython-input-53-2c962247edc5> in <module>()
-----> 1 print(f.read())
-
-ValueError: I/O operation on closed file
-```
-
-+++
-### Использование `try/finally` для работы с файлами
-
-С помощью обработки исключений, можно:
-* перехватывать исключения, которые возникают, при попытке прочитать несуществующий файл
-* закрывать файл, после всех операций, в блоке `finally`
-
-+++
-### Использование `try/finally` для работы с файлами
-
-Если попытаться открыть для чтения файл, которого не существует, возникнет такое исключение:
-
-```python
-In [7]: f = open('r3.txt', 'r')
----------------------------------------------------------------------------
-IOError                                   Traceback (most recent call last)
-<ipython-input-54-1a33581ca641> in <module>()
-----> 1 f = open('r3.txt', 'r')
-
-IOError: [Errno 2] No such file or directory: 'r3.txt'
-```
-
-+++
-### Использование `try/finally` для работы с файлами
-
-С помощью конструкции `try/except`, можно перехватить это исключение и вывести своё сообщение:
-
-```python
-In [8]: try:
-  ....:     f = open('r3.txt', 'r')
-  ....: except IOError:
-  ....:     print('No such file')
-  ....:
-No such file
-```
-
-+++
-### Использование `try/finally` для работы с файлами
-
-А с помощью части `finally`, можно закрыть файл, после всех операций:
-
-```python
-In [9]: try:
-  ....:     f = open('r1.txt', 'r')
-  ....:     print(f.read())
-  ....: except IOError:
-  ....:     print('No such file')
-  ....: finally:
-  ....:     f.close()
-  ....:
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-
-In [10]: f.closed
-Out[10]: True
-```
-
----
-## Конструкция with
-
-+++
-### Конструкция with
-
-Конструкция with называется менеджер контекста.
-
-В Python существует более удобный способ работы с файлами, чем те, которые использовались до сих пор - конструкция ```with```:
-```python
-In [1]: with open('r1.txt', 'r') as f:
-  ....:     for line in f:
-  ....:         print(line)
-  ....:
-!
-
-service timestamps debug datetime msec localtime show-timezone year
-
-service timestamps log datetime msec localtime show-timezone year
-
-service password-encryption
-
-service sequence-numbers
-
-!
-
-no ip domain lookup
-
-!
-
-ip ssh version 2
-
-!
-```
-
-+++
-### Конструкция with
-
-Кроме того, конструкция ```with``` гарантирует закрытие файла автоматически.
-
-Обратите внимание на то, как считываются строки файла:
-```python
-for line in f:
-    print(line)
-```
-
-Когда с файлом нужно работать построчно, лучше использовать такой вариант.
-
-
-+++
-### Конструкция with
-
-```python
-In [2]: with open('r1.txt', 'r') as f:
-  ....:     for line in f:
-  ....:         print(line.rstrip())
-  ....:
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-
-In [3]: f.closed
-Out[3]: True
+In [2]: print(vlans)
+['vlan 10', 'vlan 11', 'vlan 12', 'vlan 13', 'vlan 14', 'vlan 15']
 
 ```
 
-+++
-### Конструкция with
-
-И, конечно же, с конструкцией ```with``` можно использовать не только такой построчный вариант считывания, все методы, которые рассматривались до этого, также работают:
-```python
-In [4]: with open('r1.txt', 'r') as f:
-  ....:     print(f.read())
-  ....:
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
+В общем случае, это выражение, которое преобразует итерируемый объект в список.
+То есть, последовательность элементов преобразуется и добавляется в новый список.
 
 +++
-### Открытие двух файлов
+### List comprehensions (генераторы списков)
 
-В таком случае, в блоке with можно открывать два файла таким образом:
+Выражению выше аналогичен такой цикл:
 ```python
-In [5]: with open('r1.txt') as src, open('result.txt', 'w') as dest:
-   ...:     for line in src:
-   ...:         if line.startswith('service'):
-   ...:             dest.write(line)
+In [3]: vlans = []
+
+In [4]: for num in range(10,16):
+   ...:     vlans.append('vlan {}'.format(num))
    ...:
 
-In [6]: cat result.txt
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
+In [5]: print(vlans)
+['vlan 10', 'vlan 11', 'vlan 12', 'vlan 13', 'vlan 14', 'vlan 15']
+```
+
++++
+### List comprehensions (генераторы списков)
+
+В list comprehensions можно использовать выражение if.
+Таким образом можно добавлять в список только некоторые объекты.
+
+Например, такой цикл отбирает те элементы, которые являются числами, конвертирует их и добавляет в итоговый список only_digits:
+```python
+In [6]: items = ['10', '20', 'a', '30', 'b', '40']
+
+In [7]: only_digits = []
+
+In [8]: for item in items:
+   ...:     if item.isdigit():
+   ...:         only_digits.append(int(item))
+   ...:
+
+In [9]: print(only_digits)
+[10, 20, 30, 40]
 
 ```
 
 +++
-### Открытие двух файлов
+### List comprehensions (генераторы списков)
 
-Это равнозначно таким двум блокам with:
+Аналогичный вариант в виде list comprehensions:
 ```python
-In [7]: with open('r1.txt') as src:
-   ...:     with open('result.txt', 'w') as dest:
-   ...:         for line in src:
-   ...:             if line.startswith('service'):
-   ...:                 dest.write(line)
-   ...:
+In [10]: items = ['10', '20', 'a', '30', 'b', '40']
+
+In [11]: only_digits = [int(item) for item in items if item.isdigit()]
+
+In [12]: print(only_digits)
+[10, 20, 30, 40]
 
 ```
+
+Конечно, далеко не все циклы можно переписать как генератор списка, но когда это можно сделать, и при этом выражение не усложняется, лучше использовать генераторы списка.
+
+
++++
+### List comprehensions (генераторы списков)
+
+С помощью генератора списка также удобно получать элементы из вложенных словарей:
+```python
+In [13]: london_co = {
+    ...:     'r1' : {
+    ...:     'hostname': 'london_r1',
+    ...:     'location': '21 New Globe Walk',
+    ...:     'vendor': 'Cisco',
+    ...:     'model': '4451',
+    ...:     'IOS': '15.4',
+    ...:     'IP': '10.255.0.1'
+    ...:     },
+    ...:     'r2' : {
+    ...:     'hostname': 'london_r2',
+    ...:     'location': '21 New Globe Walk',
+    ...:     'vendor': 'Cisco',
+    ...:     'model': '4451',
+    ...:     'IOS': '15.4',
+    ...:     'IP': '10.255.0.2'
+    ...:     },
+    ...:     'sw1' : {
+    ...:     'hostname': 'london_sw1',
+    ...:     'location': '21 New Globe Walk',
+    ...:     'vendor': 'Cisco',
+    ...:     'model': '3850',
+    ...:     'IOS': '3.6.XE',
+    ...:     'IP': '10.255.0.101'
+    ...:     }
+    ...: }
+
+In [14]: [london_co[device]['IOS'] for device in london_co]
+Out[14]: ['15.4', '15.4', '3.6.XE']
+
+In [15]: [london_co[device]['IP'] for device in london_co]
+Out[15]: ['10.255.0.1', '10.255.0.2', '10.255.0.101']
+
+```
+
++++
+### List comprehensions (генераторы списков)
+
+Полный синтаксис генератора списка выглядит так:
+```python
+[expression for item1 in iterable1 if condition1 
+            for item2 in iterable2 if condition2
+            ...
+            for itemN in iterableN if conditionN ]
+```
+
+Это значит, можно использовать несколько for в выражении.
+
++++
+### List comprehensions (генераторы списков)
+
+Например, в списке vlans находятся несколько вложенных списков с VLAN'ами:
+```python
+In [16]: vlans = [[10,21,35], [101, 115, 150], [111, 40, 50]]
+```
+
++++
+### List comprehensions (генераторы списков)
+
+Из этого списка надо сформировать один плоский список с номерами VLAN.
+Первый вариант, с помощью циклов for:
+```
+In [17]: result = []
+
+In [18]: for vlan_list in vlans:
+    ...:     for vlan in vlan_list:
+    ...:         result.append(vlan)
+    ...:
+
+In [19]: print(result)
+[10, 21, 35, 101, 115, 150, 111, 40, 50]
+
+```
+
++++
+### List comprehensions (генераторы списков)
+
+Аналогичный вариант с генератором списков:
+```python
+In [20]: vlans = [[10,21,35], [101, 115, 150], [111, 40, 50]]
+
+In [21]: result = [vlan for vlan_list in vlans for vlan in vlan_list]
+
+In [22]: print(result)
+[10, 21, 35, 101, 115, 150, 111, 40, 50]
+```
+
++++
+### List comprehensions (генераторы списков)
+
+Можно одновременно проходиться по двум последовательностям, используя zip:
+```python
+In [23]: vlans = [100, 110, 150, 200]
+
+In [24]: names = ['mngmt', 'voice', 'video', 'dmz']
+
+In [25]: result = ['vlan {}\n name {}'.format(vlan, name) for vlan, name in zip(vlans, names)]
+
+In [26]: print('\n'.join(result))
+vlan 100
+ name mngmt
+vlan 110
+ name voice
+vlan 150
+ name video
+vlan 200
+ name dmz
+
+```
+
++++
+## Dict comprehensions (генераторы словарей)
+
+
++++
+### Dict comprehensions (генераторы словарей)
+
+Генераторы словарей аналогичны генераторам списков, но они используются для создания словарей.
+
+Например, такое выражение:
+```python
+In [27]: d = {}
+
+In [28]: for num in range(1,11):
+    ...:     d[num] = num**2
+    ...:
+
+In [29]: print(d)
+{1: 1, 2: 4, 3: 9, 4: 16, 5: 25, 6: 36, 7: 49, 8: 64, 9: 81, 10: 100}
+```
+
++++
+### Dict comprehensions (генераторы словарей)
+
+Можно заменить генератором словаря:
+```python
+In [30]: d = {num: num**2 for num in range(1,11)}
+
+In [31]: print(d)
+{1: 1, 2: 4, 3: 9, 4: 16, 5: 25, 6: 36, 7: 49, 8: 64, 9: 81, 10: 100}
+
+```
+
++++
+### Dict comprehensions (генераторы словарей)
+
+Еще один пример, в котором надо преобразовать существующий словарь и перевести все ключи в нижний регистр.
+Для начала, вариант решения без генератора словаря:
+```python
+In [32]: r1 = {'IOS': '15.4',
+    ...:   'IP': '10.255.0.1',
+    ...:   'hostname': 'london_r1',
+    ...:   'location': '21 New Globe Walk',
+    ...:   'model': '4451',
+    ...:   'vendor': 'Cisco'}
+    ...:
+
+In [33]: lower_r1 = {}
+
+In [34]: for key, value in r1.items():
+    ...:     lower_r1[str.lower(key)] = value
+    ...:
+
+In [35]: lower_r1
+Out[35]:
+{'hostname': 'london_r1',
+ 'ios': '15.4',
+ 'ip': '10.255.0.1',
+ 'location': '21 New Globe Walk',
+ 'model': '4451',
+ 'vendor': 'Cisco'}
+
+```
+
++++
+### Dict comprehensions (генераторы словарей)
+
+Аналогичный вариант с помощью генератора словаря:
+```python
+In [36]: r1 = {'IOS': '15.4',
+    ...:   'IP': '10.255.0.1',
+    ...:   'hostname': 'london_r1',
+    ...:   'location': '21 New Globe Walk',
+    ...:   'model': '4451',
+    ...:   'vendor': 'Cisco'}
+    ...:
+
+In [37]: lower_r1 = {str.lower(key): value for key, value in r1.items()}
+
+In [38]: lower_r1
+Out[38]:
+{'hostname': 'london_r1',
+ 'ios': '15.4',
+ 'ip': '10.255.0.1',
+ 'location': '21 New Globe Walk',
+ 'model': '4451',
+ 'vendor': 'Cisco'}
+
+```
+
++++
+### Dict comprehensions (генераторы словарей)
+
+Как и list comprehensions, dict comprehensions можно делать вложенными.
+Попробуем аналогичным образом преобразовать ключи во вложенных словарях:
+```python
+In [39]: london_co = {
+    ...:     'r1' : {
+    ...:     'hostname': 'london_r1',
+    ...:     'location': '21 New Globe Walk',
+    ...:     'vendor': 'Cisco',
+    ...:     'model': '4451',
+    ...:     'IOS': '15.4',
+    ...:     'IP': '10.255.0.1'
+    ...:     },
+    ...:     'r2' : {
+    ...:     'hostname': 'london_r2',
+    ...:     'location': '21 New Globe Walk',
+    ...:     'vendor': 'Cisco',
+    ...:     'model': '4451',
+    ...:     'IOS': '15.4',
+    ...:     'IP': '10.255.0.2'
+    ...:     },
+    ...:     'sw1' : {
+    ...:     'hostname': 'london_sw1',
+    ...:     'location': '21 New Globe Walk',
+    ...:     'vendor': 'Cisco',
+    ...:     'model': '3850',
+    ...:     'IOS': '3.6.XE',
+    ...:     'IP': '10.255.0.101'
+    ...:     }
+    ...: }
+
+In [40]: lower_london_co = {}
+
+In [41]: for device, params in london_co.items():
+    ...:     lower_london_co[device] = {}
+    ...:     for key, value in params.items():
+    ...:         lower_london_co[device][str.lower(key)] = value
+    ...:
+
+In [42]: lower_london_co
+Out[42]:
+{'r1': {'hostname': 'london_r1',
+  'ios': '15.4',
+  'ip': '10.255.0.1',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'r2': {'hostname': 'london_r2',
+  'ios': '15.4',
+  'ip': '10.255.0.2',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'sw1': {'hostname': 'london_sw1',
+  'ios': '3.6.XE',
+  'ip': '10.255.0.101',
+  'location': '21 New Globe Walk',
+  'model': '3850',
+  'vendor': 'Cisco'}}
+
+```
+
++++
+### Dict comprehensions (генераторы словарей)
+
+Аналогичное преобразование с dict comprehensions:
+```python
+In [43]: result = {device: {str.lower(key):value for key, value in params.items()} for device, params in london_co.items()}
+
+In [44]: result
+Out[44]:
+{'r1': {'hostname': 'london_r1',
+  'ios': '15.4',
+  'ip': '10.255.0.1',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'r2': {'hostname': 'london_r2',
+  'ios': '15.4',
+  'ip': '10.255.0.2',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'sw1': {'hostname': 'london_sw1',
+  'ios': '3.6.XE',
+  'ip': '10.255.0.101',
+  'location': '21 New Globe Walk',
+  'model': '3850',
+  'vendor': 'Cisco'}}
+
+```
+
++++
+## Set comprehensions (генераторы множеств)
+
++++
+### Set comprehensions (генераторы множеств)
+
+Генераторы множеств в целом аналогичны генераторам списков.
+
+Например, надо получить множество с уникальными номерами VLAN'ов:
+```python
+In [45]: vlans = [10, '30', 30, 10, '56']
+
+In [46]: unique_vlans = {int(vlan) for vlan in vlans}
+
+In [47]: unique_vlans
+Out[47]: {10, 30, 56}
+```
+
++++
+### Set comprehensions (генераторы множеств)
+
+Аналогичное решение, без использования set comprehensions:
+```python
+In [48]: vlans = [10, '30', 30, 10, '56']
+
+In [49]: unique_vlans = set()
+
+In [50]: for vlan in vlans:
+    ...:     unique_vlans.add(int(vlan))
+    ...:
+
+In [51]: unique_vlans
+Out[51]: {10, 30, 56}
+
+```
+
+---
+## Работа со словарями
+
++++
+### Работа со словарями
+
+При обработке вывода команд или конфигурации часто надо будет записать итоговые данные в словарь.
+
+Не всегда очевидно как обрабатывать вывод команд и каким образом в целом подходить к разбору вывода на части.
+В этом подразделе рассматриваются несколько примеров, с возрастающим уровнем сложности.
+
++++
+### Разбор вывода столбцами
+
+В этом примере будет разбираться вывод команды sh ip int br.
+Из вывода команды нам надо получить соответствия имя интерфейса - IP-адрес.
+То есть имя интерфейса - это ключ словаря, а IP-адрес - значение.
+При этом, соответствие надо делать только для тех интерфейсов, у которых назначен IP-адрес.
+
++++
+### Разбор вывода столбцами
+
+Пример вывода команды sh ip int br (файл sh_ip_int_br.txt):
+```
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            15.0.15.1       YES manual up                    up
+FastEthernet0/1            10.0.12.1       YES manual up                    up
+FastEthernet0/2            10.0.13.1       YES manual up                    up
+FastEthernet0/3            unassigned      YES unset  up                    down
+Loopback0                  10.1.1.1        YES manual up                    up
+Loopback100                100.0.0.1       YES manual up                    up
+```
+
++++
+### Разбор вывода столбцами
+
+Файл working_with_dict_example_1.py:
+```python
+result = {}
+
+with open('sh_ip_int_br.txt') as f:
+    for line in f:
+        line = line.split()
+        if line and line[1][0].isdigit():
+            interface, address, *other = line
+            result[interface] = address
+
+print(result)
+```
+
++++
+### Разбор вывода столбцами
+
+Результатом выполнения скрипта будет такой словарь (тут он разбит на пары ключ-значение для удобства, в реальном выводе скрипта словарь будет отображаться в одну строку):
+```python
+{'FastEthernet0/0': '15.0.15.1',
+ 'FastEthernet0/1': '10.0.12.1',
+ 'FastEthernet0/2': '10.0.13.1',
+ 'Loopback0': '10.1.1.1',
+ 'Loopback100': '100.0.0.1'}
+```
+
+---
+### Получение ключа и значения из разных строк вывода
+
++++
+### Получение ключа и значения из разных строк вывода
+
+Очень часто вывод команд выглядит таким образом, что ключ и значение находятся в разных строках.
+И надо придумать каким образом обрабатывать вывод, чтобы получить нужное соответствие.
+
+Например, из вывода команды sh ip interface надо получить соответствие имя интерфейса - MTU (файл sh_ip_interface.txt):
+```
+Ethernet0/0 is up, line protocol is up
+  Internet address is 192.168.100.1/24
+  Broadcast address is 255.255.255.255
+  Address determined by non-volatile memory
+  MTU is 1500 bytes
+  Helper address is not set
+  ...
+Ethernet0/1 is up, line protocol is up
+  Internet address is 192.168.200.1/24
+  Broadcast address is 255.255.255.255
+  Address determined by non-volatile memory
+  MTU is 1500 bytes
+  Helper address is not set
+  ...
+Ethernet0/2 is up, line protocol is up
+  Internet address is 19.1.1.1/24
+  Broadcast address is 255.255.255.255
+  Address determined by non-volatile memory
+  MTU is 1500 bytes
+  Helper address is not set
+  ...
+```
+
++++
+### Получение ключа и значения из разных строк вывода
+
+Имя интерфейса находится в строке вида ```Ethernet0/0 is up, line protocol is up```, а MTU в строке вида ```MTU is 1500 bytes```.
+
+Например, попробуем запоминать каждый раз интерфейс и выводить его значение, когда встречается MTU, вместе со значением MTU:
+```python
+In [2]: with open('sh_ip_interface.txt') as f:
+   ...:     for line in f:
+   ...:         if 'line protocol' in line:
+   ...:             interface = line.split()[0]
+   ...:         elif 'MTU is' in line:
+   ...:             mtu = line.split()[-2]
+   ...:             print('{:15}{}'.format(interface, mtu))
+   ...:
+Ethernet0/0    1500
+Ethernet0/1    1500
+Ethernet0/2    1500
+Ethernet0/3    1500
+Loopback0      1514
+```
+
++++
+### Получение ключа и значения из разных строк вывода
+
+Вывод организован таким образом, что всегда сначала идет строка с интерфейсом, а затем через несоколько строк - строка с MTU.
+Если запоминать имя интерфейса каждый раз, когда оно встречается, то на момент когда встретится строка с MTU, последний запомненный интерфейс - это тот к которому относится MTU.
+
+Теперь, если необходимо создать словарь с соответствием интерфейс - MTU, достаточно записать значения на момент, когда был найден MTU.
+
++++
+### Получение ключа и значения из разных строк вывода
+
+Файл working_with_dict_example_2.py:
+```python
+result = {}
+
+with open('sh_ip_interface.txt') as f:
+    for line in f:
+        if 'line protocol' in line:
+            interface = line.split()[0]
+        elif 'MTU is' in line:
+            mtu = line.split()[-2]
+            result[interface] = mtu
+
+print(result)
+```
+
++++
+### Получение ключа и значения из разных строк вывода
+
+Результатом выполнения скрипта будет такой словарь (тут он разбит на пары ключ-значение для удобства, в реальном выводе скрипта словарь будет отображаться в одну строку):
+```python
+{'Ethernet0/0': '1500',
+ 'Ethernet0/1': '1500',
+ 'Ethernet0/2': '1500',
+ 'Ethernet0/3': '1500',
+ 'Loopback0': '1514'}
+```
+
+Этот прием будет достаточно часто полезен, так как вывод команд, в целом, организован очень похожим образом.
+
+---
+### Вложенный словарь
+
++++
+### Вложенный словарь
+
+Если из вывода команды надо получить несколько параметров, очень удобно использовать словарь с вложенным словарем.
+
+
+Например, из вывода sh ip interface надо получить два параметра: IP-адрес и MTU.
+Для начала, вывод информации:
+```python
+In [2]: with open('sh_ip_interface.txt') as f:
+   ...:     for line in f:
+   ...:         if 'line protocol' in line:
+   ...:             interface = line.split()[0]
+   ...:         elif 'Internet address' in line:
+   ...:             ip_address = line.split()[-1]
+   ...:         elif 'MTU' in line:
+   ...:             mtu = line.split()[-2]
+   ...:             print('{:15}{:17}{}'.format(interface, ip_address, mtu))
+   ...:
+Ethernet0/0    192.168.100.1/24 1500
+Ethernet0/1    192.168.200.1/24 1500
+Ethernet0/2    19.1.1.1/24      1500
+Ethernet0/3    192.168.230.1/24 1500
+Loopback0      4.4.4.4/32       1514
+```
+
++++
+### Вложенный словарь
+
+Тут используется такой же прием, как в предыдущем примере, но добавляется еще одна вложенность словаря:
+```python
+result = {}
+
+with open('sh_ip_interface.txt') as f:
+    for line in f:
+        if 'line protocol' in line:
+            interface = line.split()[0]
+            result[interface] = {}
+        elif 'Internet address' in line:
+            ip_address = line.split()[-1]
+            result[interface]['ip'] = ip_address
+        elif 'MTU' in line:
+            mtu = line.split()[-2]
+            result[interface]['mtu'] = mtu
+
+print(result)
+```
+
++++
+### Вложенный словарь
+
+Каждый раз, когда встречается интерфейс, в словаре result создается ключ с именем интерфейса, которому соответствует пустой словарь.
+Эта заготовка нужна для того, чтобы на момент когда встретится IP-адрес или MTU можно было записать параметр во вложенный словарь соответствующего интерфейса.
+
+
++++
+### Вложенный словарь
+
+Результатом выполнения скрипта будет такой словарь (тут он разбит на пары ключ-значение для удобства, в реальном выводе скрипта словарь будет отображаться в одну строку):
+```python
+{'Ethernet0/0': {'ip': '192.168.100.1/24', 'mtu': '1500'},
+ 'Ethernet0/1': {'ip': '192.168.200.1/24', 'mtu': '1500'},
+ 'Ethernet0/2': {'ip': '19.1.1.1/24', 'mtu': '1500'},
+ 'Ethernet0/3': {'ip': '192.168.230.1/24', 'mtu': '1500'},
+ 'Loopback0': {'ip': '4.4.4.4/32', 'mtu': '1514'}}
+```
+
+---
+### Вывод с пустыми значениями
+
++++
+### Вывод с пустыми значениями
+
+Иногда, в выводе будут попадаться секции с пустыми значениями.
+Например, в случае с выводом sh ip interface, могут попадаться интерфейс, которые выглядят так:
+```
+Ethernet0/1 is up, line protocol is up
+  Internet protocol processing disabled
+Ethernet0/2 is administratively down, line protocol is down
+  Internet protocol processing disabled
+Ethernet0/3 is administratively down, line protocol is down
+  Internet protocol processing disabled
+```
+
+Соответственно тут нет MTU или IP-адреса.
+
++++
+### Вывод с пустыми значениями
+
+И, если выполнить предыдущий скрипт для файла с такими интерфейсами, результат будет таким (вывод для файла sh_ip_interface2.txt):
+```python
+{'Ethernet0/0': {'ip': '192.168.100.2/24', 'mtu': '1500'},
+ 'Ethernet0/1': {},
+ 'Ethernet0/2': {},
+ 'Ethernet0/3': {},
+ 'Loopback0': {'ip': '2.2.2.2/32', 'mtu': '1514'}}
+```
+
++++
+### Вывод с пустыми значениями
+
+Если необходимо добавлять интерфейсы в словарь только, когда на интерфейсе назначен IP-адрес, надо перенести создание ключа с именем интерфейса на момент, когда встречается строка с IP-адресом (файл working_with_dict_example_4.py):
+```python
+result = {}
+
+with open('sh_ip_interface2.txt') as f:
+    for line in f:
+        if 'line protocol' in line:
+            interface = line.split()[0]
+        elif 'Internet address' in line:
+            ip_address = line.split()[-1]
+            result[interface] = {}
+            result[interface]['ip'] = ip_address
+        elif 'MTU' in line:
+            mtu = line.split()[-2]
+            result[interface]['mtu'] = mtu
+
+print(result)
+```
+
++++
+### Вывод с пустыми значениями
+
+В этом случае, результатом будет такой словарь:
+```python
+{'Ethernet0/0': {'ip': '192.168.100.2/24', 'mtu': '1500'},
+ 'Loopback0': {'ip': '2.2.2.2/32', 'mtu': '1514'}}
+```
+
 
