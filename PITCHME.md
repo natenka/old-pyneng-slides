@@ -5,319 +5,275 @@
 
 ---
 
-## Объектно-ориентированное программирование
+## Генераторы
 
++++
+### Генератор (generator)
+
+Генератор - функция, которая позволяет легко создавать свои итераторы
+
+В отличии от обычных функций, генератор не просто возвращает значение и завершает работу, а возвращает итератор, который отдает элементы по одному.
+
+Функция-генератор - это функция, в которой присутствует ключевое слово yield.
+При вызове, эта функция возвращает объект генератор. 
+
++++
+### Функции
+
+Обычная функция завершает работу если:
+* встретилось выражение return
+* закончился код функции (это срабатывает как выражение ```return None```)
+* возникло исключение
+
+После выполнения функции, управление возвращается и программа выполняется дальше.
+Все аргументы, которые передавались в функцию, локальные переменные, все это теряется.
+Остается только результат, который вернула функция.
+
+Функция может возвращать список элементов, несколько объектов или возвращать разные результаты, в зависимости от аргументов, но она всегда возвращает какой-то один результат.
+
++++
+### Генератор (generator)
+
+С точки зрения синтаксиса, генератор выглядит как обычная функция.
+Но, вместо return, используется оператор ```yield```.
+
+Каждый раз, когда внутри функции встречается yield, генератор приостанавливается и возвращает значение.
+При следующем запросе, генератор начинает работать с того же места, где он завершил работу в прошлый раз.
+
+Так как yield не завершает работу генератора, он может использоваться несколько раз.
 
 ---
-### Специальные методы
+### Пример генератора
 
----
-### `__str__`
-
-+++
-### `__str__`
-
-Метод `__str__` отвечает за строковое отображение информации об объекте. Он вызывается при использовании str и print:
-
+Пример функции-генератора:
 ```python
-class Switch:
-    def __init__(self, hostname, model):
-        self.hostname = hostname
-        self.model = model
-
-    def __str__(self):
-        return 'Swicth: {}'.format(self.hostname)
-
-In [5]: sw1 = Switch('sw1', 'Cisco 3850')
-
-In [6]: print(sw1)
-Swicth: sw1
-
-In [7]: str(sw1)
-Out[7]: 'Swicth: sw1'
-```
-
----
-### `__del__`
-
-+++
-### `__del__`
-
-Метод `__del__` вызывается перед удалением объекта.
-В этот метод, как правило выносятся такие действия как, например, корректное завершение сессии.
-
-```python
-class Switch:
-    def __init__(self, hostname, model):
-        self.hostname = hostname
-        self.model = model
-
-    def __str__(self):
-        return 'Swicth: {}'.format(self.hostname)
-
-    def __del__(self):
-        print('Я умираю....')
-
-In [9]: sw1 = Switch('sw1', 'Cisco 3850')
-
-In [10]: del sw1
-Я умираю....
-```
-
-+++
-### `__del__`
-
-```python
-import netmiko
-
-DEVICE_PARAMS = {
-        'device_type': 'cisco_ios',
-        'ip': '192.168.100.1',
-        'username': 'cisco',
-        'password': 'cisco',
-        'secret': 'cisco'
-}
-
-class CiscoSSH:
-    def __init__(self, **device_params):
-        self.ssh = netmiko.ConnectHandler(**device_params)
-        self.ssh.enable()
-
-    def __del__(self):
-        print('Закрываю сессию')
-        self.ssh.disconnect()
-
-
-In [4]: r1 = CiscoSSH(**DEVICE_PARAMS)
-
-In [5]: del r1
-Закрываю сессию
-```
-
----
-### Менеджер контекста
-
-+++
-### Менеджер контекста
-
-Для использования объекта в менеджере контекста, в классе должны быть определены методы `__enter__` и `__exit__`:
-
-* `__enter__` выполняется в начале блока with и, если метод возвращает значение, оно присваивается в переменную, которая стоит после as.
-* `__exit__` гарантированно вызывается после блока with, даже если в блоке возникло исключение.
-
-+++
-### Менеджер контекста
-
-```python
-class CiscoSSH:
-    def __init__(self, **device_params):
-        self.ssh = netmiko.ConnectHandler(**device_params)
-        self.ssh.enable()
-        print('CiscoSSH __init__ called')
-
-    def __enter__(self):
-        print('CiscoSSH __enter__ called')
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print('CiscoSSH __exit__ called')
-        self.ssh.disconnect()
-```
-
-+++
-### Менеджер контекста
-
-```python
-In [8]: with CiscoSSH(**DEVICE_PARAMS) as r1:
-   ...:     print('Внутри with')
-   ...:     print(r1.ssh.send_command('sh ip int br'))
+In [1]: def generate_nums(number):
+   ...:     print('Start of generation')
+   ...:     yield number
+   ...:     print('Next number')
+   ...:     yield number+1
+   ...:     print('The end')
    ...:
-CiscoSSH __init__ called
-CiscoSSH __enter__ called
-Внутри with
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                192.168.100.1   YES NVRAM  up                    up
-Ethernet0/1                192.168.200.1   YES NVRAM  up                    up
-Ethernet0/2                190.16.200.1    YES NVRAM  up                    up
-Ethernet0/3                192.168.230.1   YES NVRAM  up                    up
-Ethernet0/3.100            10.100.0.1      YES NVRAM  up                    up
-Ethernet0/3.200            10.200.0.1      YES NVRAM  up                    up
-Ethernet0/3.300            10.30.0.1       YES NVRAM  up                    up
-CiscoSSH __exit__ called
+```
+
+
++++
+### Пример генератора
+
+Если вызвать функцию-генератор и присвоить результат в переменную, его код еще не будет выполняться:
+```python
+In [3]: result = generate_nums(100)
+```
+
+Теперь в переменной result находится итератор:
+```python
+In [4]: result
+Out[4]: <generator object generate_nums at 0xb5788e9c>
 ```
 
 +++
-### Менеджер контекста
+### Пример генератора
 
-Если внутри блока with возникает исключение, оно будет сгенерировано после выполнения метода `__exit__`:
+Раз result это итератор, можно вызвать функцию next, чтобы получить значение:
 ```python
-In [10]: with CiscoSSH(**DEVICE_PARAMS) as r1:
-    ...:     print('Внутри with')
-    ...:     print(r1.ssh.send_command('sh ip int br'))
-    ...:     raise ValueError('Ошибка')
-    ...:
-CiscoSSH __init__ called
-CiscoSSH __enter__ called
-Внутри with
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                192.168.100.1   YES NVRAM  up                    up
-Ethernet0/1                192.168.200.1   YES NVRAM  up                    up
-Ethernet0/2                190.16.200.1    YES NVRAM  up                    up
-Ethernet0/3                192.168.230.1   YES NVRAM  up                    up
-Ethernet0/3.100            10.100.0.1      YES NVRAM  up                    up
-Ethernet0/3.200            10.200.0.1      YES NVRAM  up                    up
-Ethernet0/3.300            10.30.0.1       YES NVRAM  up                    up
-CiscoSSH __exit__ called
----------------------------------------------------------------------------
-ValueError                                Traceback (most recent call last)
-<ipython-input-10-4e8b17370785> in <module>()
-      2     print('Внутри with')
-      3     print(r1.ssh.send_command('sh ip int br'))
-----> 4     raise ValueError('Ошибка')
+In [5]: next(result)
+Start of generation
+Out[5]: 100
+```
 
-ValueError: Ошибка
+Второй вызов next:
+```python
+In [6]: next(result)
+Next number
+Out[6]: 101
 ```
 
 +++
-### Менеджер контекста
+### Пример генератора
 
-Если метод `__exit__` возвращает истинное значение, исключение не генерируется:
+
+Следующий next:
 ```python
-class CiscoSSH:
-    def __init__(self, **device_params):
-        self.ssh = netmiko.ConnectHandler(**device_params)
-        self.ssh.enable()
-        print('CiscoSSH __init__ called')
+In [7]: next(result)
+The end
+------------------------------------------------------------
+StopIteration              Traceback (most recent call last)
+<ipython-input-7-1b214ba10814> in <module>()
+----> 1 next(result)
 
-    def __enter__(self):
-        print('CiscoSSH __enter__ called')
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print('CiscoSSH __exit__ called')
-        self.ssh.disconnect()
-        return True
+StopIteration:
 ```
 
 +++
-### Менеджер контекста
+### Пример генератора
 
+Раз функция-генератор возвращает итератор, его можно использовать в цикле:
 ```python
-In [17]: with CiscoSSH(**DEVICE_PARAMS) as r1:
-    ...:     print('Внутри with')
-    ...:     print(r1.ssh.send_command('sh ip int br'))
-    ...:     raise ValueError('Ошибка')
-    ...:
-CiscoSSH __init__ called
-CiscoSSH __enter__ called
-Внутри with
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                192.168.100.1   YES NVRAM  up                    up
-Ethernet0/1                192.168.200.1   YES NVRAM  up                    up
-Ethernet0/2                190.16.200.1    YES NVRAM  up                    up
-Ethernet0/3                192.168.230.1   YES NVRAM  up                    up
-Ethernet0/3.100            10.100.0.1      YES NVRAM  up                    up
-Ethernet0/3.200            10.200.0.1      YES NVRAM  up                    up
-Ethernet0/3.300            10.30.0.1       YES NVRAM  up                    up
-CiscoSSH __exit__ called
+In [8]: for num in generate_nums(100):
+   ...:     print('Number:', num)
+   ...:
+Start of generation
+Number: 100
+Next number
+Number: 101
+The end
 ```
 
 ---
-### Метод `__getattr__`
+### Обычная функция и аналогичный генератор
 
+С помощью генераторов зачастую можно написать ту же функцию с меньшим количеством промежуточных переменных.
+```python
+In [14]: def work_with_items(items):
+    ...:     result = []
+    ...:     for item in items:
+    ...:         result.append('Changed {}'.format(item))
+    ...:     return result
+    ...:
+
+In [15]: for i in work_with_items(range(10)):
+    ...:     print(i)
+    ...:
+Changed 0
+Changed 1
+Changed 2
+Changed 3
+Changed 4
+Changed 5
+Changed 6
+Changed 7
+Changed 8
+Changed 9
+```
 
 +++
-### Метод `__getattr__`
+### Обычная функция и аналогичный генератор
 
-Метод `__getattr__` вызывается только для не существующих атрибутов:
+Можно заменить таким генератором:
 ```python
-In [1]: class CiscoSSH:
-   ...:     def __init__(self, **device_params):
-   ...:         self._device_params = device_params
-   ...:         self.ssh = netmiko.ConnectHandler(**device_params)
-   ...:         self.ssh.enable()
+In [16]: def yield_items(items):
+    ...:     for item in items:
+    ...:         yield 'Changed {}'.format(item)
+    ...:
+
+In [17]: for i in yield_items(range(10)):
+    ...:     print(i)
+    ...:
+Changed 0
+Changed 1
+Changed 2
+Changed 3
+Changed 4
+Changed 5
+Changed 6
+Changed 7
+Changed 8
+Changed 9
+```
+
++++
+### Обычная функция и аналогичный генератор
+
+Генератор yield_items возвращает элементы по одному, а функция work_with_items - собирает их в список, а потом возвращает.
+Если количество элементов небольшое, это не существенно, но, при обработке больших объемов данных, лучше работать с элементами по одному.
+
++++
+### Обычная функция и аналогичный генератор
+
+В любой момент, если действительно нужно получить все элементы, например, в виде списка, это можно сделать применив функцию list:
+```python
+In [20]: result =  yield_items(range(10))
+
+In [21]: result
+Out[21]: <generator object yield_items at 0xb579053c>
+
+In [22]: list(result)
+Out[22]:
+['Changed 0',
+ 'Changed 1',
+ 'Changed 2',
+ 'Changed 3',
+ 'Changed 4',
+ 'Changed 5',
+ 'Changed 6',
+ 'Changed 7',
+ 'Changed 8',
+ 'Changed 9']
+```
+
+---
+### Использование генератора, при работе с файлами
+
+Например, при обработке большого log-файла, лучше обрабатывать его построчно, не выгружая все содержимое в память.
+
+Допустим, нам нужно часто фильтровать определенные строки из файла.
+Например, надо получить только строки, которые соответствуют регулярному выражению.
+Конечно, можно каждый раз это делать в процессе обработки строк.
+Но можно вынести подобную функциональность и в отдельную функцию.
+
+Но только, в случае обычной функции, придется опять возвращать список или подобный объект.
+А, если файл очень большой, то, скорее всего, придется отказаться от этой затеи.
+
++++
+### Использование генератора, при работе с файлами
+
+Однако, если использовать генератор, файл будет обрабатываться построчно.
+Это может быть, например, такой генератор:
+```python
+In [3]: import re
+
+In [5]: def filter_lines(filename, regex):
+   ...:     with open(filename) as f:
+   ...:         for line in f:
+   ...:             if re.search(regex, line):
+   ...:                 yield line.rstrip()
    ...:
-
-In [2]: r1 = CiscoSSH(**DEVICE_PARAMS)
-
-In [3]: r1.test
----------------------------------------------------------------------------
-AttributeError                            Traceback (most recent call last)
-<ipython-input-20-d2cff4242cf5> in <module>()
-----> 1 r1.test
-
-AttributeError: 'CiscoSSH' object has no attribute 'test'
 ```
 
+Генератор проходится по указанному файлу и отдает те строки, которые совпали с регулярным выражением.
+
 +++
-### Метод `__getattr__`
+### Использование генератора, при работе с файлами
 
-Этот метод позволяет динамически создавать атрибуты, при первом вызове:
+
+Пример использования:
 ```python
-class CiscoSSH:
-    def __init__(self, **device_params):
-        self.ssh = netmiko.ConnectHandler(**device_params)
-        self.ssh.enable()
-
-    def __getattr__(self, attr):
-        if attr == 'sh_version':
-            print('Создаю атрибут sh_version')
-            output = self.ssh.send_command('sh version')
-            self.sh_version = re.search('Version (.*?),', output).group(1)
-            return self.sh_version
-
-In [8]: r1 = CiscoSSH(**DEVICE_PARAMS)
-
-In [9]: r1.sh_version
-Создаю атрибут sh_version
-Out[9]: '15.2(2.3)T'
-
-In [10]: r1.sh_version
-Out[10]: '15.2(2.3)T'
+In [7]: for line in filter_lines('config_r1.txt', '^interface'):
+   ...:     print(line)
+   ...:
+interface Loopback0
+interface Tunnel0
+interface Ethernet0/0
+interface Ethernet0/1
+interface Ethernet0/2
+interface Ethernet0/3
+interface Ethernet0/3.100
+interface Ethernet1/0
 ```
 
-+++
-### Метод `__getattr__`
-
-При таком варианте метода `__getattr__` не генерируется исключение при доступе к несуществующим атрибутам. Чтобы вернуть этот функционал, добавлена генерация исключения:
-```python
-class CiscoSSH:
-    def __init__(self, **device_params):
-        self.ssh = netmiko.ConnectHandler(**device_params)
-        self.ssh.enable()
-
-    def __getattr__(self, attr):
-        if attr == 'sh_version':
-            print('Создаю атрибут sh_version')
-            output = self.ssh.send_command('sh version')
-            self.sh_version = re.search('Version (.*?),', output).group(1)
-            return self.sh_version
-        else:
-            raise AttributeError("'CiscoSSH' object has no attribute '{}'".format(attr))
-```
+---
+## generator expression (генераторное выражение)
 
 +++
-### Метод `__getattr__`
+### generator expression (генераторное выражение)
 
+Генераторное выражение использует такой же синтаксис, как list comprehentions, но возвращает итератор, а не список.
+
+Генераторное выражение выглядит точно так же, как list comprehentions, но используются круглые скобки:
 ```python
-In [3]: r1 = CiscoSSH(**DEVICE_PARAMS)
+In [1]: genexpr = (x**2 for x in range(10000))
 
-In [4]: r1.sh_version
-Создаю атрибут sh_version
-Out[4]: '15.2(2.3)T'
+In [2]: genexpr
+Out[2]: <generator object <genexpr> at 0xb571ec8c>
 
-In [5]: r1.sh_clock
----------------------------------------------------------------------------
-AttributeError                            Traceback (most recent call last)
-<ipython-input-55-0e09b642cfdd> in <module>()
-----> 1 r1.sh_clock
+In [3]: next(genexpr)
+Out[3]: 0
 
-<ipython-input-52-e5278c4462df> in __getattr__(self, attr)
-     11             return self.sh_version
-     12         else:
----> 13             raise AttributeError("'CiscoSSH' object has no attribute '{}'".format(attr))
+In [4]: next(genexpr)
+Out[4]: 1
 
-AttributeError: 'CiscoSSH' object has no attribute 'sh_clock'
+In [5]: next(genexpr)
+Out[5]: 4
 ```
 
 
