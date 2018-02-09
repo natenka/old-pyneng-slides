@@ -2,946 +2,806 @@
 # Python для сетевых инженеров 
 
 ---
-
-# Функции
-
-+++
-
-### Функции
-
-Функция - это блок кода, выполняющий определенные действия:
-* у функции есть имя, с помощью которого можно запускать этот блок кода сколько угодно раз
- * запуск кода функции называется вызовом функции
-* при создании функции, как правило, определяются параметры функции.
- * параметры функции определяют, какие аргументы функция может принимать
-* функциям можно передавать аргументы
- * соответственно, код функции будет выполняться с учетом указанных аргументов
-
-+++
-### Зачем нужны функции?
-
-Часто получается, что есть кусок кода, который повторяется.
-Конечно, его можно копировать из одного скрипта в другой.
-Но это очень неудобно, так как при внесении изменений в код нужно будет обновить его во всех файлах, в которые он скопирован.
-
-Гораздо проще и правильней вынести этот код в функцию (это может быть и несколько функций). И тогда будет просто производиться вызов этой функции - в этом файле или каком-то другом.
+## Полезные встроенные функции
 
 ---
-### Создание функций
+## Функция print
 
 +++
-### Создание функций
+### Функция print
 
-* функции создаются с помощью зарезервированного слова __def__
-* за def следуют имя функции и круглые скобки
-* внутри скобок могут указываться параметры, которые функция принимает
-* после круглых скобок идет двоеточие и с новой строки, с отступом, идет блок кода, который выполняет функция
-* первой строкой, опционально, может быть комментарий, так называемая __docstring__
-* в функциях может использоваться оператор __return__
- * он используется для прекращения работы функции и выхода из нее
- * чаще всего, оператор return возвращает какое-то значение
-
-+++
-### Пример функции
-
-```python
-In [1]: def open_file( filename ):
-   ...:     """Documentation string"""
-   ...:     with open(filename) as f:
-   ...:         print(f.read())
-   ...:
+Функция print выводит все элементы, разделяя их значением sep, и завершает вывод значением end.
+```
+print(*items, sep=' ', end='\n', file=sys.stdout, flush=False)
 ```
 
-Когда функция создана, она ещё ничего не выполняет. Только при вызыве функции действия, которые в ней перечислены, будут выполняться.
+Все аргументы, которые управляют поведением функции print, надо передавать как ключевые, а не позиционные.
 
 +++
-### Вызов функции
+### Функция print
 
-При вызове функции нужно указать её имя и передать аргументы, если нужно.
-
-* Параметры - это переменные, которые используются при создании функции.
-* Аргументы - это фактические значения (данные), которые передаются функции при вызове.
-
-
-+++
-### Вызов функции
-
+Все элементы, которые передаются как аргументы, конвертируются в строки:
 ```python
-In [1]: def open_file( filename ):
-   ...:     """Documentation string"""
-   ...:     with open(filename) as f:
-   ...:         print(f.read())
+In [4]: def f(a):
+   ...:     return a
    ...:
 
-In [2]: open_file('r1.txt')
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
+In [5]: print(1, 2, f, range(10))
+1 2 <function f at 0xb4de926c> range(0, 10)
 ```
 
 +++
-### docstring
+### Функция print
 
-Первая строка в определении функции - это docstring, строка документации. Это комментарий, который используется как описание функции. Его можно отобразить так:
+Для функций f и range результат равнозначен применению str():
 ```python
-In [4]: open_file.__doc__
-Out[4]: 'Documentation string'
+In [6]: str(f)
+Out[6]: '<function f at 0xb4de926c>'
+
+In [7]: str(range(10))
+Out[7]: 'range(0, 10)'
 ```
 
 +++
-### Оператор return
+### sep
 
-Оператор __return__ используется для прекращения работы функции, выхода из нее, и, как правило, возврата какого-то значения.
-Функция может возвращать любой объект Python.
+Параметр sep контролирует то, какой разделитель будет использоваться между элементами.
 
-+++
-### Оператор return
-
+По умолчанию используется пробел:
 ```python
-In [5]: result = open_file('ospf.txt')
-router ospf 1
- router-id 10.0.0.3
- auto-cost reference-bandwidth 10000
- network 10.0.1.0 0.0.0.255 area 0
- network 10.0.2.0 0.0.0.255 area 2
- network 10.1.1.0 0.0.0.255 area 0
-
-In [6]: print(result)
-None
+In [8]: print(1, 2, 3)
+1 2 3
 ```
 
 +++
-### Оператор return
+### sep
 
-Для того, чтобы функция возвращала значение, которое потом можно, например, присвоить переменной, используется оператор ```return```:
+Можно изменить значение sep на любую другую строку:
 ```python
-In [7]: def open_file( filename ):
-   ...:     """Documentation string"""
-   ...:     with open(filename) as f:
-   ...:         return f.read()
+In [9]: print(1, 2, 3, sep='|')
+1|2|3
+
+In [10]: print(1, 2, 3, sep='\n')
+1
+2
+3
+
+In [11]: print(1, 2, 3, sep='\n'+'-'*10+'\n')
+1
+----------
+2
+----------
+3
+
+```
+
++++
+### sep
+
+В некоторых ситуациях функция print может заменить метод join:
+```python
+In [12]: items = [1,2,3,4,5]
+
+In [13]: print(*items, sep=', ')
+1, 2, 3, 4, 5
+
+```
+
++++
+### end
+
+Параметр end контролирует то, какое значение выведется после вывода всех элементов.
+
+По умолчанию используется перевод строки:
+```python
+In [19]: print(1,2,3)
+1 2 3
+
+```
+
+Можно изменить значение end на любую другую строку:
+```python
+In [20]: print(1,2,3, end='\n'+'-'*10)
+1 2 3
+----------
+```
+
++++
+### file
+
+Параметр file контролирует то, куда выводятся значения функции print.
+По умолчанию все выводится на стандартный поток вывода - sys.stdout.
+
+Но Python позволяет передавать file как аргумент любой объект с методом write(string).
+За счет этого с помощью print можно записывать строки в файл:
+```python
+In [1]: f = open('result.txt', 'w')
+
+In [2]: for num in range(10):
+   ...:     print('Item {}'.format(num), file=f)
    ...:
 
-In [8]: result = open_file('r1.txt')
+In [3]: f.close()
 
-In [9]: print(result)
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
-+++
-### Оператор return
-
-Выражения, которые идут после return, не выполняются:
-```python
-In [10]: def open_file( filename ):
-    ...:     print("Reading file", filename)
-    ...:     with open(filename) as f:
-    ...:         return f.read()
-    ...:         print("Done")
-    ...:
-
-In [11]: result = open_file('r1.txt')
-Reading file r1.txt
-
-```
-
----
-### Пространства имен. Области видимости
-
-+++
-### Пространства имен. Области видимости
-
-У переменных в Python есть область видимости. В зависимости от места в коде, где переменная была определена, определяется и область видимости, то есть, где переменная будет доступна.
-
-При использовании имен переменных в программе, Python каждый раз ищет, создает или изменяет эти имена в соответствующем пространстве имен.
-Пространство имен, которое доступно в каждый момент, зависит от области, в которой находится код.
-
-+++
-### Правило LEGB
-
-Python ищет переменную в таком порядке по областям видимости (до первого совпадения):
-* L (local) - в локальной (внутри функции)
-* E (enclosing) - в локальной области объемлющих функций (это те функции, внутри которых находится наша функция)
-* G (global) - в глобальной (в скрипте)
-* B (built-in) - в встроенной (зарезервированные значения Python)
-
-+++
-### локальные и глобальные переменные:
-
-Локальные переменные:
-
-* переменные, которые определены внутри функции
-* эти переменные становятся недоступными после выхода из функции
-
-Глобальные переменные
-
-* переменные, которые определены вне функции
-* эти переменные 'глобальны' только в пределах модуля
-
-+++
-### Пример локальной и глобальной переменной
-
-```python
-In [1]: result = 'test string'
-
-In [2]: def open_file( filename ):
-   ...:     with open(filename) as f:
-   ...:         result = f.read()
-   ...:         return result
-   ...:
-
-In [3]: open_file('r1.txt')
-Out[3]: '!\nservice timestamps debug datetime msec localtime show-timezone year\nservice timestamps log datetime msec localtime show-timezone year\nservice password-encryption\nservice sequence-numbers\n!\nno ip domain lookup\n!\nip ssh version 2\n!\n'
-
-In [4]: result
-Out[4]: 'test string'
-```
-
----
-## Параметры и аргументы функций
-
-+++
-### Параметры и аргументы функций
-
-Цель создания функции, как правило, заключается в том, чтобы вынести кусок кода, который выполняет определенную задачу, в отдельный объект.  
-Это позволяет использовать этот кусок кода многократно, не создавая его заново в программе.
-
-Как правило, функция должна выполнять какие-то действия с входящими значениями и на выходе выдавать результат.
-
-При работе с функциями важно различать:
-
-* **параметры** - это переменные, которые используются при создании функции.
-* **аргументы** - это фактические значения \(данные\), которые передаются функции при вызове.
-
-
-+++
-### Параметры и аргументы функций
-
-Для того, чтобы функция могла принимать входящие значения, ее нужно создать с параметрами (файл func_params_args.py):
-
-```python
-In [1]: def delete_exclamation_from_cfg(in_cfg, out_cfg):
-   ...:     with open(in_cfg) as in_file:
-   ...:         result = in_file.readlines()
-   ...:     with open(out_cfg, 'w') as out_file:
-   ...:         for line in result:
-   ...:             if not line.startswith('!'):
-   ...:                 out_file.write(line)
-   ...:
-```
-
-+++
-### Параметры и аргументы функций
-
-Файл r1.txt будет использоваться как первый аргумент \(in\_cfg\):
-```python
-In [2]: cat r1.txt
-!
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-!
-no ip domain lookup
-!
-ip ssh version 2
-!
-```
-
-+++
-### Параметры и аргументы функций
-
-Пример использования функции delete\_exclamation\_from\_cfg:
-
-```python
-In [3]: delete_exclamation_from_cfg('r1.txt', 'result.txt')
-```
-
-Файл result.txt выглядит так:
-
-```python
 In [4]: cat result.txt
-service timestamps debug datetime msec localtime show-timezone year
-service timestamps log datetime msec localtime show-timezone year
-service password-encryption
-service sequence-numbers
-no ip domain lookup
-ip ssh version 2
+Item 0
+Item 1
+Item 2
+Item 3
+Item 4
+Item 5
+Item 6
+Item 7
+Item 8
+Item 9
 ```
 
 +++
-### Параметры и аргументы функций
+### flush
 
-При таком определении функции надо обязательно передать оба аргумента.  
-Если передать только один аргумент, возникнет ошибка.
-Аналогично, возникнет ошибка, если передать три и больше аргументов.
+По умолчанию при записи в файл или выводе на стандартный поток вывода вывод буферизируется.
+Функция print позволяет отключать буферизацию.
 
+
+Пример скрипта, который выводит число от 0 до 10 каждую секунду (файл print_nums.py):
 ```python
-In [5]: delete_exclamation_from_cfg('r1.txt')
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-12-66ae381f1c4f> in <module>()
-----> 1 delete_exclamation_from_cfg('r1.txt')
+import time
 
-TypeError: delete_exclamation_from_cfg() missing 1 required positional argument: 'out_cfg'
-```
-
-
----
-## Типы параметров функции
-
-+++
-### Типы параметров функции
-
-При создании функции можно указать, какие аргументы нужно передавать обязательно, а какие нет.
-
-Функция может быть создана с параметрами:
-* __обязательными__
-* __необязательными__ (опциональными, параметрами со значением по умолчанию)
-
-+++
-### Обязательные параметры
-
-__Обязательные параметры__ - определяют, какие аргументы нужно передать функции обязательно.
-При этом, их нужно передать ровно столько, сколько указано параметров функции (нельзя указать большее или меньшее количество аргументов)
-
-```python
-In [1]: def cfg_to_list(cfg_file, delete_exclamation):
-  ....:     result = []
-  ....:     with open( cfg_file ) as f:
-  ....:         for line in f:
-  ....:             if delete_exclamation and line.startswith('!'):
-  ....:                 pass
-  ....:             else:
-  ....:                 result.append(line.rstrip())
-  ....:     return result
+for num in range(10):
+    print(num)
+    time.sleep(1)
 ```
 
 +++
-### Обязательные параметры
+### flush
 
-Пример вызова функции:
+Теперь, аналогичный скрипт, но числа будут выводиться в одной строке (файл print_nums_oneline.py):
 ```python
-In [2]: cfg_to_list('r1.txt', True)
-Out[2]:
-['service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- 'no ip domain lookup',
- 'ip ssh version 2']
-```
+import time
 
-Так как аргументу delete_exclamation передано значение True, в итоговом словаре нет строк с восклицательными знаками.
-
-+++
-### Обязательные параметры
-
-Вызов функции со значением False для аргумента delete_exclamation:
-```python
-In [3]: cfg_to_list('r1.txt', False)
-Out[3]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- 'ip ssh version 2',
- '!']
-```
-
-+++
-### Необязательные параметры (параметры со значением по умолчанию)
-
-```python
-In [4]: def cfg_to_list(cfg_file, delete_exclamation=True):
-  ....:     result = []
-  ....:     with open( cfg_file ) as f:
-  ....:         for line in f:
-  ....:             if delete_exclamation and line.startswith('!'):
-  ....:                 pass
-  ....:             else:
-  ....:                 result.append(line.rstrip())
-  ....:     return result
-  ....:
+for num in range(10):
+    print(num, end=' ')
+    time.sleep(1)
 
 ```
 
-+++
-### Параметры со значением по умолчанию
-
-Так как теперь у параметра delete_exclamation значение по умолчанию равно True,
-соответствующий аргумент можно не указывать при вызове функции, если значение по умолчанию подходит:
-```python
-In [5]: cfg_to_list('r1.txt')
-Out[5]:
-['service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- 'no ip domain lookup',
- 'ip ssh version 2']
-```
+Числа не выводятся по одному в секунду, а выводятся все через 10 секунд.
 
 +++
-### Параметры со значением по умолчанию
+### flush
 
+Чтобы скрипт отрабатывал как нужно, необходимо установить flush равным True (файл print_nums_oneline_fixed.py):
 ```python
-In [6]: cfg_to_list('r1.txt', False)
-Out[6]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- 'ip ssh version 2',
- '!']
+import time
+
+for num in range(10):
+    print(num, end=' ', flush=True)
+    time.sleep(1)
 
 ```
 
 ---
-## Типы аргументов функции
+## Функция range
 
 +++
-### Типы аргументов функции
+### Функция range
 
-* __позиционные__ - передаются в том же порядке, в котором они определены при создании функции. То есть, порядок передачи аргументов определяет, какое значение получит каждый
-* __ключевые__ - передаются с указанием имени аргумента и его значения. В таком случае, аргументы могут быть указаны в любом порядке, так как их имя указывается явно.
+Функция range возвращает неизменяемую последовательность чисел в виде объекта range.
 
-+++
-### Типы аргументов функции
-
-Позиционные и ключевые аргументы могут быть смешаны при вызове функции.
-То есть, можно использовать оба способа при передаче аргументов одной и той же функции.
-При этом, сначала должны идти позиционные аргументы, а только потом - ключевые.
-
-+++
-### Типы аргументов функции
-
+Синтаксис функции:
 ```python
-In [1]: def cfg_to_list(cfg_file, delete_exclamation):
-  ....:     result = []
-  ....:     with open( cfg_file ) as f:
-  ....:         for line in f:
-  ....:             if delete_exclamation and line.startswith('!'):
-  ....:                 pass
-  ....:             else:
-  ....:                 result.append(line.rstrip())
-  ....:     return result
-  ....:
+range(stop)
+range(start, stop)
+range(start, stop, step)
+```
+
+Параметры функции:
+* **start** - с какого числа начинается последовательность. По умолчанию - 0
+* **stop** - до какого числа продолжается последовательность чисел. Указанное число не включается в диапазон
+* **step** - с каким шагом растут числа. По умолчанию 1
+
++++
+### Функция range
+
+Функция range хранит только информацию о значениях start, stop и step и вычисляет значения по мере необходимости.
+Это значит, что, независимо от размера диапазона, который описывает функция range, она всегда будет занимать фиксированный объем памяти.
+
++++
+### Функция range
+
+Самый простой вариант range - передать только значение stop:
+```python
+In [1]: range(5)
+Out[1]: range(0, 5)
+
+In [2]: list(range(5))
+Out[2]: [0, 1, 2, 3, 4]
 ```
 
 +++
-### Позиционные аргументы
+### Функция range
 
-Позиционные аргументы при вызове функции надо передать в правильном порядке:
+Если передаются два аргумента, то первый используется как start, а второй - как stop:
 ```python
-In [2]: cfg_to_list('r1.txt', False)
-Out[2]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- '',
- '',
- 'ip ssh version 2',
- '!']
+In [3]: list(range(1, 5))
+Out[3]: [1, 2, 3, 4]
+```
+
+И, чтобы указать шаг последовательности, надо передать три аргумента:
+```python
+In [4]: list(range(0, 10, 2))
+Out[4]: [0, 2, 4, 6, 8]
+
+In [5]: list(range(0, 10, 3))
+Out[5]: [0, 3, 6, 9]
 ```
 
 +++
-### Ключевые аргументы
+### Функция range
 
-* передаются с указанием имени аргумента
-* за счет этого они могут передаваться в любом порядке
-
+С помощью range можно генерировать и убывающие последовательности чисел:
 ```python
-In [4]: cfg_to_list(delete_exclamation=False, cfg_file='r1.txt')
-Out[4]:
-['!',
- 'service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- '!',
- 'no ip domain lookup',
- '!',
- 'ip ssh version 2',
- '!']
+In [6]: list(range(10, 0, -1))
+Out[6]: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+In [7]: list(range(5, -1, -1))
+Out[7]: [5, 4, 3, 2, 1, 0]
+```
+
+Для получения убывающей последовательности надо использовать отрицательный шаг и соответственно указать start - большим числом, а stop - меньшим.
+
+В убывающей последовательности шаг тоже может быть разным:
+```python
+In [8]: list(range(10, 0, -2))
+Out[8]: [10, 8, 6, 4, 2]
 ```
 
 +++
-### Ключевые аргументы
+### Функция range
 
-__Сначала должны идти позиционные аргументы, а затем ключевые.__
-
-Если сделать наоборот, возникнет ошибка:
+Функция поддерживает отрицательные значения start и stop:
 ```python
-In [5]: cfg_to_list(delete_exclamation=False, 'r1.txt')
-  File "<ipython-input-3-8f3a3aa16a22>", line 1
-    cfg_to_list(delete_exclamation=False, 'r1.txt')
-                                         ^
-SyntaxError: positional argument follows keyword argument
+In [9]: list(range(-10, 0, 1))
+Out[9]: [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1]
 
+In [10]: list(range(0, -10, -1))
+Out[10]: [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
 ```
 
 +++
-### Ключевые аргументы
+### Функция range
 
-Но в такой комбинации можно:
+Объект range поддерживает все [операции](https://docs.python.org/3.6/library/stdtypes.html#sequence-types-list-tuple-range), которые поддерживают последовательности в Python, кроме сложения и умножения.
+
+Проверка, входит ли число в диапазон, который описывает range:
 ```python
-In [6]: cfg_to_list('r1.txt', delete_exclamation=True)
-Out[6]:
-['service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- 'no ip domain lookup',
- 'ip ssh version 2']
+In [11]: nums = range(5)
 
+In [12]: nums
+Out[12]: range(0, 5)
+
+In [13]: 3 in nums
+Out[13]: True
+
+In [14]: 7 in nums
+Out[14]: False
 ```
 
----
-## Аргументы переменной длины
+> Начиная с версии Python 3.2, эта проверка выполняется за постоянное время (O(1)).
 
 +++
-### Аргументы переменной длины
+### Функция range
 
-Иногда необходимо сделать так, чтобы функция принимала не фиксированное количество аргументов, а любое.
-Для такого случая в Python можно создавать функцию со специальным параметром, который принимает аргументы переменной длины.
-Такой параметр может быть как ключевым, так и позиционным.
-
-+++
-### Позиционные аргументы переменной длины
-
-Параметр, который принимает позиционные аргументы переменной длины, создается добавлением перед именем параметра звездочки.
-Имя параметра может быть любым, но, по договоренности, чаще всего, используют имя ```*args```
-
+Можно получить конкретный элемент диапазона:
 ```python
-In [1]: def sum_arg(a,*args):
-  ....:     print(a, args)
-  ....:     return a + sum(args)
-  ....: 
+In [15]: nums = range(5)
+
+In [16]: nums[0]
+Out[16]: 0
+
+In [17]: nums[-1]
+Out[17]: 4
 ```
 
 +++
-### Позиционные аргументы переменной длины
+### Функция range
 
-Вызов функции с разным количеством аргументов:
+Range поддерживает срезы:
 ```python
-In [2]: sum_arg(1,10,20,30)
-1 (10, 20, 30)
-Out[2]: 61
+In [18]: nums = range(5)
 
-In [3]: sum_arg(1,10)
-1 (10,)
-Out[3]: 11
+In [19]: nums[1:]
+Out[19]: range(1, 5)
 
-In [4]: sum_arg(1)
-1 ()
-Out[4]: 1
+In [20]: nums[:3]
+Out[20]: range(0, 3)
 ```
 
 +++
-### Позиционные аргументы переменной длины
+### Функция range
 
+Можно получить длину диапазона:
 ```python
-In [5]: def sum_arg(*args):
-  ....:     print(args)
-  ....:     return sum(args)
-  ....: 
+In [21]: nums = range(5)
 
-In [6]: sum_arg(1, 10, 20, 30)
-(1, 10, 20, 30)
-Out[6]: 61
-
-In [7]: sum_arg()
-()
-Out[7]: 0
+In [22]: len(nums)
+Out[22]: 5
 ```
 
 +++
-### Ключевые аргументы переменной длины
+### Функция range
 
-Параметр, который принимает ключевые аргументы переменной длины, создается добавлением перед именем параметра двух звездочек.
-Имя параметра может быть любым, но, по договоренности, чаще всего, используют имя ```**kwargs``` (от keyword arguments).
-
-
+А также минимальный и максимальный элемент:
 ```python
-In [8]: def sum_arg(a,**kwargs):
-  ....:     print(a, kwargs)
-  ....:     return a + sum(kwargs.values())
-  ....: 
+In [23]: nums = range(5)
+
+In [24]: min(nums)
+Out[24]: 0
+
+In [25]: max(nums)
+Out[25]: 4
 ```
 
 +++
-### Ключевые аргументы переменной длины
+### Функция range
 
-Вызов функции с разным количеством ключевых аргументов:
+Кроме того, объект range поддерживает метод index:
 ```python
-In [9]: sum_arg(a=10,b=10,c=20,d=30)
-10 {'c': 20, 'b': 10, 'd': 30}
-Out[9]: 70
+In [26]: nums = range(1, 7)
 
-In [10]: sum_arg(b=10,c=20,d=30,a=10)
-10 {'c': 20, 'b': 10, 'd': 30}
-Out[10]: 70
-```
-
-+++
-### Ключевые аргументы переменной длины
-
-Нельзя указывать позиционный аргумент после ключевого:
-```python
-In [11]: sum_arg(10,b=10,c=20,d=30)
-10 {'c': 20, 'b': 10, 'd': 30}
-Out[11]: 70
-
-In [12]: sum_arg(b=10,c=20,d=30,10)
-  File "<ipython-input-14-71c121dc2cf7>", line 1
-    sum_arg(b=10,c=20,d=30,10)
-                          ^
-SyntaxError: positional argument follows keyword argument
+In [27]: nums.index(3)
+Out[27]: 2
 ```
 
 ---
-## Распаковка аргументов
+## Функция sorted
 
 +++
-### Распаковка аргументов
+### Функция sorted
 
-В Python выражения ```*args``` и ```**kwargs``` позволяют выполнять ещё одну задачу - __распаковку аргументов__.
-
-До сих пор мы вызывали все функции вручную.
-И, соответственно, передавали все нужные аргументы.
-
-Но в реальной жизни, как правило, данные необходимо передавать в функцию программно.
-И часто данные идут в виде какого-то объекта Python.
+Функция ```sorted()``` возвращает новый отсортированный список, который получен из итерируемого объекта, который был передан как аргумент.
+Функция также поддерживает дополнительные параметры, которые позволяют управлять сортировкой.
 
 +++
-### Распаковка позиционных аргументов
+### sorted всегда возвращает список
 
-Например, при форматировании строк часто надо передать методу format несколько аргументов.
-И часто эти аргументы уже находятся в списке или кортеже.
-Чтобы их передать методу format, приходится использовать индексы таким образом:
 ```python
-In [1]: items = [1,2,3]
+In [1]: list_of_words = ['one', 'two', 'list', '', 'dict']
 
-In [2]: print('One: {}, Two: {}, Three: {}'.format(items[0], items[1], items[2]))
-One: 1, Two: 2, Three: 3
+In [2]: sorted(list_of_words)
+Out[2]: ['', 'dict', 'list', 'one', 'two']
+
+In [3]: tuple_of_words = ('one', 'two', 'list', '', 'dict')
+
+In [4]: sorted(tuple_of_words)
+Out[4]: ['', 'dict', 'list', 'one', 'two']
+
+In [5]: set_of_words = {'one', 'two', 'list', '', 'dict'}
+
+In [6]: sorted(set_of_words)
+Out[6]: ['', 'dict', 'list', 'one', 'two']
 ```
 
 +++
-### Распаковка позиционных аргументов
+### sorted всегда возвращает список
 
-Вместо этого, можно воспользоваться распаковкой аргументов и сделать так:
 ```python
-In [4]: items = [1,2,3]
+In [7]: string_to_sort = 'long string'
 
-In [5]: print('One: {}, Two: {}, Three: {}'.format(*items))
-One: 1, Two: 2, Three: 3
+In [8]: sorted(string_to_sort)
+Out[8]: [' ', 'g', 'g', 'i', 'l', 'n', 'n', 'o', 'r', 's', 't']
 
+In [9]: dict_for_sort = {
+   ...:         'id': 1,
+   ...:         'name':'London',
+   ...:         'to_name': None,
+   ...:         'to_id': None,
+   ...:         'port':'G1/0/11'
+   ...: }
+
+In [10]: sorted(dict_for_sort)
+Out[10]:
+['id',
+ 'name',
+ 'port',
+ 'to_id',
+ 'to_name']
 ```
 
 +++
-### Распаковка позиционных аргументов
+### reverse
 
-Функция config_interface (файл func_args_unpacking.py): 
+Флаг reverse позволяет управлять порядком сортировки.
+По умолчанию сортировка будет по возрастанию элементов.
+
 ```python
-def config_interface(intf_name, ip_address, cidr_mask):
-    interface = 'interface {}'
-    no_shut = 'no shutdown'
-    ip_addr = 'ip address {} {}'
-    result = []
-    result.append(interface.format(intf_name))
-    result.append(no_shut)
+In [11]: list_of_words = ['one', 'two', 'list', '', 'dict']
 
-    mask_bits = int(cidr_mask.split('/')[-1])
-    bin_mask = '1'*mask_bits + '0'*(32-mask_bits)
-    dec_mask = [str(int(bin_mask[i:i+8], 2)) for i in range(0,25,8)]
-    dec_mask_str = '.'.join(dec_mask)
+In [12]: sorted(list_of_words)
+Out[12]: ['', 'dict', 'list', 'one', 'two']
 
-    result.append(ip_addr.format(ip_address, dec_mask_str))
-    return result
-
+In [13]: sorted(list_of_words, reverse=True)
+Out[13]: ['two', 'one', 'list', 'dict', '']
 ```
 
 +++
-### Распаковка позиционных аргументов
+### key
 
+С помощью параметра key можно указывать, как именно выполнять сортировку.
+Параметр key ожидает функцию, с помощью которой должно быть выполнено сравнение.
+
+Например, таким образом можно отсортировать список строк по длине строки:
 ```python
-In [1]: config_interface('Fa0/1', '10.0.1.1', '/25')
-Out[1]: ['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.128']
+In [14]: list_of_words = ['one', 'two', 'list', '', 'dict']
 
-In [2]: config_interface('Fa0/3', '10.0.0.1', '/18')
-Out[2]: ['interface Fa0/3', 'no shutdown', 'ip address 10.0.0.1 255.255.192.0']
-
-In [3]: config_interface('Fa0/3', '10.0.0.1', '/32')
-Out[3]: ['interface Fa0/3', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']
-
-In [4]: config_interface('Fa0/3', '10.0.0.1', '/30')
-Out[4]: ['interface Fa0/3', 'no shutdown', 'ip address 10.0.0.1 255.255.255.252']
-
-In [5]: config_interface('Fa0/3', '10.0.0.1', '30')
-Out[5]: ['interface Fa0/3', 'no shutdown', 'ip address 10.0.0.1 255.255.255.252']
+In [15]: sorted(list_of_words, key=len)
+Out[15]: ['', 'one', 'two', 'list', 'dict']
 ```
 
 +++
-### Распаковка позиционных аргументов
+### key
 
-Например, список interfaces_info, в котором находятся параметры для настройки интерфейсов:
+Если нужно отсортировать ключи словаря, но при этом игнорировать регистр строк:
 ```python
-In [6]: interfaces_info = [['Fa0/1', '10.0.1.1', '/24'],
-   ....:                    ['Fa0/2', '10.0.2.1', '/24'],
-   ....:                    ['Fa0/3', '10.0.3.1', '/24'],
-   ....:                    ['Fa0/4', '10.0.4.1', '/24'],
-   ....:                    ['Lo0', '10.0.0.1', '/32']]
+In [16]: dict_for_sort = {
+    ...:         'id': 1,
+    ...:         'name':'London',
+    ...:         'IT_VLAN':320,
+    ...:         'User_VLAN':1010,
+    ...:         'Mngmt_VLAN':99,
+    ...:         'to_name': None,
+    ...:         'to_id': None,
+    ...:         'port':'G1/0/11'
+    ...: }
+
+In [17]: sorted(dict_for_sort, key=str.lower)
+Out[17]:
+['id',
+ 'IT_VLAN',
+ 'Mngmt_VLAN',
+ 'name',
+ 'port',
+ 'to_id',
+ 'to_name',
+ 'User_VLAN']
 ```
 
 +++
-### Распаковка позиционных аргументов
+### key
 
-Если пройтись по списку в цикле и передавать вложенный список как аргумент функции, возникнет ошибка:
-```python
-In [7]: for info in interfaces_info:
-   ....:     print(config_interface(info))
-   ....:
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-5-f7d6a9d80d48> in <module>()
-      1 for info in interfaces_info:
-----> 2      print(config_interface(info))
-      3
+Параметру key можно передавать любые функции, не только встроенные.
+Также тут удобно использовать анонимную функцию lambda.
 
-TypeError: config_interface() missing 2 required positional arguments: 'ip_address' and 'cidr_mask'
+С помощью параметра key можно сортировать объекты не по первому элементу, а по любому другому.
+Но для этого надо использовать или функцию lambda, или специальные функции из модуля operator.
 
-``` 
 
 +++
-### Распаковка позиционных аргументов
+### key
 
-В такой ситуации пригодится распаковка аргументов.
-Достаточно добавить ```*``` перед передачей списка как аргумента, и ошибки уже не будет:
+Например, чтобы отсортировать список кортежей из двух элементов по второму элементу, надо использовать такой прием:
 ```python
-In [8]: for info in interfaces_info:
-  ....:     print(config_interface(*info))
-  ....:
-['interface Fa0/1', 'no shutdown', 'ip address 10.0.1.1 255.255.255.0']
-['interface Fa0/2', 'no shutdown', 'ip address 10.0.2.1 255.255.255.0']
-['interface Fa0/3', 'no shutdown', 'ip address 10.0.3.1 255.255.255.0']
-['interface Fa0/4', 'no shutdown', 'ip address 10.0.4.1 255.255.255.0']
-['interface Lo0', 'no shutdown', 'ip address 10.0.0.1 255.255.255.255']
-```
+In [18]: from operator import itemgetter
 
-Python сам 'распакует' список info и передаст в функцию элементы списка как аргументы.
+In [19]: list_of_tuples = [('IT_VLAN', 320),
+    ...:  ('Mngmt_VLAN', 99),
+    ...:  ('User_VLAN', 1010),
+    ...:  ('DB_VLAN', 11)]
+
+In [20]: sorted(list_of_tuples, key=itemgetter(1))
+Out[20]: [('DB_VLAN', 11), ('Mngmt_VLAN', 99), ('IT_VLAN', 320), ('User_VLAN', 1010)]
+```
 
 ---
-### Распаковка ключевых аргументов
+## enumerate
 
 +++
-### Распаковка ключевых аргументов
+### enumerate
 
-Аналогичным образом можно распаковывать словарь, чтобы передать его как ключевые аргументы.
+Иногда, при переборе объектов в цикле for, нужно не только получить сам объект, но и его порядковый номер.
+Это можно сделать, создав дополнительную переменную, которая будет расти на единицу с каждым прохождением цикла.
+Однако, гораздо удобнее это делать с помощью итератора __```enumerate()```__.
 
-Функция config_to_list (файл func_args_unpacking.py):
 ```python
-def config_to_list(cfg_file, delete_excl=True,
-                   delete_empty=True, strip_end=True):
-    result = []
-    with open(cfg_file) as f:
-        for line in f:
-            if strip_end:
-                line = line.rstrip()
-            if delete_empty and not line:
-                pass
-            elif delete_excl and line.startswith('!'):
-                pass
-            else:
-                result.append(line)
-    return result
-```
+In [15]: list1 = ['str1', 'str2', 'str3']
 
-+++
-### Распаковка ключевых аргументов
-
-Пример использования:
-```python
-In [9]: config_to_list('r1.txt')
-Out[9]:
-['service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- 'no ip domain lookup',
- 'ip ssh version 2']
-```
-
-+++
-### Распаковка ключевых аргументов
-
-Список словарей ```cfg```, в которых указано имя файла и все аргументы:
-```python
-In [10]: cfg = [dict(cfg_file='r1.txt', delete_excl=True, delete_empty=True, strip_end=True),
-   ....:        dict(cfg_file='r2.txt', delete_excl=False, delete_empty=True, strip_end=True),
-   ....:        dict(cfg_file='r3.txt', delete_excl=True, delete_empty=False, strip_end=True),
-   ....:        dict(cfg_file='r4.txt', delete_excl=True, delete_empty=True, strip_end=False)]
-```
-
-+++
-### Распаковка ключевых аргументов
-
-Если передать словарь функции config_to_list, возникнет ошибка:
-```python
-In [11]: for d in cfg:
-   ....:     print(config_to_list(d))
-   ....:
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-4-8d1e8defad71> in <module>()
-      1 for d in cfg:
-----> 2     print(config_to_list(d))
-      3
-
-<ipython-input-1-6337ba2bfe7a> in config_to_list(cfg_file, delete_excl, delete_empty, strip_end)
-      2                    delete_empty=True, strip_end=True):
-      3     result = []
-----> 4     with open( cfg_file ) as f:
-      5         for line in f:
-      6             if strip_end:
-
-TypeError: expected str, bytes or os.PathLike object, not dict
-
-```
-
-+++
-### Распаковка ключевых аргументов
-
-Если добавить ```**``` перед передачей словаря функции, функция нормально отработает:
-```python
-In [12]: for d in cfg:
-    ...:     print(config_to_list(**d))
+In [16]: for position, string in enumerate(list1):
+    ...:     print(position, string)
     ...:
-['service timestamps debug datetime msec localtime show-timezone year', 'service timestamps log datetime msec localtime show-timezone year', 'service password-encryption', 'service sequence-numbers', 'no ip domain lookup', 'ip ssh version 2']
-['!', 'service timestamps debug datetime msec localtime show-timezone year', 'service timestamps log datetime msec localtime show-timezone year', 'service password-encryption', 'service sequence-numbers', '!', 'no ip domain lookup', '!', 'ip ssh version 2', '!']
-['service timestamps debug datetime msec localtime show-timezone year', 'service timestamps log datetime msec localtime show-timezone year', 'service password-encryption', 'service sequence-numbers', '', '', '', 'ip ssh version 2', '']
-['service timestamps debug datetime msec localtime show-timezone year\n', 'service timestamps log datetime msec localtime show-timezone year\n', 'service password-encryption\n', 'service sequence-numbers\n', 'no ip domain lookup\n', 'ip ssh version 2\n']
+0 str1
+1 str2
+2 str3
+```
+
++++
+### enumerate
+
+```enumerate()``` умеет считать не только с нуля, но и с любого значение, которое ему указали после объекта:
+```python
+In [17]: list1 = ['str1', 'str2', 'str3']
+
+In [18]: for position, string in enumerate(list1, 100):
+    ...:     print(position, string)
+    ...:
+100 str1
+101 str2
+102 str3
+```
+
++++
+### enumerate
+
+Иногда нужно проверить, что сгенерировал итератор, как правило, на стадии написания скрипта.
+Если необходимо увидеть содержимое, которое сгенерирует итератор, полностью, можно воспользоваться функцией list:
+```python
+In [19]: list1 = ['str1', 'str2', 'str3']
+
+In [20]: list(enumerate(list1, 100))
+Out[20]: [(100, 'str1'), (101, 'str2'), (102, 'str3')]
+```
+
++++
+### Пример использования enumerate для EEM
+
+В этом примере используется Cisco [EEM](http://xgu.ru/wiki/EEM).
+Если в двух словах, то EEM позволяет выполнять какие-то действия (action) в ответ на событие (event).
+
+Выглядит applet EEM так:
+```python
+event manager applet Fa0/1_no_shut
+ event syslog pattern "Line protocol on Interface FastEthernet0/0, changed state to down"
+ action 1 cli command "enable"
+ action 2 cli command "conf t"
+ action 3 cli command "interface fa0/1"
+ action 4 cli command "no sh"
+```
+
+В EEM, в ситуации, когда действий выполнить нужно много, неудобно каждый раз набирать ```action x cli command```.
+Плюс, чаще всего, уже есть готовый кусок конфигурации, который должен выполнить EEM.
+
++++
+### Пример использования enumerate для EEM
+
+С помощью простого скрипта Python можно сгенерировать команды EEM на основании существующего списка команд (файл enumerate_eem.py):
+```python
+import sys
+
+config = sys.argv[1]
+
+with open(config, 'r') as f:
+    for i, command in enumerate(f, 1):
+        print('action {:04} cli command "{}"'.format(i, command.rstrip()))
+
+```
+
++++
+### Пример использования enumerate для EEM
+
+Файл с командами выглядит так (r1_config.txt):
+```python
+en
+conf t
+no int Gi0/0/0.300
+no int Gi0/0/0.301
+no int Gi0/0/0.302
+int range gi0/0/0-2
+ channel-group 1 mode active
+interface Port-channel1.300
+ encapsulation dot1Q 300
+ vrf forwarding Management
+ ip address 10.16.19.35 255.255.255.248
+```
+
++++
+### Пример использования enumerate для EEM
+
+Вывод будет таким:
+```python
+$ python enumerate_eem.py r1_config.txt
+action 0001 cli command "en"
+action 0002 cli command "conf t"
+action 0003 cli command "no int Gi0/0/0.300"
+action 0004 cli command "no int Gi0/0/0.301"
+action 0005 cli command "no int Gi0/0/0.302"
+action 0006 cli command "int range gi0/0/0-2"
+action 0007 cli command " channel-group 1 mode active"
+action 0008 cli command "interface Port-channel1.300"
+action 0009 cli command " encapsulation dot1Q 300"
+action 0010 cli command " vrf forwarding Management"
+action 0011 cli command " ip address 10.16.19.35 255.255.255.248"
 ```
 
 ---
-### Пример использования ключевых аргументов переменной длины и распаковки аргументов
+## Функция zip
 
 +++
-### Пример использования
+### Функция zip
 
-С помощью аргументов переменной длины и распаковки аргументов
-можно передавать аргументы между функциями.
+* на вход функции передаются последовательности
+* zip() возвращает итератор с кортежами, в котором n-ый кортеж состоит из n-ых элементов последовательностей, которые были переданы как аргументы
+  * например, десятый кортеж будет содержать десятый элемент каждой из переданных последовательностей
+* если на вход были переданы последовательности разной длины, то все они будут отрезаны по самой короткой последовательности
+* порядок элементов соблюдается
 
-Функция config_to_list (файл kwargs_example.py):
++++
+### Функция zip
+
 ```python
-def config_to_list(cfg_file, delete_excl=True,
-                   delete_empty=True, strip_end=True):
-    result = []
-    with open(cfg_file) as f:
-        for line in f:
-            if strip_end:
-                line = line.rstrip()
-            if delete_empty and not line:
-                pass
-            elif delete_excl and line.startswith('!'):
-                pass
-            else:
-                result.append(line)
-    return result
+In [1]: a = [1,2,3]
+
+In [2]: b = [100,200,300]
+
+In [3]: list(zip(a,b))
+Out[3]: [(1, 100), (2, 200), (3, 300)]
 ```
 
 +++
-### Вызов функции в ipython:
+### Функция zip
+
+Использование zip\(\) со списками разной длины:
 
 ```python
-In [1]: config_to_list('r1.txt')
-Out[1]:
-['service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- 'no ip domain lookup',
- 'ip ssh version 2']
-```
+In [4]: a = [1,2,3,4,5]
 
-По умолчанию из конфигурации убираются пустые строки, перевод строки в конце строк и строки, которые начинаются на знак восклицания.
+In [5]: b = [10,20,30,40,50]
 
-+++
-### Вызов функции
+In [6]: c = [100,200,300]
 
-Вызов функции со значением ```delete_empty=False```:
-```python
-In [2]: config_to_list('r1.txt', delete_empty=False)
-Out[2]:
-['service timestamps debug datetime msec localtime show-timezone year',
- 'service timestamps log datetime msec localtime show-timezone year',
- 'service password-encryption',
- 'service sequence-numbers',
- 'no ip domain lookup',
- '',
- '',
- 'ip ssh version 2']
-
+In [7]: list(zip(a,b,c))
+Out[7]: [(1, 10, 100), (2, 20, 200), (3, 30, 300)]
 ```
 
 +++
+### Использование zip для создания словаря
 
-Сделаем 'оберточную' функцию clear_cfg_and_write_to_file, которая берет файл конфигурации
-с помощью функции config_to_list, удаляет лишние строки и затем записывает строки в указанный файл.
-
-Но, при этом, мы не хотим терять возможность управлять тем, какие строки будут отброшены.
-То есть, необходимо, чтобы функция clear_cfg_and_write_to_file поддерживала те же параметры, что и функция config_to_list.
-
-+++
-### Дублирование параметров
-
-Конечно, можно просто продублировать все параметры функции и передать их в функцию config_to_list:
 ```python
-def clear_cfg_and_write_to_file(cfg, to_file, delete_excl=True,
-                                delete_empty=True, strip_end=True):
+In [4]: d_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
+In [5]: d_values = ['london_r1', '21 New Globe Walk', 'Cisco', '4451', '15.4', '10.255.0.1']
 
-    cfg_as_list = config_to_list(cfg, delete_excl=delete_excl,
-                    delete_empty=delete_empty, strip_end=strip_end)
-    with open(to_file, 'w') as f:
-        f.write('\n'.join(cfg_as_list))
+In [6]: list(zip(d_keys,d_values))
+Out[6]: 
+[('hostname', 'london_r1'),
+ ('location', '21 New Globe Walk'),
+ ('vendor', 'Cisco'),
+ ('model', '4451'),
+ ('IOS', '15.4'),
+ ('IP', '10.255.0.1')]
+
+In [7]: dict(zip(d_keys,d_values))
+Out[7]: 
+{'IOS': '15.4',
+ 'IP': '10.255.0.1',
+ 'hostname': 'london_r1',
+ 'location': '21 New Globe Walk',
+ 'model': '4451',
+ 'vendor': 'Cisco'}
+In [8]: r1 = dict(zip(d_keys,d_values))
+
+In [9]: r1
+Out[9]: 
+{'IOS': '15.4',
+ 'IP': '10.255.0.1',
+ 'hostname': 'london_r1',
+ 'location': '21 New Globe Walk',
+ 'model': '4451',
+ 'vendor': 'Cisco'}
 ```
 
 +++
-### Аргументы переменной длины
+### Использование zip для создания словаря
 
-Но, если воспользоваться возможностью Python принимать аргументы переменной длины, можно сделать функцию clear_cfg_and_write_to_file такой:
+Соберем их в словарь с ключами из списка и информацией из словаря data:
 ```python
-def clear_cfg_and_write_to_file(cfg, to_file, **kwargs):
-    cfg_as_list = config_to_list(cfg, **kwargs)
-    with open(to_file, 'w') as f:
-        f.write('\n'.join(cfg_as_list))
+In [10]: d_keys = ['hostname', 'location', 'vendor', 'model', 'IOS', 'IP']
+
+In [11]: data = {
+   ....: 'r1': ['london_r1', '21 New Globe Walk', 'Cisco', '4451', '15.4', '10.255.0.1'],
+   ....: 'r2': ['london_r2', '21 New Globe Walk', 'Cisco', '4451', '15.4', '10.255.0.2'],
+   ....: 'sw1': ['london_sw1', '21 New Globe Walk', 'Cisco', '3850', '3.6.XE', '10.255.0.101']
+   ....: }
+
+In [12]: london_co = {}
+
+In [13]: for k in data.keys():
+   ....:     london_co[k] = dict(zip(d_keys,data[k]))
+   ....:     
+
+In [14]: london_co
+Out[14]: 
+{'r1': {'IOS': '15.4',
+  'IP': '10.255.0.1',
+  'hostname': 'london_r1',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'r2': {'IOS': '15.4',
+  'IP': '10.255.0.2',
+  'hostname': 'london_r2',
+  'location': '21 New Globe Walk',
+  'model': '4451',
+  'vendor': 'Cisco'},
+ 'sw1': {'IOS': '3.6.XE',
+  'IP': '10.255.0.101',
+  'hostname': 'london_sw1',
+  'location': '21 New Globe Walk',
+  'model': '3850',
+  'vendor': 'Cisco'}}
+```
+
+---
+## Функция all
+
++++
+### Функция all
+
+Функция all() возвращает True, если все элементы истина (или объект пустой).
+```python
+In [1]: all([False, True, True])
+Out[1]: False
+
+In [2]: all([True, True, True])
+Out[2]: True
+
+In [3]: all([])
+Out[3]: True
+```
+
++++
+### Функция all
+
+Например, с помощью all можно проверить, все ли октеты в IP-адресе являются числами:
+```python
+In [4]: IP = '10.0.1.1'
+
+In [5]: all( i.isdigit() for i in IP.split('.'))
+Out[5]: True
+
+In [6]: all( i.isdigit() for i in '10.1.1.a'.split('.'))
+Out[6]: False
+```
+
+---
+## Функция any
+
++++
+### Функция any
+
+Функция any() возвращает True, если хотя бы один элемент истина.
+```python
+In [7]: any([False, True, True])
+Out[7]: True
+
+In [8]: any([False, False, False])
+Out[8]: False
+
+In [9]: any([])
+Out[9]: False
+
+In [10]: any( i.isdigit() for i in '10.1.1.a'.split('.'))
+Out[10]: True
+```
+
++++
+### Функция any
+
+Например, с помощью any, можно заменить функцию ignore_command:
+```python
+def ignore_command(command, ignore):
+    ignore = ['duplex', 'alias', 'Current configuration']
+
+    ignore_command = False
+
+    for word in ignore:
+        if word in command:
+            return True
+    return ignore_command
+```
+
+На такой вариант:
+```python
+def ignore_command(command, ignore):
+    ignore = ['duplex', 'alias', 'Current configuration']
+
+    return any(word in command for word in ignore)
 ```
 
