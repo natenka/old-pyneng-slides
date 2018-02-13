@@ -786,7 +786,7 @@ Out[10]: True
 
 Например, с помощью any, можно заменить функцию ignore_command:
 ```python
-def ignore_command(command, ignore):
+def ignore_command(command):
     ignore = ['duplex', 'alias', 'Current configuration']
 
     ignore_command = False
@@ -799,7 +799,7 @@ def ignore_command(command, ignore):
 
 На такой вариант:
 ```python
-def ignore_command(command, ignore):
+def ignore_command(command):
     ignore = ['duplex', 'alias', 'Current configuration']
 
     return any(word in command for word in ignore)
