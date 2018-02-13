@@ -5,7 +5,7 @@
 
 .reveal pre code {
     max-height: 550px;
-    font-family: Monaco, "Ubuntu Mono";
+    font-family: Monaco, "Ubuntu Mono", monospace;
 }
 
 .reveal .slides {
