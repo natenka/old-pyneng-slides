@@ -11,7 +11,7 @@
 +++
 ### Базовый пример
 
----?code=code/logging_basic.py&lang=python
+---?code=code/logging_basic.py&lang=python&title=Базовый пример
 
 +++
 ### Базовый пример
