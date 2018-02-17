@@ -192,3 +192,49 @@ logfile_with_rotation.log.3
 logfile_with_rotation.log - это самый свежий файл, затем идет logfile_with_rotation.log.1, logfile_with_rotation.log.2 и тд.
 
 
+---
+### Logging tree
+
++++?code=code/netmiko_func.py&lang=python&title=netmiko_func.py
+
++++?code=code/logging_api_example_6_mult_files.py&lang=python&title=logging_api_example_6_mult_files.py
+
++++
+### Результат выполнения
+
+```
+$ python logging_api_example_6_mult_files.py
+19:16:44 - superscript - DEBUG - Before function
+19:16:50 - superscript.netfunc - DEBUG - Вывод команды:
+Interface                  IP-Address      OK? Method Status                Protocol
+Ethernet0/0                192.168.100.1   YES NVRAM  up                    up
+Ethernet0/1                192.168.200.1   YES NVRAM  up                    up
+Ethernet0/2                190.16.200.1    YES NVRAM  up                    up
+Ethernet0/3                192.168.230.1   YES NVRAM  administratively down down
+Ethernet0/3.100            10.100.0.1      YES NVRAM  administratively down down
+Ethernet0/3.200            10.200.0.1      YES NVRAM  administratively down down
+Ethernet0/3.300            10.30.0.1       YES NVRAM  administratively down down
+Loopback0                  10.1.1.2        YES manual up                    up
+19:16:50 - superscript - DEBUG - After function
+```
+
+
+---
+### logger.exception
+
++++?code=code/logging_api_example_7_exception.py&lang=python&title=logging_api_example_7_exception.py
+
++++
+### Результат выполнения
+
+```
+$ python logging_api_example_7_exception.py
+19:23:24 - superscript - DEBUG - Before exception
+19:23:24 - superscript - ERROR - Error
+Traceback (most recent call last):
+  File "logging_api_example_7_exception.py", line 17, in <module>
+    2 + 'test'
+TypeError: unsupported operand type(s) for +: 'int' and 'str'
+19:23:24 - superscript - DEBUG - After exception
+```
+

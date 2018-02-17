@@ -1,3 +1,0 @@
-18:14:24 - My Script - DEBUG - Сообщение уровня debug SOS
-18:14:24 - My Script - INFO - Сообщение уровня info
-18:14:24 - My Script - WARNING - Сообщение уровня warning
