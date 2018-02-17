@@ -11,7 +11,11 @@
 ---
 ### Базовый пример
 
----?code=code/logging_basic_1.py&lang=python&title=logging_basic_1.py
++++?code=code/logging_basic_1.py&lang=python&title=logging_basic_1.py
+
+@[1]
+@[3]
+@[5-7]
 
 +++
 ### Log-файл
@@ -22,7 +26,7 @@ INFO:root:Сообщение уровня info
 WARNING:root:Сообщение уровня warning
 ```
 
----?code=code/logging_basic_2.py&lang=python&title=logging_basic_2.py
++++?code=code/logging_basic_2.py&lang=python&title=logging_basic_2.py
 
 +++
 ### Log-файл
@@ -33,3 +37,5 @@ DEBUG:root:Сообщение уровня debug:
 INFO:root:Сообщение уровня info
 WARNING:root:Сообщение уровня warning
 ```
+
+
