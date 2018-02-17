@@ -79,7 +79,7 @@ $ python logging_api_example_1.py
 
 По умолчанию вывод идет в stderr и уровень warning.
 
-+++?code=code/logging_api_example_1.py&lang=python&title=logging_api_example_1.py
++++?code=code/logging_api_example_2.py&lang=python&title=logging_api_example_2.py
 
 @[1]
 @[3-4]
