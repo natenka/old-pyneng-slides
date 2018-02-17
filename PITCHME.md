@@ -11,7 +11,6 @@
 ---
 ### Базовый пример
 
-+++
 ---?code=code/logging_basic_1.py&lang=python&title=logging_basic_1.py
 
 +++
@@ -23,10 +22,6 @@ INFO:root:Сообщение уровня info
 WARNING:root:Сообщение уровня warning
 ```
 
----
-### Базовый пример
-
-+++
 ---?code=code/logging_basic_2.py&lang=python&title=logging_basic_2.py
 
 +++
