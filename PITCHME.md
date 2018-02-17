@@ -105,6 +105,13 @@ $ python logging_api_example_2.py
 16:39:27 - My Script - WARNING - Сообщение уровня warning
 ```
 
++++
+### Вывод на стандартный поток вывода
+
++++?code=code/logging_api_example_2_stdout.py&lang=python&title=logging_api_example_2_stdout.py
+
+
+
 +++?code=code/logging_api_example_2_new_format.py&lang=python&title=logging_api_example_2_new_format.py
 
 @[1]
@@ -139,4 +146,49 @@ $ python logging_api_example_2.py
 @[3-4,12]
 @[14-17]
 @[1-17]
+
+
++++
+### Результат выполнения
+
+Файл logfile.log
+```
+17:58:34 - My Script - WARNING - Сообщение уровня warning
+```
+
+---
+### Запись в файл и вывод на stderr
+
++++?code=code/logging_api_example_4.py&lang=python&title=logging_api_example_4.py
+
+@[1-4]
+@[6-13]
+@[15-22]
+@[1-28]
+
+
+---
+### Handlers
+
++++
+### RotatingFileHandler
+
++++?code=code/logging_api_example_5_file_rotation.py&lang=python&title=logging_api_example_5_file_rotation.py
+
+@[2,7-8]
+@[1-20]
+
++++
+### Результат выполнения
+
+```
+$ ls -1 logfile_with_rotation*
+logfile_with_rotation.log
+logfile_with_rotation.log.1
+logfile_with_rotation.log.2
+logfile_with_rotation.log.3
+```
+
+logfile_with_rotation.log - это самый свежий файл, затем идет logfile_with_rotation.log.1, logfile_with_rotation.log.2 и тд.
+
 
