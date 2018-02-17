@@ -89,7 +89,7 @@ $ python logging_api_example_1.py
 @[1]
 @[3-4]
 @[6-7]
-@[8-10]
+@[8-10]([LogRecord attributes](https://docs.python.org/3.6/library/logging.html#logrecord-attributes), [time.strftime](https://docs.python.org/3.6/library/time.html#time.strftime))
 @[6-10]
 @[3-4,12]
 @[14-17]
