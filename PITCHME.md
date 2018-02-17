@@ -245,6 +245,8 @@ TypeError: unsupported operand type(s) for +: 'int' and 'str'
 
 +++?code=code/logging_api_example_8_yaml_cfg.py&lang=python&title=logging_api_example_8_yaml_cfg.py
 
++++?code=code/log_config.yml&lang=yaml&title=log_config.yml
+
 +++
 ### Результат выполнения
 
