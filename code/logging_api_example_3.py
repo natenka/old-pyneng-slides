@@ -3,16 +3,16 @@ import logging
 logger = logging.getLogger('My Script')
 logger.setLevel(logging.DEBUG)
 
-console = logging.StreamHandler()
-console.setLevel(logging.DEBUG)
+logfile = logging.FileHandler('logfile.log')
+logfile.setLevel(logging.WARNING)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                               datefmt='%H:%M:%S')
-console.setFormatter(formatter)
+logfile.setFormatter(formatter)
 
-logger.addHandler(console)
+logger.addHandler(logfile)
 
 ## messages
-logger.debug('Сообщение уровня debug %s', 'SOS')
+logger.debug('Сообщение уровня debug')
 logger.info('Сообщение уровня info')
 logger.warning('Сообщение уровня warning')
 

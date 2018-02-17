@@ -31,6 +31,7 @@ WARNING:root:Сообщение уровня warning
 @[1]
 @[3]
 @[5-7]
+@[1-7]
 
 +++
 ### Log-файл
@@ -63,11 +64,15 @@ WARNING:root:Сообщение уровня warning
 * Filter - позволяет фильтровать сообщения
 * Formatter - указывает формат сообщения
 
+---
+### Вывод на стандартный поток ошибок
+
 +++?code=code/logging_api_example_1.py&lang=python&title=logging_api_example_1.py
 
 @[1]
 @[3]
 @[5-8]
+@[1-8]
 
 +++
 ### Результат выполнения
@@ -85,16 +90,53 @@ $ python logging_api_example_1.py
 @[3-4]
 @[6-7]
 @[8-10]
-@[12]
+@[6-10]
+@[3-4,12]
 @[14-17]
+@[1-17]
 
 +++
 ### Результат выполнения
 
 ```
 $ python logging_api_example_2.py
-16:30:07 - My Script - DEBUG - Сообщение уровня debug
-16:30:07 - My Script - INFO - Сообщение уровня info
-16:30:07 - My Script - WARNING - Сообщение уровня warning
+16:39:27 - My Script - DEBUG - Сообщение уровня debug: SOS
+16:39:27 - My Script - INFO - Сообщение уровня info
+16:39:27 - My Script - WARNING - Сообщение уровня warning
 ```
+
++++?code=code/logging_api_example_2_new_format.py&lang=python&title=logging_api_example_2_new_format.py
+
+@[1]
+@[3-4]
+@[6-7]
+@[8-10]
+@[6-10]
+@[3-4,12]
+@[14-17]
+@[1-17]
+
++++
+### Результат выполнения
+
+```
+$ python logging_api_example_2.py
+16:45:20 - My Script - DEBUG - Сообщение уровня debug: SOS
+16:45:20 - My Script - INFO - Сообщение уровня info
+16:45:20 - My Script - WARNING - Сообщение уровня warning
+```
+
+---
+### Запись логов в файл
+
++++?code=code/logging_api_example_3.py&lang=python&title=logging_api_example_3.py
+
+@[1]
+@[3-4]
+@[6-7]
+@[8-10]
+@[6-10]
+@[3-4,12]
+@[14-17]
+@[1-17]
 
