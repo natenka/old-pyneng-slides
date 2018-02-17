@@ -238,3 +238,20 @@ TypeError: unsupported operand type(s) for +: 'int' and 'str'
 19:23:24 - superscript - DEBUG - After exception
 ```
 
+---
+### Конфигурация logging из словаря
+
++++?code=code/logging_api_example_8.py&lang=python&title=logging_api_example_8.py
+
++++?code=code/logging_api_example_8_yaml_cfg.py&lang=python&title=logging_api_example_8_yaml_cfg.py
+
++++
+### Результат выполнения
+
+```
+$ python logging_api_example_8_yaml_cfg.py
+2018-02-17 19:50:56,266 - superscript - DEBUG - Сообщение уровня debug SOS
+2018-02-17 19:50:56,266 - superscript - INFO - Сообщение уровня info
+2018-02-17 19:50:56,266 - superscript - WARNING - Сообщение уровня warning
+```
+
