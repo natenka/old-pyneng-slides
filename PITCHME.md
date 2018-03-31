@@ -154,7 +154,7 @@ r5.example.com
 Если в группу надо добавить несколько устройств с однотипными именами, можно использовать такой вариант записи:
 ```ini
 [cisco-routers]
-192.168.255.[1-5]
+192.168.255.[1:5]
 ```
 
 В группу попадут устройства с адресами 192.168.255.1-192.168.255.5.
@@ -780,25 +780,15 @@ Ansible позволяет хранить переменные для групп
 
 Файл group_vars/all.yml:
 ```
-cli:
-  host: "{{ inventory_hostname }}"
-  username: "cisco"
-  password: "cisco"
-  transport: cli
-  authorize: yes
-  auth_pass: "cisco"
+ansible_connection: network_cli
+ansible_network_os: ios
+ansible_user: cisco
+ansible_password: cisco
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_pass: cisco
 
 ```
-
-#VSLIDE
-### Переменные в специальных файлах
-
-В файле group_vars/all.yml создан словарь cli.
-В этом словаре перечислены те аргументы, которые должны задаваться для работы с сетевым оборудованием через встроенные модули Ansible
-
-Переменная host: "{{ inventory_hostname }}":
-* inventory_hostname - это специальная переменная, которая указывает на тот хост, для которого Ansible выполняет действия.
-* синтаксис {{ inventory_hostname }} - это подстановка переменных. Используется формат Jinja
 
 #VSLIDE
 ### Переменные в специальных файлах
@@ -1111,21 +1101,16 @@ $ ansible-playbook 3_register_debug_when.yml
 #VSLIDE
 ### Особенности подключения к сетевому оборудованию
 
-При  работе с сетевым оборудованием, есть несколько параметров в playbook, которые нужно менять:
-* gather_facts - надо отключить, так как для сетевого оборудования используются свои модули сбора фактов
-* connection - управляет тем, как именно будет происходить подключение. Для сетевого оборудования необходимо установить в network_cli
+При  работе с сетевым оборудованием надо указать, что должно использоваться подключение типа network_cli.
+Это можно указывать в инвентарном файле, файлах с перемеными и т.д.
 
-#VSLIDE
-### Особенности подключения к сетевому оборудованию
 
-То есть, для каждого сценария (play), нужно указывать:
-* gather_facts: false
-* connection: network_cli
-
+Пример настройки для сценария (play):
 ```
+---
+
 - name: Run show commands on routers
   hosts: cisco-routers
-  gather_facts: false
   connection: network_cli
 
 ```
@@ -1135,12 +1120,20 @@ $ ansible-playbook 3_register_debug_when.yml
 
 В Ansible переменные можно указывать в разных местах, поэтому те же настройки можно указать по-другому.
 
-Например, в конфигурационном файле:
-```
-[defaults]
 
-gathering = explicit
+Например, в инвентарном файле:
 ```
+[cisco-routers]
+192.168.100.1
+192.168.100.2
+192.168.100.3
+
+[cisco-switches]
+192.168.100.100
+
+[cisco-routers:vars]
+ansible_connection=network_cli
+
 
 #VSLIDE
 ### Особенности подключения к сетевому оборудованию
@@ -1176,122 +1169,35 @@ ansible_connection=network_cli
 ansible_connection: network_cli
 ```
 
-#VSLIDE
-### Особенности подключения к сетевому оборудованию
-
-В следующих разделах будет использоваться такой вариант:
-```
-- name: Run show commands on routers
-  hosts: cisco-routers
-  gather_facts: false
-  connection: network_cli
-```
-
-В реальной жизни нужно выбрать тот вариант, который наиболее удобен для работы.
 
 #VSLIDE
-### Аргумент provider
 
-Модули, которые используются для работы с сетевым оборудованием, требуют задания нескольких аргументов.
+Модули, которые используются для работы с сетевым оборудованием, требуют задания нескольких параметров.
 
-Для каждой задачи должны быть указаны такие аргументы:
-* __host__ - имя или IP-адрес удаленного устройства
-* __port__ - к какому порту подключаться
-* __username__ - имя пользователя
-* __password__ - пароль
-* __transport__ - тип подключения: CLI или API. По умолчанию - cli
-* __authorize__ - нужно ли переходить в привилегированный режим (enable, для Cisco)
-* __auth_pass__ - пароль для привилегированного режима
+* ansible_network_os - например, ios, eos
+* ansible_user - имя пользователя
+* ansible_password - пароль
+* ansible_become - нужно ли переходить в привилегированный режим (enable, для Cisco)
+* ansible_become_method - каким образом надод переходить в привилегированный режим
+* ansible_become_pass - пароль для привилегированного режима
 
-#VSLIDE
-### Аргумент provider
 
-Ansible также позволяет собрать их в один аргумент - __provider__.
 
-```
-  tasks:
-
-    - name: run show version
-      ios_command:
-        commands: show version
-        host: "{{ inventory_hostname }}"
-        username: cisco
-        password: cisco
-        transport: cli
-```
 
 #VSLIDE
-### Аргумент provider
 
-Аргументы созданы как переменная ```cli``` в playbook, а затем передаются как переменная аргументу provider:
+Пример указания всех параметров в group_vars/all.yml:
 ```
-  vars:
-    cli:
-      host: "{{ inventory_hostname }}"
-      username: cisco
-      password: cisco
-      transport: cli
+---
 
-  tasks:
-    - name: run show version
-      ios_command:
-        commands: show version
-        provider: "{{ cli }}"
-
+ansible_connection: network_cli
+ansible_network_os: ios
+ansible_user: cisco
+ansible_password: cisco
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_pass: cisco
 ```
-
-#VSLIDE
-### Аргумент provider
-
-И, самый удобный вариант, задавать аргументы в каталоге group_vars.
-
-Например, если у всех устройств одинаковые значения аргументов, можно задать их в файле group_vars/all.yml:
-```
-cli:
-  host: "{{ inventory_hostname }}"
-  username: cisco
-  password: cisco
-  transport: cli
-  authorize: yes
-  auth_pass: cisco
-```
-
-#VSLIDE
-### Аргумент provider
-
-Затем переменная используется в playbook так же, как и в случае указания переменных в playbook:
-```
-  tasks:
-    - name: run show version
-      ios_command:
-        commands: show version
-        provider: "{{ cli }}"
-```
-
-#VSLIDE
-### Аргумент provider
-
-Кроме того, Ansible поддерживает задание параметров в переменных окружения:
-* ANSIBLE_NET_USERNAME - для переменной username
-* ANSIBLE_NET_PASSWORD - password
-* ANSIBLE_NET_SSH_KEYFILE - ssh_keyfile
-* ANSIBLE_NET_AUTHORIZE - authorize
-* ANSIBLE_NET_AUTH_PASS - auth_pass
-
-#VSLIDE
-### Аргумент provider
-
-Приоритетность значений в порядке возрастания приоритетности:
-* значения по умолчанию
-* значения переменных окружения
-* параметр provider
-* аргументы задачи (task)
-
-#VSLIDE
-### Подготовка к работе с сетевыми модулями
-
-В следующих разделах рассматривается работа с модулями ios_command, ios_facts и ios_config.
-Для того, чтобы все примеры playbook работали, надо создать несколько файлов (проверить, что они есть).
 
 #VSLIDE
 ### Подготовка к работе с сетевыми модулями
@@ -1315,23 +1221,22 @@ cli:
 [defaults]
 
 inventory = ./myhosts
-
-remote_user = cisco
-ask_pass = True
 ```
 
 #VSLIDE
 ### Подготовка к работе с сетевыми модулями
 
-В файле group_vars/all.yml надо создать переменную cli, чтобы не указывать каждый раз все параметры, которые нужно передать аргументу provider:
+В файле group_vars/all.yml надо создать параметры для подключения к оборудованию:
 ```
-cli:
-  host: "{{ inventory_hostname }}"
-  username: "cisco"
-  password: "cisco"
-  transport: cli
-  authorize: yes
-  auth_pass: "cisco"
+---
+
+ansible_connection: network_cli
+ansible_network_os: ios
+ansible_user: cisco
+ansible_password: cisco
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_pass: cisco
 ```
 
 #HSLIDE
@@ -1375,15 +1280,12 @@ cli:
 ```
 - name: Run show commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
     - name: run sh ip int br
       ios_command:
         commands: show ip int br
-        provider: "{{ cli }}"
       register: sh_ip_int_br_result
 
     - name: Debug registered var
@@ -1395,7 +1297,6 @@ cli:
 
 Модуль ios_command ожидает параметры:
 * commands - список команд, которые нужно отправить на устройство
-* provider - словарь с параметрами подключения
  * в нашем случае, он указан в файле group_vars/all.yml
 
 Обратите внимание, что параметр register находится на одном уровне с именем задачи и модулем, а не на уровне параметров модуля ios_command.
@@ -1417,8 +1318,6 @@ Playbook 2_ios_command.yml выполняет несколько команд и
 ```
 - name: Run show commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -1427,7 +1326,6 @@ Playbook 2_ios_command.yml выполняет несколько команд и
         commands:
           - show ip int br
           - sh ip route
-        provider: "{{ cli }}"
       register: show_result
 
     - name: Debug registered var
@@ -1491,8 +1389,6 @@ Ansible обнаружил ошибку и возвращает сообщени
 ```
 - name: Run show commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -1501,7 +1397,6 @@ Ansible обнаружил ошибку и возвращает сообщени
         commands: ping 192.168.100.100
         wait_for:
           - result[0] contains 'Success rate is 100 percent'
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -1578,7 +1473,6 @@ $ ansible-playbook 3_ios_command_wait_for.yml -v
 ```
 - ios_facts:
     gather_subset: all
-    provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -1589,7 +1483,6 @@ $ ansible-playbook 3_ios_command_wait_for.yml -v
 - ios_facts:
     gather_subset:
       - interfaces
-    provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -1600,7 +1493,6 @@ $ ansible-playbook 3_ios_command_wait_for.yml -v
 - ios_facts:
     gather_subset:
       - "!hardware"
-    provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -1632,15 +1524,12 @@ Ansible собирает такие факты:
 ```
 - name: Collect IOS facts
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
     - name: Facts
       ios_facts:
         gather_subset: all
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -1677,15 +1566,12 @@ Using /home/nata/pyneng_course/chapter15/ansible.cfg as config file
 ```yml
 - name: Collect IOS facts
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
     - name: Facts
       ios_facts:
         gather_subset: all
-        provider: "{{ cli }}"
 
     - name: Show ansible_net_all_ipv4_addresses fact
       debug: var=ansible_net_all_ipv4_addresses
@@ -1721,15 +1607,12 @@ Playbook 3_ios_facts.yml:
 ```
 - name: Collect IOS facts
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
     - name: Facts
       ios_facts:
         gather_subset: all
-        provider: "{{ cli }}"
       register: ios_facts_result
 
     #- name: Create all_facts dir
@@ -1890,8 +1773,6 @@ $ ansible-playbook 3_ios_facts.yml
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -1899,7 +1780,6 @@ $ ansible-playbook 3_ios_facts.yml
       ios_config:
         lines:
           - service password-encryption
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -1942,8 +1822,6 @@ $ ansible-playbook 1_ios_config_lines.yml
 ```
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -1954,7 +1832,6 @@ $ ansible-playbook 1_ios_config_lines.yml
           - no ip http server
           - no ip http secure-server
           - no ip domain lookup
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -1990,8 +1867,6 @@ line vty 0 4
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2002,7 +1877,6 @@ line vty 0 4
         lines:
           - login local
           - transport input ssh
-        provider: "{{ cli }}"
 
 ```
 
@@ -2035,8 +1909,6 @@ policy-map OUT_QOS
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2047,7 +1919,6 @@ policy-map OUT_QOS
           - class class-default
         lines:
           - shape average 100000000 1000000
-        provider: "{{ cli }}"
 ```
 
 #HSLIDE
@@ -2061,8 +1932,6 @@ Playbook 2_ios_config_parents_basic.yml:
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2073,7 +1942,6 @@ Playbook 2_ios_config_parents_basic.yml:
         lines:
           - login local
           - transport input ssh
-        provider: "{{ cli }}"
 
 ```
 
@@ -2110,8 +1978,6 @@ $ ansible-playbook 2_ios_config_parents_basic.yml -v
 ```
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2122,7 +1988,6 @@ $ ansible-playbook 2_ios_config_parents_basic.yml -v
         lines:
           - login local
           - transport input ssh
-        provider: "{{ cli }}"
       register: cfg
 
     - name: Show config updates
@@ -2205,8 +2070,6 @@ Playbook 4_ios_config_save_when.yml
 ```
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2218,7 +2081,6 @@ Playbook 4_ios_config_save_when.yml
           - login local
           - transport input ssh
         save_when: modified
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2228,8 +2090,6 @@ Playbook 4_ios_config_save_when.yml
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2240,14 +2100,12 @@ Playbook 4_ios_config_save_when.yml
         lines:
           - login local
           - transport input ssh
-        provider: "{{ cli }}"
       register: cfg
 
     - name: Save config
       ios_command:
         commands:
           - write
-        provider: "{{ cli }}"
       when: cfg.changed
 ```
 
@@ -2272,8 +2130,6 @@ Playbook 5_ios_config_backup.yml:
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2285,7 +2141,6 @@ Playbook 5_ios_config_backup.yml:
           - login local
           - transport input ssh
         backup: yes
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2337,8 +2192,6 @@ $ ansible-playbook 5_ios_config_backup.yml -v
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2349,7 +2202,6 @@ $ ansible-playbook 5_ios_config_backup.yml -v
         lines:
           - ip address 192.168.200.1 255.255.255.0
           - ip mtu 1500
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2359,8 +2211,6 @@ $ ansible-playbook 5_ios_config_backup.yml -v
 ```
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2372,7 +2222,6 @@ $ ansible-playbook 5_ios_config_backup.yml -v
           - ip address 192.168.200.1 255.255.255.0
           - ip mtu 1500
         defaults: yes
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2415,8 +2264,6 @@ $ ansible-playbook 6_ios_config_defaults.yml
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2428,7 +2275,6 @@ $ ansible-playbook 6_ios_config_defaults.yml
           - ip address 192.168.230.1 255.255.255.0
         after:
           - no shutdown
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2457,8 +2303,6 @@ $ ansible-playbook 7_ios_config_after.yml -v
 ```yml
 - name: Run cfg commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2472,7 +2316,6 @@ $ ansible-playbook 7_ios_config_after.yml -v
         after:
           - end
           - write
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2513,8 +2356,6 @@ Playbook 8_ios_config_before.yml:
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2528,7 +2369,6 @@ Playbook 8_ios_config_before.yml:
           - permit tcp 10.0.1.0 0.0.0.255 any eq www
           - permit tcp 10.0.1.0 0.0.0.255 any eq 22
           - permit icmp any any
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2595,8 +2435,6 @@ ip access-list extended IN_to_OUT
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2608,7 +2446,6 @@ ip access-list extended IN_to_OUT
           - permit tcp 10.0.1.0 0.0.0.255 any eq www
           - permit tcp 10.0.1.0 0.0.0.255 any eq 22
           - permit icmp any any
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2664,8 +2501,6 @@ Playbook 9_ios_config_match_exact.yml (будет постепенно допо�
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2678,7 +2513,6 @@ Playbook 9_ios_config_match_exact.yml (будет постепенно допо�
           - permit tcp 10.0.1.0 0.0.0.255 any eq 22
           - permit icmp any any
           - deny   ip any any
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2713,8 +2547,6 @@ ip access-list extended IN_to_OUT
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2729,7 +2561,6 @@ ip access-list extended IN_to_OUT
           - permit tcp 10.0.1.0 0.0.0.255 any eq 22
           - permit icmp any any
           - deny   ip any any
-        provider: "{{ cli }}"
 ```
 
 Если применить playbook к последнему состоянию маршрутизатора, то изменений не будет никаких, так как все строки уже есть.
@@ -2781,8 +2612,6 @@ ip access-list extended IN_to_OUT
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2798,7 +2627,6 @@ ip access-list extended IN_to_OUT
           - permit icmp any any
           - deny   ip any any
         match: exact
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2832,8 +2660,6 @@ ip access-list extended IN_to_OUT
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2849,7 +2675,6 @@ ip access-list extended IN_to_OUT
           - permit icmp any any
           - deny   ip any any
         match: exact
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2913,8 +2738,6 @@ Playbook 9_ios_config_match_strict.yml:
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2929,7 +2752,6 @@ Playbook 9_ios_config_match_strict.yml:
           - permit tcp 10.0.1.0 0.0.0.255 any eq 22
           - permit icmp any any
         match: strict
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -2961,8 +2783,6 @@ $ ansible-playbook 9_ios_config_match_strict.yml -v
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -2977,7 +2797,6 @@ $ ansible-playbook 9_ios_config_match_strict.yml -v
           - permit tcp 10.0.1.0 0.0.0.255 any eq 22
           - permit icmp any any
         match: none
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -3027,8 +2846,6 @@ ip access-list extended IN_to_OUT
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -3043,7 +2860,6 @@ ip access-list extended IN_to_OUT
           - permit tcp 10.0.1.0 0.0.0.255 any eq 22
           - permit icmp any any
           - deny   ip any any
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -3099,8 +2915,6 @@ Playbook 10_ios_config_replace_block.yml:
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -3116,7 +2930,6 @@ Playbook 10_ios_config_replace_block.yml:
           - permit icmp any any
           - deny   ip any any
         replace: block
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -3159,15 +2972,12 @@ ip access-list extended IN_to_OUT
 ```yml
 - name: Run cfg commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
     - name: Config ACL
       ios_config:
         src: templates/acl_cfg.txt
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -3297,15 +3107,12 @@ ospf_ints:
 ```yml
 - name: Run cfg commands on router
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
     - name: Config OSPF
       ios_config:
         src: templates/ospf.j2
-        provider: "{{ cli }}"
 ```
 
 #VSLIDE
@@ -3460,8 +3267,6 @@ pip install ntc-ansible
 ```
 - name: Run show commands on router
   hosts: 192.168.100.1
-  gather_facts: false
-  connection: local
 
   tasks:
 
@@ -3521,8 +3326,6 @@ Start
 ```
 - name: Run show commands on routers
   hosts: cisco-routers
-  gather_facts: false
-  connection: local
 
   tasks:
 
