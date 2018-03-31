@@ -1109,41 +1109,24 @@ $ ansible-playbook 3_register_debug_when.yml
 
 
 #VSLIDE
-### Варианты подключения
-
-Ansible поддерживает такие типы подключений:
-* __paramiko__
-* __SSH__ - OpenSSH. Используется по умолчанию
-* __local__ - действия выполняются локально, на управляющем хосте
-
-При подключении по SSH, по умолчанию используются SSH ключи, но можно переключиться на использование паролей.
-
-#VSLIDE
-### Варианты подключения
-
-По умолчанию, Ansible загружает модуль Python на устройство, для того, чтобы выполнить действия.
-Если же оборудование не поддерживает Python, как в случае с доступом к сетевому оборудованию через CLI, нужно указать, что модуль должен запускаться локально, на управляющем хосте Ansible.
-
-
-#VSLIDE
 ### Особенности подключения к сетевому оборудованию
 
 При  работе с сетевым оборудованием, есть несколько параметров в playbook, которые нужно менять:
 * gather_facts - надо отключить, так как для сетевого оборудования используются свои модули сбора фактов
-* connection - управляет тем, как именно будет происходить подключение. Для сетевого оборудования необходимо установить в local
+* connection - управляет тем, как именно будет происходить подключение. Для сетевого оборудования необходимо установить в network_cli
 
 #VSLIDE
 ### Особенности подключения к сетевому оборудованию
 
 То есть, для каждого сценария (play), нужно указывать:
 * gather_facts: false
-* connection: local
+* connection: network_cli
 
 ```
 - name: Run show commands on routers
   hosts: cisco-routers
   gather_facts: false
-  connection: local
+  connection: network_cli
 
 ```
 
@@ -1182,7 +1165,7 @@ gathering = explicit
 192.168.100.100
 
 [cisco-routers:vars]
-ansible_connection=local
+ansible_connection=network_cli
 ```
 
 #VSLIDE
@@ -1190,7 +1173,7 @@ ansible_connection=local
 
 Или в файлах переменных, например, в group_vars/all.yml:
 ```
-ansible_connection: local
+ansible_connection: network_cli
 ```
 
 #VSLIDE
@@ -1201,7 +1184,7 @@ ansible_connection: local
 - name: Run show commands on routers
   hosts: cisco-routers
   gather_facts: false
-  connection: local
+  connection: network_cli
 ```
 
 В реальной жизни нужно выбрать тот вариант, который наиболее удобен для работы.
