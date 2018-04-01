@@ -1131,7 +1131,7 @@ $ ansible-playbook 3_register_debug_when.yml
 
 [cisco-routers:vars]
 ansible_connection=network_cli
-
+```
 
 #VSLIDE
 ### Особенности подключения к сетевому оборудованию
