@@ -1107,8 +1107,6 @@ $ ansible-playbook 3_register_debug_when.yml
 
 Пример настройки для сценария (play):
 ```
----
-
 - name: Run show commands on routers
   hosts: cisco-routers
   connection: network_cli
@@ -1188,8 +1186,6 @@ ansible_connection: network_cli
 
 Пример указания всех параметров в group_vars/all.yml:
 ```
----
-
 ansible_connection: network_cli
 ansible_network_os: ios
 ansible_user: cisco
@@ -1228,8 +1224,6 @@ inventory = ./myhosts
 
 В файле group_vars/all.yml надо создать параметры для подключения к оборудованию:
 ```
----
-
 ansible_connection: network_cli
 ansible_network_os: ios
 ansible_user: cisco
