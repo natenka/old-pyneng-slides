@@ -354,5 +354,5 @@ $ ansible-playbook 3_ios_command_wait_for.yml -v
 #VSLIDE
 ### wait_for
 
-![ios_command](https://raw.githubusercontent.com/vladimirovgeorgij/PyNEng/master/images/15_ansible/3_ios_command_waitfor.png)
+![ios_command](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/3_ios_command_waitfor.png)
 
