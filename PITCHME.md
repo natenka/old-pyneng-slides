@@ -87,8 +87,8 @@
 ### Модуль ios_facts
 
 Ansible собирает такие факты:
-* ansible_net_all_ipv4_addresses - список IPv4 адресов на устройстве
-* ansible_net_all_ipv6_addresses - список IPv6 адресов на устройстве
+* ansible_net_all_ipv4_addresses - список IPv4-адресов на устройстве
+* ansible_net_all_ipv6_addresses - список IPv6-адресов на устройстве
 * ansible_net_config - конфигурация (для Cisco sh run)
 * ansible_net_filesystems - файловая система устройства
 * ansible_net_gather_subset - какая информация собирается (hardware, default, interfaces, config)
