@@ -17,7 +17,7 @@ __ntc-ansible__ - это модуль для работы с сетевым об
 #VSLIDE
 ### ntc-ansible
 
-Но прежде нужно указать в ansible.cfg, где искать сторонние модули:
+Но прежде нужно указать Ansible, где искать сторонние модули в ansible.cfg:
 ```
 [defaults]
 
@@ -65,14 +65,14 @@ pip install ntc-ansible
 #VSLIDE
 ### ntc-ansible
 
-Раз в текущей версии Ansible уже есть модули, которые работают с сетевым оборудованием и позволяют выполнять команды, то из всех возможностей ntc-ansible, наиболее полезной будет отправка команд show и получение структурированного вывода.
+Так как в текущей версии Ansible уже есть модули, которые работают с сетевым оборудованием и позволяют выполнять команды, из всех возможностей ntc-ansible, наиболее полезной будет отправка команд show и получение структурированного вывода.
 
 За это отвечает модуль ntc_show_command.
 
 #VSLIDE
 ### ntc_show_command
 
-Модуль использует netmiko для подключения к оборудованию (netmiko должен быть установлен) и, после выполнения команды, преобразует вывод команды show с помощью TextFSM в структурированный вывод (список словарей).
+Модуль использует netmiko для подключения к оборудованию и, после выполнения команды, преобразует вывод команды show с помощью TextFSM в структурированный вывод (список словарей).
 
 Преобразование будет выполняться в том случае, если в файле index была найдена команда и для команды был найден шаблон.
 
@@ -81,13 +81,13 @@ pip install ntc-ansible
 
 Параметры для подключения:
 
-* __connection__ - ssh (подключение netmiko) или offline (чтение из файла для тестовых целей);
-* __platform__ - платформа, которая существует в index файле library/ntc-ansible/ntc-templates/templates/index;
+* __connection__ - тут возможны два варианта: ssh (подключение netmiko) или offline (чтение из файла для тестовых целей);
+* __platform__ - платформа, которая существует в index файле (library/ntc-ansible/ntc-templates/templates/index);
 * __command__ - команда, которую нужно выполнить на устройстве;
 * __host__ - IP-адрес или имя устройства;
 * __username__ - имя пользователя;
 * __password__ - пароль;
-* __template_dir__ - путь к каталогу с шаблонами library/ntc-ansible/ntc-templates/templates.
+* __template_dir__ - путь к каталогу с шаблонами (library/ntc-ansible/ntc-templates/templates.
 
 #VSLIDE
 ### ntc_show_command
@@ -130,6 +130,7 @@ $ ansible-playbook 1_ntc-ansible.yml
 ### ntc_show_command
 
 В переменной response находится структурированный вывод в виде списка словарей.
+
 Ключи в словарях получены на основании переменных, которые описаны в шаблоне library/ntc-ansible/ntc-templates/templates/cisco_ios_show_ip_int_brief.template (единственное отличие - регистр):
 ```
 Value INTF (\S+)
@@ -144,14 +145,14 @@ Start
 #VSLIDE
 ### ntc_show_command
 
-Для того, чтобы получить вывод про первый интерфейс, можно поменять вывод модуля debug, таким образом:
+Для того, чтобы получить вывод про первый интерфейс, нужно изменить вывод модуля debug таким образом:
 ```
     - debug: var=result.response[0]
 ```
 
 #VSLIDE
 
-Пример playbook 2_ntc_ansible_save.yml с сохранением результатов команды:
+Пример playbook 2_ntc_ansible_save.yml с сохранением в файл результатов выполнения команды:
 ```
 - name: Run show commands on routers
   hosts: cisco-routers
@@ -192,7 +193,8 @@ $ ansible-playbook 2_ntc-ansible_save.yml
 ### Сохранение результатов выполнения команды
 
 В результате, в каталоге all_facts появляются соответствующие файлы для каждого маршрутизатора.
-Пример файла all_facts/192.168.100.1_sh_ip_int_br.json:
+
+Например, файл all_facts/192.168.100.1_sh_ip_int_br.json:
 ```
 [
     {
@@ -247,4 +249,4 @@ ls -ls library/ntc-ansible/ntc-templates/templates/
 
 Используя TextFSM можно самостоятельно создавать дополнительные шаблоны.
 
-И, для того, чтобы ntc-ansible их использовал автоматически, добавить их в файл index (library/ntc-ansible/ntc-templates/templates/index)
+Для того, чтобы ntc-ansible их использовал автоматически, нужно добавить их в файл index (library/ntc-ansible/ntc-templates/templates/index).
