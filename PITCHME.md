@@ -54,7 +54,7 @@
     <th align="center">Лекция</th>
     <th align="center">Дата</th>
     <th align="center">Тема</th>
-    <th align="center">Кол-во заданий</th>
+    <th align="center">Задания</th>
  </tr>
  <tr>
     <td align="center">1</td>
@@ -90,6 +90,17 @@
     <td>Управление ходом программы. Работа с файлами (4ч)</td>
     <td align="center">13</td>
  </tr>
+ </table>
+
+ 
+ <table border="1" cellpadding="4" cellspacing="0">
+ <tr>
+    <th align="center">Неделя</th>
+    <th align="center">Лекция</th>
+    <th align="center">Дата</th>
+    <th align="center">Тема</th>
+    <th align="center">Задания</th>
+ </tr>
  <tr>
     <td rowspan="2" align="center">5</td>
     <td align="center">6</td>
@@ -116,6 +127,8 @@
     <td>Регулярные выражения (3ч)</td>
     <td align="center">10</td>
  </tr>
+</table>
+
 
  <tr>
     <td align="center">7</td>
