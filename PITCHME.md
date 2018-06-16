@@ -46,12 +46,14 @@
 ---
 ### Расписание курса
 
++++
+
 <table border="1" cellpadding="4" cellspacing="0">
  <tr>
     <th align="center">Неделя</th>
     <th align="center">Лекция</th>
     <th align="center">Дата</th>
-    <th align="center">Тема (длительность лекции)</th>
+    <th align="center">Тема</th>
     <th align="center">Кол-во заданий</th>
  </tr>
  <tr>
