@@ -94,7 +94,7 @@
 
 +++
 
- <table border="1" cellpadding="4" cellspacing="0">
+<table border="1" cellpadding="4" cellspacing="0">
  <tr>
     <th align="center">Неделя</th>
     <th align="center">Лекция</th>
@@ -218,6 +218,17 @@
     <td align="center">16.09.18</td>
     <td>Обработка неструктурированного вывода команд с помощью TextFSM (3ч)</td>
     <td align="center">8</td>
+ </tr>
+ </table>
+
++++
+ <table border="1" cellpadding="4" cellspacing="0">
+ <tr>
+    <th align="center">Неделя</th>
+    <th align="center">Лекция</th>
+    <th align="center">Дата</th>
+    <th align="center">Тема</th>
+    <th align="center">Задания</th>
  </tr>
  <tr>
     <td rowspan="2" align="center">15</td>
