@@ -128,9 +128,6 @@
     <td>Регулярные выражения (3ч)</td>
     <td align="center">10</td>
  </tr>
-</table>
-
-
  <tr>
     <td align="center">7</td>
     <td align="center">10</td>
@@ -144,6 +141,17 @@
     <td align="center">04.08.18</td>
     <td>Обработка данных в форматах YAML, JSON, CSV (3ч)</td>
     <td align="center">6</td>
+ </tr>
+ </table>
+
++++
+ <table border="1" cellpadding="4" cellspacing="0">
+ <tr>
+    <th align="center">Неделя</th>
+    <th align="center">Лекция</th>
+    <th align="center">Дата</th>
+    <th align="center">Тема</th>
+    <th align="center">Задания</th>
  </tr>
  <tr>
     <td align="center">9</td>
