@@ -187,6 +187,18 @@
     <td>Подключение к сетевым устройствам (Telnet, SSH) (2ч)</td>
     <td align="center">4</td>
  </tr>
+ </table>
+ 
+ +++
+
+<table border="1" cellpadding="4" cellspacing="0">
+ <tr>
+    <th align="center">Неделя</th>
+    <th align="center">Лекция</th>
+    <th align="center">Дата</th>
+    <th align="center">Тема</th>
+    <th align="center">Задания</th>
+ </tr>
  <tr>
     <td align="center">13</td>
     <td align="center">16</td>
