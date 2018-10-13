@@ -86,6 +86,7 @@ Python позволяет делать достаточно многое обл�
 * [StackStorm](https://stackstorm.com/) - StackStorm is event-driven automation commonly used for auto-remediation, security responses, facilitated troubleshooting, complex deployments, and more
 * [Nornir](https://github.com/nornir-automation/nornir)
 * [eNMS](https://github.com/afourmy/eNMS)
+* [netdev](https://github.com/selfuryon/netdev)
 
 #HSLIDE
 ## Python без привязки к сетевому оборудованию
