@@ -44,6 +44,7 @@ Python позволяет делать достаточно многое обл�
 #VSLIDE
 ### Книги
 
+* [Network Programmability and Automation: Skills for the Next-Generation Network Engineer](https://www.amazon.com/Network-Programmability-Automation-Next-Generation-Engineer/dp/1491931256)
 * [Mastering Python Networking (Eric Chou)](https://www.packtpub.com/networking-and-servers/mastering-python-networking) - отчасти перекликается с тем, что рассматривалось в этой книге, но в ней есть и много новых тем. Плюс, рассматриваются примеры не только на оборудовании Cisco, но Juniper и Arista.
 
 
@@ -77,9 +78,14 @@ Python позволяет делать достаточно многое обл�
 * [NOC Project](https://kb.nocproject.org/display/SITE/NOC) - NOC is the scalable, high-performance and open-source OSS system for ISP, service and content providers
 * [Requests](https://github.com/kennethreitz/requests) - библиотека для работы с HTTP
 * [SaltStack](https://saltstack.com/) - аналог Ansible
+
+#VSLIDE
+### Проекты:
+
 * [Scapy](https://github.com/secdev/scapy) - сетевая утилита, которая позволяет манипулировать сетевыми пакетами
 * [StackStorm](https://stackstorm.com/) - StackStorm is event-driven automation commonly used for auto-remediation, security responses, facilitated troubleshooting, complex deployments, and more
-
+* [Nornir](https://github.com/nornir-automation/nornir)
+* [eNMS](https://github.com/afourmy/eNMS)
 
 #HSLIDE
 ## Python без привязки к сетевому оборудованию
