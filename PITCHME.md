@@ -1,37 +1,31 @@
 # Python для сетевых инженеров 
 
 ---
-## Welcome to продленка :)
+## PEP 8 - руководство по написанию кода
 
 ---
 
-## Модуль logging
+## Расположение кода
 
 
 +++
-### Базовый пример
+### Отступы. Да
+---?color=orange
 
----?code=code/logging_basic.py&lang=python
-
-+++
-### Базовый пример
-
-Файл logging_basic.py:
 ```python
-import logging
+# Выравнивание по открывающейся скобке
+foo = long_function_name(var_one, var_two,
+                         var_three, var_four)
 
-logging.basicConfig(filename='mylog.log', level=logging.DEBUG)
+# 
+def long_function_name(
+        var_one, var_two, var_three,
+        var_four):
+    print(var_one)
 
-logging.debug('Сообщение уровня debug')
-logging.info('Сообщение уровня info')
-logging.warning('Сообщение уровня warning')
+# Hanging indents should add a level.
+foo = long_function_name(
+    var_one, var_two,
+    var_three, var_four)
 ```
 
-+++
-### Log-файл
-
-```
-DEBUG:root:Сообщение уровня debug
-INFO:root:Сообщение уровня info
-WARNING:root:Сообщение уровня warning
-```

@@ -5,7 +5,7 @@
 
 .reveal pre code {
     max-height: 550px;
-    font-family: Monaco, "Ubuntu Mono", monospace;
+    font-family: Monaco, "Ubuntu Mono";
 }
 
 .reveal .slides {
@@ -18,15 +18,9 @@
     text-align: center;
 }
 
-.reveal .slides section>ul {
-    margin-left: 10%;
-    margin-right: 0;
-}
-
-.reveal section img {
+.reveal img {
     border: 0;
     box-shadow: none;
-    margin-left: 20%;
     max-height: 500px;
     text-align: center;
 }
