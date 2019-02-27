@@ -17,7 +17,7 @@
 > Как правило, в редакторах и IDE есть настройка, которая позволяет указать, что при нажатии клавиши Tab будет устанавливаться 4 пробела.
 
 
-+++?color=darkseagreen
++++?color=rgba(143,188,143, 0.5)
 
 ### Отступы. Да
 
@@ -46,7 +46,7 @@ foo = long_function_name(
     var_three, var_four)
 ```
 
-+++?color=darkseagreen
++++?color=rgba(143,188,143, 0.5)
 
 
 ### Отступы. Да
@@ -59,7 +59,7 @@ foo = long_function_name(
 ```
 
 
-+++?color=lightcoral
++++?color=rgba(240,128,128, 0.5)
 
 ### Отступы. Нет
 
