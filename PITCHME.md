@@ -28,3 +28,23 @@ foo = long_function_name(
     var_three, var_four)
 ```
 
++++?color=rgba(255, 0, 0, 0.5)
+
+### Отступы. Нет
+
+```python
+# Выравнивание по открывающейся скобке
+foo = long_function_name(var_one, var_two,
+                         var_three, var_four)
+
+# 
+def long_function_name(
+        var_one, var_two, var_three,
+        var_four):
+    print(var_one)
+
+# Hanging indents should add a level.
+foo = long_function_name(
+    var_one, var_two,
+    var_three, var_four)
+```
