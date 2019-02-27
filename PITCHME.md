@@ -95,7 +95,10 @@ if (this_is_one_thing
     do_something()
 ```
 
-Иногда, создание дополнительной переменной перед условием, также можно помочь сократить условие
++++?color=rgba(143,188,143, 0.5)
+### Отступы и перенос условия на разные строки
+
+Иногда, создание дополнительной переменной перед условием, также может помочь сократить условие
 ```python
 ignore_line = '!' in line or ignore_command(line, ignore)
 
@@ -104,7 +107,74 @@ if line and not ignore_line:
 ```
 
 Python позволяет разбивать код до или после операторов, однако рекомендуется разбивать код до операторов.
-Такой вариант обычно лекгче воспринимается
+Такой вариант обычно легче воспринимается
+```python
+income = (gross_wages
+          + taxable_interest
+          + (dividends - qualified_dividends)
+          - ira_deduction
+          - student_loan_interest)
+```
 
 +++?color=rgba(143,188,143, 0.5)
-### 
+### Закрывающиеся скобки
+
+Первый вариант закрытия скобок:
+```python
+port_security_template = [
+    'switchport port-security maximum 2',
+    'switchport port-security violation restrict',
+    'switchport port-security',
+    ]
+```
+
+Второй вариант закрытия скобок:
+```python
+port_security_template = [
+    'switchport port-security maximum 2',
+    'switchport port-security violation restrict',
+    'switchport port-security',
+]
+```
+
++++
+## Максимальная длина строки
+
+* Максимальная длина строки кода - 79 символов.
+* Максимальная длина комментариев/docstring - 72 символа.
+
+Длинные строки предпочтительней разбивать на несколько, используя круглые скобки:
+```python
+if (this_is_one_thing
+        and that_is_another_thing):
+    do_something()
+```
+
+Многие выражения в скобках можно переность на разные строки:
+```python
+r1 = {'IOS': '15.4',
+      'IP': '10.255.0.1',
+      'hostname': 'london_r1',
+      'location': '21 New Globe Walk',
+      'model': '4451',
+      'vendor': 'Cisco'}
+
+lower_r1 = {str.lower(key): value
+            for key, value in r1.items()}
+```
+
++++
+## Максимальная длина строки
+
+Некоторые выражения нельзя разбить на несколько строк. В этом случае, можно использовать обратный слеш:
+```python
+with open('/path/to/some/file/you/want/to/read') as file_1, \
+     open('/path/to/some/file/being/written', 'w') as file_2:
+    file_2.write(file_1.read())
+```
+
+Аналогичная ситуация будет с выражением assert:
+```python
+assert return_value == correct_return_value,\
+       "Функция возвращает неправильное значение"
+```
