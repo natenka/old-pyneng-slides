@@ -16,7 +16,7 @@
 
 > Как правило, в редакторах и IDE есть настройка, которая позволяет указать, что при нажатии клавиши Tab будет устанавливаться 4 пробела.
 
-+++?color=rgba(0, 100, 0, 0.5)
++++?color=darkseagreen
 
 ### Отступы. Да
 
@@ -41,7 +41,36 @@ foo = long_function_name(
     var_three, var_four)
 ```
 
-+++?color=rgba(143,188,143)
++++?color=darkseagreen
+
+### Отступы. Да
+
+Ввертикальное выравнивание по открывающейся скобке
+```python
+foo = long_function_name(var_one, var_two,
+                         var_three, var_four)
+```
+
+Выравнивание с учетом остальных строк.
+Тут параметры функции сдвинуты относительно print,
+чтобы визуально разделить их
+```python
+def long_function_name(
+        var_one, var_two, var_three,
+        var_four):
+    print(var_one)
+```
+
+Висячие отступы (hanging indents) - все строки с отступом, кроме первой.
+Однако, надо учитывать ситуацию выше
+и отделять строки дополнительным отступом, если необходимо
+```python
+foo = long_function_name(
+    var_one, var_two,
+    var_three, var_four)
+```
+
++++?color=darkseagreen
 
 
 ### Отступы. Да
