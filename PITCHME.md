@@ -127,6 +127,7 @@ income = (gross_wages +
           student_loan_interest)
 ```
 
++++
 ### Закрывающиеся скобки
 
 Первый вариант закрытия скобок:
@@ -260,9 +261,6 @@ import sys
 
 Каждая группа должна быть разделена пустой строкой.
 
-+++
-### Импорт
-
 ```python
 import sys
 import os
@@ -292,5 +290,237 @@ from subprocess import run, PIPE
 
 ```python
 import os, sys
+```
+
+---
+## Пробелы в выражениях
+
+Следует избегать использования пробелов в таких ситуациях:
+
+* сразу после открытых скобок
+* пробелы между последней запятой и закрывающейся скобкой
+* перед запятой, двоеточием и точкой с запятой
+* перед открывающейся скобкой, за которой следуют аргументы функции, индекс или срез 
+* более одного пробела вокруг оператора присваивания
+
+
++++
+### Пробелы сразу после открытых скобок
+
+Правильно:
+```python
+spam(ham[1], {eggs: 2})
+```
+
+Неправильно:
+```python
+spam( ham[ 1 ], { eggs: 2 } )
+```
+
+
++++
+### Пробелы между последней запятой и закрывающейся скобкой
+
+Правильно:
+```python
+foo = (0,)
+```
+
+Неправильно:
+```python
+foo = (0, )
+```
+
++++
+### Пробелы перед запятой, двоеточием и точкой с запятой
+
+Правильно:
+```python
+if x == 4: print x, y; x, y = y, x
+```
+
+Неправильно:
+```python
+if x == 4 : print x , y ; x , y = y , x
+```
+
++++
+### Пробелы в срезах
+
+Правильно:
+```python
+ham[1:9], ham[1:9:3], ham[:9:3], ham[1::3], ham[1:9:]
+ham[lower:upper], ham[lower:upper:], ham[lower::step]
+ham[lower+offset : upper+offset]
+ham[: upper_fn(x) : step_fn(x)], ham[:: step_fn(x)]
+ham[lower + offset : upper + offset]
+```
+
+Неправильно:
+```python
+ham[lower + offset:upper + offset]
+ham[1: 9], ham[1 :9], ham[1:9 :3]
+ham[lower : : upper]
+ham[ : upper]
+```
+
++++
+### Перед открывающейся скобкой, за которой следуют аргументы функции, индекс или срез 
+
+Правильно:
+```python
+spam(1)
+dct['key'] = lst[index]
+```
+
+Неправильно:
+```python
+spam (1)
+dct ['key'] = lst [index]
+```
+
++++
+### Более одного пробела вокруг оператора присваивания
+
+Правильно:
+```python
+x = 1
+y = 2
+long_variable = 3
+```
+
+Неправильно:
+```python
+x             = 1
+y             = 2
+long_variable = 3
+```
+
++++
+### Знак равенства в ключевом аргументе
+
+Не используйте пробелы вокруг знака равенства, если он используется в ключевом аргументе или в параметре со значением по умолчанию.
+
+Правильно:
+```python
+def complex(real, imag=0.0):
+    return magic(r=real, i=imag)
+```
+
+Неправильно:
+```python
+def complex(real, imag = 0.0):
+    return magic(r = real, i = imag)
+```
+
+
++++
+### Пробелы в конце строки
+
+Не ставьте пробелы в конце строки!
+
+Например, пробел после обратного слеша приводит к ошибке
+```python
+In [3]: return_value = 4
+   ...: correct_return_value = 3
+   ...: assert return_value == correct_return_value,\
+   ...:        "Функция возвращает неправильное значение"
+  File "<ipython-input-3-42fca39fd65f>", line 3
+    assert return_value == correct_return_value,\
+                                                  ^
+SyntaxError: unexpected character after line continuation character
+```
+
++++
+### Пробелы в аннотации функций
+
+Правильно:
+```python
+def munge(input: AnyStr):
+    ...
+
+def munge() -> AnyStr:
+    ...
+```
+
+Неправильно:
+```python
+def munge(input:AnyStr):
+    ...
+
+def munge()->PosInt:
+    ...
+```
+
+
++++
+### Пробелы в аннотации функций
+
+Правильно:
+```python
+def munge(sep: AnyStr = None):
+    ...
+
+def munge(input: AnyStr, sep: AnyStr = None, limit=1000):
+    ...
+```
+
+Неправильно:
+```python
+def munge(input: AnyStr=None):
+    ...
+
+def munge(input: AnyStr, limit = 1000):
+    ...
+```
+
+---
+## Составные конструкции
+
++++
+### Составные конструкции
+
+В целом, лучше не писать несколько выражений в одной строке.
+
+Правильно:
+```python
+if foo == 'blah':
+    do_blah_thing()
+do_one()
+do_two()
+do_three()
+```
+
+Неправильно:
+```python
+if foo == 'blah': do_blah_thing()
+do_one(); do_two(); do_three()
+```
+
+
++++?color=rgba(240,128,128, 0.5)
+### Составные конструкции
+
+Небольшие выражения if/while/for можно писать в одной строке, но если в блоке несколько команд, не пишите выражение в одну строку.
+
+Лучше не надо писать так:
+```python 
+if foo == 'blah': do_blah_thing()
+for x in lst: total += x
+while t < 10: t = delay()
+```
+
+И точно не стоит писать так:
+```python
+if foo == 'blah': do_blah_thing()
+else: do_non_blah_thing()
+
+try: something()
+finally: cleanup()
+
+do_one(); do_two(); do_three(long, argument,
+                             list, like, this)
+
+if foo == 'blah': one(); two(); three()
 ```
 
