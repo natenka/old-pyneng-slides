@@ -7,7 +7,7 @@
 
 ## Расположение кода
 
-+++?color=rgba(0, 100, 0, 0.5)
++++?color=rgba(0, 100, 0, 0.4)
 
 ### Отступы. Да
 
@@ -28,7 +28,7 @@ foo = long_function_name(
     var_three, var_four)
 ```
 
-+++?color=rgba(139, 0, 0, 0.5)
++++?color=rgba(139, 0, 0, 0.4)
 
 ### Отступы. Нет
 
