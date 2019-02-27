@@ -116,7 +116,17 @@ income = (gross_wages
           - student_loan_interest)
 ```
 
-+++?color=rgba(143,188,143, 0.5)
++++?color=rgba(240,128,128, 0.5)
+### Отступы и перенос условия на разные строки
+
+```python
+income = (gross_wages +
+          taxable_interest +
+          (dividends - qualified_dividends) -
+          ira_deduction -
+          student_loan_interest)
+```
+
 ### Закрывающиеся скобки
 
 Первый вариант закрытия скобок:
@@ -150,7 +160,7 @@ if (this_is_one_thing
     do_something()
 ```
 
-Многие выражения в скобках можно переность на разные строки:
+Многие выражения в скобках можно переносить на разные строки:
 ```python
 r1 = {'IOS': '15.4',
       'IP': '10.255.0.1',
@@ -178,3 +188,109 @@ with open('/path/to/some/file/you/want/to/read') as file_1, \
 assert return_value == correct_return_value,\
        "Функция возвращает неправильное значение"
 ```
+
++++
+## Пустые строки
+
+Функции и классы должны быть отделены друг от друга двумя пустыми строками:
+```python
+def sum_numbers(a, b):
+    return a + b
+
+
+def divide_numbers(a, b):
+    return a/b
+
+
+class Robot:
+
+    def __init__(self, name):
+        self.name = name
+```
+
++++
+## Пустые строки
+
+Внутри класса метода должны быть отделены друг от друга одной пустой строкой:
+```python
+class Robot:
+
+    def __init__(self, name):
+        self.name = name
+
+    def hello(self):
+        return f'My name is {self.name}'
+
+    def say(self, message):
+        return f'message'
+```
+
++++
+## Кодировка исходного файла
+
+Для кода должна использоваться кодировка UTF-8.
+
+Соглашение по именам в стандартной библиотеке:
+
+* все идентификаторы должны состоять только из ASCII символов
+* индентификаторы должны сосоять из английских слов/сокращений
+* комментарии должны состоять из ASCII символов
+
++++
+### Импорт
+
+Импорт модулей всегда должен находиться в начале файла, сразу после docstring/комментариев модуля.
+```python
+# -*- coding: utf-8 -*-
+"""Utilities for writing code that runs on Python 2 and 3"""
+
+import functools
+import itertools
+import operator
+import sys
+```
+
++++
+### Импорт
+
+Импорт модулей должен выполняться в таком порядке
+1. Модули стандартной библиотеки
+2. Модули сторонних библиотек
+3. Модули текущего проекта  
+
+Каждая группа должна быть разделена пустой строкой.
+
++++
+### Импорт
+
+```python
+import sys
+import os
+
+import tabulate
+import jinja
+
+import my_super_script
+```
+
++++?color=rgba(143,188,143, 0.5)
+### Импорт. Правильно
+
+Импорт каждого модуля, как правило, должен находиться на отдельной строке:
+```python
+import os
+import sys
+```
+
+При этом, можно импортировать несколько объектов из модуля в одной строке:
+```python
+from subprocess import run, PIPE
+```
+
++++?color=rgba(240,128,128, 0.5)
+### Импорт. Неправильно
+
+```python
+import os, sys
+```
+
