@@ -54,7 +54,7 @@ foo = long_function_name(
 ```
 
 
-+++?color=rgba(139, 0, 0, 0.5)
++++?color=lightcoral
 
 ### Отступы. Нет
 
