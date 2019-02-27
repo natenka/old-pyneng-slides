@@ -28,7 +28,7 @@ foo = long_function_name(
     var_three, var_four)
 ```
 
-+++?color=rgba(220, 20, 60, 0.1)
++++?color=rgba(220, 20, 60, 0.5)
 
 ### Отступы. Нет
 
