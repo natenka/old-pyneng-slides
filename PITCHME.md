@@ -7,44 +7,52 @@
 
 ## Расположение кода
 
-+++?color=rgba(0, 100, 0, 0.4)
++++
+## Табы или пробелы
+
+* В качестве отступов рекомендуется использовать пробелы.
+* Один уровень отступа - 4 пробела
+* Python 3 запрещает одновременное использование Tab и пробелов в отступах.
+
+> Как правило, в редакторах и IDE есть настройка, которая позволяет указать, что при нажатии клавиши Tab будет устанавливаться 4 пробела.
+
++++?color=rgba(0, 100, 0, 0.5)
 
 ### Отступы. Да
 
 ```python
-# Выравнивание по открывающейся скобке
+# Ввертикальное выравнивание по открывающейся скобке
 foo = long_function_name(var_one, var_two,
                          var_three, var_four)
 
-# 
+# Выравнивание с учетом остальных строк.
+# Тут параметры функции сдвинуты относительно print,
+# чтобы визуально разделить их
 def long_function_name(
         var_one, var_two, var_three,
         var_four):
     print(var_one)
 
-# Hanging indents should add a level.
+# Висячие отступы (hanging indents) - все строки с отступом, кроме первой
+# Однако, надо учитывать ситуацию выше
+# и отделять строки дополнительным отступом, если необходимо
 foo = long_function_name(
     var_one, var_two,
     var_three, var_four)
 ```
 
-+++?color=rgba(139, 0, 0, 0.4)
++++?color=rgba(139, 0, 0, 0.5)
 
 ### Отступы. Нет
 
 ```python
-# Выравнивание по открывающейся скобке
+# Запрещено писать аргументы в первой строке, если не используется вертикальное выравнивание.
 foo = long_function_name(var_one, var_two,
-                         var_three, var_four)
-
-# 
-def long_function_name(
-        var_one, var_two, var_three,
-        var_four):
-    print(var_one)
-
-# Hanging indents should add a level.
-foo = long_function_name(
-    var_one, var_two,
     var_three, var_four)
+
+# В этом случае, надо добавить отступы перед параметрами функции, чтобы они отличались от следующих строк.
+def long_function_name(
+    var_one, var_two, var_three,
+    var_four):
+    print(var_one)
 ```
