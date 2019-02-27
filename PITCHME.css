@@ -1,10 +1,10 @@
 .reveal pre {
-    font-size: 0.50em;
+    font-size: 0.60em;
     border: 0;
 }
 
 .reveal pre code {
-    max-height: 550px;
+    max-height: 650px;
     font-family: Monaco, "Ubuntu Mono";
 }
 
