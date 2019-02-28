@@ -542,18 +542,21 @@ if foo == 'blah': one(); two(); three()
 
 Обычно комментарии относятся к блоку кода, который следует за ними и должны быть на том же уровне отступа, что и код следующий за ними.
 
-Если комментарий длинный и в пояснении нужно выделить параграфы, они разделяются между собой пустой строкой с #:
+Если комментарий длинный и в пояснении нужно выделить параграфы, они разделяются между собой пустой строкой с #.
 ```python
-def function(arg):
-    """docstring"""
+    # Check for device with no password configured
+    if re.search(r"assword required, but none set", output):
+        self.remote_conn.close()
+        msg = "Login failed - Password required, but none set: {}".format(
+            self.host
+        )
+        raise NetMikoAuthenticationException(msg)
 
-    do_thing()
-    # Обычно комментарии относятся к блоку кода, который следует за ними
-    # и должны быть на том же уровне отступа, что и код следующий за ними.
-    #
-    # Если комментарий длинный и в пояснении нужно выделить параграфы,
-    # они разделяются между собой пустой строкой с #
-    do_something()
+    # Check if proper data received
+    if re.search(pri_prompt_terminator, output, flags=re.M) or re.search(
+        alt_prompt_terminator, output, flags=re.M
+    ):
+        return return_msg
 ```
 
 +++
