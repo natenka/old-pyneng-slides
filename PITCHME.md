@@ -564,22 +564,3 @@ def function(arg):
 x = x + 1   # Compensate for border
 ```
 
----
-## Соглашение об именах
-
-+++
-### Различные стили имен
-
-```
-b (single lowercase letter)
-B (single uppercase letter)
-lowercase
-lower_case_with_underscores
-UPPERCASE
-UPPER_CASE_WITH_UNDERSCORES
-CapitalizedWords (or CapWords, CamelCase5, StudlyCaps)
-mixedCase (differs from CapitalizedWords by initial lowercase character!)
-Capitalized_Words_With_Underscores (ugly!)
-```
-
-> Если в имени используется распространенная аббревиатура, ее надо оставить неизменной. То есть писать так `ConnectSSH`, а не так `ConnectSsh`
