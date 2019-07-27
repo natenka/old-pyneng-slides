@@ -114,10 +114,10 @@ GIL можно представить как некий переходящий �
 Кроме того, количество процессов, которые запускаются параллельно, зависит от количества ядер и CPU и обычно исчисляется в десятках, тогда как количество потоков для операций ввода-вывода может исчисляться в сотнях.
 
 ---
-### Количество потоков
+## Количество потоков
 
 +++
-## Одна команда
+### Одна команда
 
 ```
 Количество устройств: 40
@@ -126,7 +126,7 @@ GIL можно представить как некий переходящий �
 ```
 
 +++
-## Тест 1. От 5 до 30 потоков с шагом 5
+### Тест 1. От 5 до 30 потоков с шагом 5
 
 ```
 $ python netmiko_threads_submit_count.py
@@ -147,7 +147,7 @@ $ python netmiko_threads_submit_count.py
 
 
 +++
-## Тест 2. От 20 до 40 потоков с шагом 5
+### Тест 2. От 20 до 40 потоков с шагом 5
 
 ```
 $ python netmiko_threads_submit_count.py
@@ -166,7 +166,7 @@ $ python netmiko_threads_submit_count.py
 
 
 +++
-### Пример подключения к 5000 устройств с разным количеством потоков
+### Тест 3. 5000 устройств 30-300 потоков
 
 ```
 Количество устройств: 5460
@@ -215,656 +215,289 @@ logging.basicConfig(
     level=logging.INFO)
 ```
 
+* все сообщения будут выводиться на стандартный поток вывода,
+* будут выводиться сообщения уровня INFO и выше,
+* в каждом сообщении будет информация о потоке, имя логера, уровень сообщения и само сообщение.
 
++++
+### Пример скрипта
+
+```python
+from datetime import datetime
+import logging
+import netmiko
+import yaml
+
+
+logging.basicConfig(
+    format = '%(threadName)s %(name)s %(levelname)s: %(message)s',
+    level=logging.INFO)
+
+
+def send_show(device, show):
+    start_msg = '===> {} Connection: {}'
+    received_msg = '<=== {} Received:   {}'
+    ip = device["ip"]
+    logging.info(start_msg.format(datetime.now().time(), ip))
+
+    with netmiko.ConnectHandler(**device) as ssh:
+        ssh.enable()
+        result =  ssh.send_command(show)
+        logging.info(received_msg.format(datetime.now().time(), ip))
+    return result
+
+
+if __name__ == "__main__":
+    with open('devices.yaml') as f:
+        devices = yaml.safe_load(f)
+    for dev in devices:
+        print(send_show(dev, 'sh clock'))
+```
+
++++
+### Результат выполнения скрипта
+
+```
+$ python logging_basics.py
+MainThread root INFO: ===> 12:26:12.767168 Connection: 192.168.100.1
+MainThread root INFO: <=== 12:26:18.307017 Received:   192.168.100.1
+*12:26:18.137 UTC Wed Jun 5 2019
+MainThread root INFO: ===> 12:26:18.413913 Connection: 192.168.100.2
+MainThread root INFO: <=== 12:26:23.991715 Received:   192.168.100.2
+*12:26:23.819 UTC Wed Jun 5 2019
+MainThread root INFO: ===> 12:26:24.095452 Connection: 192.168.100.3
+MainThread root INFO: <=== 12:26:29.478553 Received:   192.168.100.3
+*12:26:29.308 UTC Wed Jun 5 2019
+```
 
 ---
 ## Модуль concurrent.futures
 
 Модуль concurrent.futures предоставляет высокоуровневый интерфейс для работы с процессами и потоками.
 При этом и для потоков, и для процессов используется одинаковый интерфейс, что позволяет легко переключаться между ними.
-
-Если сравнивать этот модуль с threading или multiprocessing, то у него меньше возможностей.
-Но зато с concurrent.futures работать проще и интерфейс более понятный.
+Если сравнивать этот модуль с threading или multiprocessing, то у него меньше возможностей, но с concurrent.futures работать проще и интерфейс более понятный.
 
 +++
 ### Модуль concurrent.futures
 
-Модуль concurrent.futures позволяет легко решить задачу запуска нескольких потоков/процессов и получения из них данных.
+Модуль concurrent.futures позволяет решить задачу запуска нескольких потоков/процессов и получения из них данных. Для этого в модуле используются два класса:
 
-Модуль предоставляет два класса:
-
-* **ThreadPoolExecutor** - для работы с потоками
-* **ProcessPoolExecutor** - для работы с процессами
-
+* ThreadPoolExecutor - для работы с потоками
+* ProcessPoolExecutor - для работы с процессами
 
 Оба класса используют одинаковый интерфейс, поэтому достаточно разобраться с одним и затем просто переключиться на другой при необходимости.
 
 +++
+### Executor
+
+Создание объекта Executor на примере ThreadPoolExecutor:
+
+```
+executor = ThreadPoolExecutor(max_workers=5)
+```
+
+После создания объекта Executor, у него есть три метода: shutdown, map и submit. Метод shutdown отвечает за завершение потоков/процессов, а методы map и submit за запуск функций в разных потоках/процессах.
+
++++
+### Метод shutdown
+
+Метод shutdown указывает, что объекту Executor надо завершить работу. При этом, если методу shutdown передать значение wait=True (значение по умолчанию), он не вернут результат пока не завершатся все функции, которые запущены в потоках. Если же wait=False, метод shutdown завершает работу мгновенно, но при этом сам скрипт не завершит работу пока все функции не отработают.
+
+Как правило, метод shutdown не используется явно, так как при создании объекта Executor в менеджере контекста, метод shutdown автоматически вызывается в конце блока with c wait равным True.
+
+```
+with ThreadPoolExecutor(max_workers=5) as executor:
+    ...
+```
+
++++
+### Схема работы с concurrent.futures
+
+Так как методы map и submit запускают какую-то функцию в потоках или процессах, в коде должна присутствовать, как минимум, функция которая выполняет одно действие и которую надо запустить в разных потоках с разными аргументами функции.
+
+Например, если необходимо пинговать несколько IP-адресов в разных потоках, надо создать функцию, которая будет пинговать один IP-адрес, а затем запустить эту функцию в разных потоках для разных IP-адресов с помощью concurrent.futures.
+
+---
+### Метод map
+
+Метод map - работает похоже на встроенную функцию map: применяет функцию func к одному или более итерируемых объектов. При этом, каждый вызов функции запускается в отдельном потоке/процессе. Метод map возвращает итератор с результатами выполнения функции для каждого элемента итерируемого объекта. Результаты расположены в том же порядке, что и элементы в итерируемом объекте.
+
+```
+map(func, *iterables, timeout=None)
+```
+
++++
+### Метод map
+
+```python
+from datetime import datetime
+import time
+from itertools import repeat
+from concurrent.futures import ThreadPoolExecutor
+import logging
+import netmiko
+import yaml
+
+
+logging.getLogger('paramiko').setLevel(logging.WARNING)
+logging.basicConfig(
+    format = '%(threadName)s %(name)s %(levelname)s: %(message)s',
+    level=logging.INFO)
+
+
+def send_show(device, show):
+    start_msg = '===> {} Connection: {}'
+    received_msg = '<=== {} Received:   {}'
+    ip = device['ip']
+    logging.info(start_msg.format(datetime.now().time(), ip))
+    if ip == '192.168.100.1':
+        time.sleep(5)
+
+    with netmiko.ConnectHandler(**device) as ssh:
+        ssh.enable()
+        result = ssh.send_command(show)
+        logging.info(received_msg.format(datetime.now().time(), ip))
+    return result
+
+
+with open('devices.yaml') as f:
+    devices = yaml.safe_load(f)
+
+with ThreadPoolExecutor(max_workers=3) as executor:
+    result = executor.map(send_show, devices, repeat('sh clock'))
+    for device, output in zip(devices, result):
+        print(device['ip'], output)
+```
+
++++
+### Метод map
+
+Последние 4 строки кода отвечают за подключение к устройствам в отдельных потоках:
+
+```python
+with ThreadPoolExecutor(max_workers=3) as executor:
+    result = executor.map(send_show, devices, repeat('sh clock'))
+    for device, output in zip(devices, result):
+        print(device['ip'], output)
+```
+
++++
+### Метод map
+
+Результат выполнения:
+```
+$ python netmiko_threads_map_basics.py
+ThreadPoolExecutor-0_0 root INFO: ===> 08:28:55.950254 Connection: 192.168.100.1
+ThreadPoolExecutor-0_1 root INFO: ===> 08:28:55.963198 Connection: 192.168.100.2
+ThreadPoolExecutor-0_2 root INFO: ===> 08:28:55.970269 Connection: 192.168.100.3
+ThreadPoolExecutor-0_1 root INFO: <=== 08:29:11.968796 Received:   192.168.100.2
+ThreadPoolExecutor-0_2 root INFO: <=== 08:29:15.497324 Received:   192.168.100.3
+ThreadPoolExecutor-0_0 root INFO: <=== 08:29:16.854344 Received:   192.168.100.1
+192.168.100.1 *08:29:16.663 UTC Thu Jul 4 2019
+192.168.100.2 *08:29:11.744 UTC Thu Jul 4 2019
+192.168.100.3 *08:29:15.374 UTC Thu Jul 4 2019
+```
+
+---
+## Метод submit
+
++++
+### Метод submit
+
+* submit запускает в потоке только одну функцию
+* с помощью submit можно запускать разные функции с разными несвязанными аргументами, а map надо обязательно запускать с итерируемым объектами в роли аргументов
+* submit сразу возвращает результат, не дожидаясь выполнения функции
+* submit возвращает специальный объект Future, который представляет выполнение функции.
+* submit возвращает результаты в порядке готовности, а не в порядке аргументов
+* submit можно передавать ключевые аргументы, а map только позиционные
+
++++
 ## Future
 
-Модуль использует понятие future.
-[Future](https://en.wikipedia.org/wiki/Futures_and_promises) - это объект, который представляет отложенное вычисление.
-Этот объект можно запрашивать о состоянии (завершена работа или нет), можно получать результаты или исключения, которые возникли в процессе работы, по мере возникновения.
-
-При этом нет необходимости создавать их вручную.
-Эти объекты создаются ThreadPoolExecutor и ProcessPoolExecutor.
+Метод submit использует объект Future - это объект, который представляет отложенное вычисление. Этот объект можно запрашивать о состоянии (завершена работа или нет), можно получать результаты или исключения, которые возникли в процессе работы, по мере возникновения. Future не нужно создавать вручную, эти объекты создаются методом submit.
 
 +++
-### Метод map
+### Метод submit
 
-Метод map - это самый простой вариант работы с concurrent.futures.
-
-Пример использования функции map с ThreadPoolExecutor (файл netmiko_threads_map_ver1.py):
-```python
-from concurrent.futures import ThreadPoolExecutor
-from pprint import pprint
-
-import yaml
-from netmiko import ConnectHandler
-
-
-def connect_ssh(device_dict, command='sh clock'):
-    print('Connection to device: {}'.format(device_dict['ip']))
-    with ConnectHandler(**device_dict) as ssh:
-        ssh.enable()
-        result = ssh.send_command(command)
-    return {device_dict['ip']: result}
-
-
-def threads_conn(function, devices, limit=2):
-    with ThreadPoolExecutor(max_workers=limit) as executor:
-        f_result = executor.map(function, devices)
-    return list(f_result)
-
-
-if __name__ == '__main__':
-    devices = yaml.load(open('devices.yaml'))
-    all_done = threads_conn(connect_ssh, devices['routers'])
-    pprint(all_done)
-
-```
-
-
-+++
-### Метод map
-
-```python
-def threads_conn(function, devices, limit=2):
-    with ThreadPoolExecutor(max_workers=limit) as executor:
-        f_result = executor.map(function, devices)
-    return list(f_result)
-```
-
-Обратите внимание, что функция занимает всего 4 строки, и для получения данных не надо создавать очередь и передавать ее в функцию connect_ssh.
-
-+++
-### Метод map
-
-* ```with ThreadPoolExecutor(max_workers=limit) as executor:``` - класс ThreadPoolExecutor инициируется в блоке with с указанием количества потоков
-* ```f_result = executor.map(function, devices)``` - метод map похож на функцию map, но тут функция function вызывается в разных потоках. При этом в разных потоках функция будет вызываться с разными аргументами - элементами итерируемого объекта devices.
-* метод map возвращает генератор. В этом генераторе содержатся результаты выполнения функций
-
-+++
-### Метод map
-
-Результат выполнения:
-```
-$ python netmiko_threads_map_ver1.py
-Connection to device: 192.168.100.1
-Connection to device: 192.168.100.2
-Connection to device: 192.168.100.3
-[{'192.168.100.1': '*04:43:01.629 UTC Mon Aug 28 2017'},
- {'192.168.100.2': '*04:43:01.648 UTC Mon Aug 28 2017'},
- {'192.168.100.3': '*04:43:07.291 UTC Mon Aug 28 2017'}]
-
-```
-
-+++
-### Метод map
-
-Важная особенность метода map - он возвращает результаты в том же порядке, в котором они указаны в итерируемом объекте.
-
-Для демонстрации этой особенности в функции connect_ssh добавлены сообщения с выводом информации о том, когда функция начала работать и когда закончила.
-
-+++
-### Метод map
-
-Файл netmiko_threads_map_ver2.py:
-```python
-from concurrent.futures import ThreadPoolExecutor
-from pprint import pprint
-from datetime import datetime
-import time
-
-import yaml
-from netmiko import ConnectHandler
-
-
-start_msg = '===> {} Connection to device: {}'
-received_msg = '<=== {} Received result from device: {}'
-```
-
-+++
-### Метод map
-
-```python
-def connect_ssh(device_dict, command='sh clock'):
-    print(start_msg.format(datetime.now().time(), device_dict['ip']))
-    if device_dict['ip'] == '192.168.100.1':
-        time.sleep(10)
-    with ConnectHandler(**device_dict) as ssh:
-        ssh.enable()
-        result = ssh.send_command(command)
-        print(received_msg.format(datetime.now().time(), device_dict['ip']))
-    return {device_dict['ip']: result}
-
-
-def threads_conn(function, devices, limit=2):
-    with ThreadPoolExecutor(max_workers=limit) as executor:
-        f_result = executor.map(function, devices)
-    return list(f_result)
-
-
-if __name__ == '__main__':
-    devices = yaml.load(open('devices.yaml'))
-    all_done = threads_conn(connect_ssh, devices['routers'])
-    pprint(all_done)
-
-```
-
-+++
-### Метод map
-
-Результат выполнения:
-```
-$ python netmiko_threads_map_ver2.py
-===> 04:50:50.175076 Connection to device: 192.168.100.1
-===> 04:50:50.175553 Connection to device: 192.168.100.2
-<=== 04:50:55.582707 Received result from device: 192.168.100.2
-===> 04:50:55.689248 Connection to device: 192.168.100.3
-<=== 04:51:01.135640 Received result from device: 192.168.100.3
-<=== 04:51:05.568037 Received result from device: 192.168.100.1
-[{'192.168.100.1': '*04:51:05.395 UTC Mon Aug 28 2017'},
- {'192.168.100.2': '*04:50:55.411 UTC Mon Aug 28 2017'},
- {'192.168.100.3': '*04:51:00.964 UTC Mon Aug 28 2017'}]
-```
-
-+++
-### Метод map
-
-Обратите внимание на фактический порядок выполнения задач: 192.168.100.2, 192.168.100.3, 192.168.100.1.
-Но в итоговом списке все равно соблюдается порядок на основе списка devices['routers'].
-
-+++
-### Метод map
-
-Еще один момент, который тут хорошо заметен, это то, что как только одна задача выполнилась, сразу берется следующая.
-То есть, ограничение в два потока влияет на количество потоков, которые выполняются одновременно.
-
-+++
-### Метод map
-
-Осталось изменить функцию таким образом, чтобы ей можно было передавать команду как аргумент.
-
-Для этого мы воспользуемся функцией repeat из модуля itertools.
-Функция repeat тут нужна для того, чтобы команда передавалась при каждом вызове функции connect_ssh.
-
-+++
-### Метод map
-
-Файл netmiko_threads_map_final.py
-
-```python
-from concurrent.futures import ThreadPoolExecutor
-from pprint import pprint
-from datetime import datetime
-import time
-from itertools import repeat
-
-import yaml
-from netmiko import ConnectHandler
-
-
-start_msg = '===> {} Connection to device: {}'
-received_msg = '<=== {} Received result from device: {}'
-```
-
-+++
-### Метод map
-
-Файл netmiko_threads_map_final.py
-```python
-def connect_ssh(device_dict, command):
-    print(start_msg.format(datetime.now().time(), device_dict['ip']))
-    if device_dict['ip'] == '192.168.100.1':
-        time.sleep(10)
-    with ConnectHandler(**device_dict) as ssh:
-        ssh.enable()
-        result = ssh.send_command(command)
-        print(received_msg.format(datetime.now().time(), device_dict['ip']))
-    return {device_dict['ip']: result}
-
-
-
-def threads_conn(function, devices, limit=2, command=''):
-    with ThreadPoolExecutor(max_workers=limit) as executor:
-        f_result = executor.map(function, devices, repeat(command))
-    return list(f_result)
-
-
-if __name__ == '__main__':
-    devices = yaml.load(open('devices.yaml'))
-    all_done = threads_conn(connect_ssh,
-                            devices['routers'],
-                            command='sh clock')
-    pprint(all_done)
-
-```
-
-+++
-### Метод map
-
-Результат выполнения:
-```
-$ python netmiko_threads_map_final.py
-===> 05:01:08.314962 Connection to device: 192.168.100.1
-===> 05:01:08.315114 Connection to device: 192.168.100.2
-<=== 05:01:13.693083 Received result from device: 192.168.100.2
-===> 05:01:13.799002 Connection to device: 192.168.100.3
-<=== 05:01:19.363250 Received result from device: 192.168.100.3
-<=== 05:01:23.685859 Received result from device: 192.168.100.1
-[{'192.168.100.1': '*05:01:23.513 UTC Mon Aug 28 2017'},
- {'192.168.100.2': '*05:01:13.522 UTC Mon Aug 28 2017'},
- {'192.168.100.3': '*05:01:19.189 UTC Mon Aug 28 2017'}]
-```
-
-+++
-### Использование ProcessPoolExecutor с map
-
-Для того чтобы предыдущий пример использовал процессы вместо потоков, достаточно сменить ThreadPoolExecutor на ProcessPoolExecutor:
-```python
-from concurrent.futures import ProcessPoolExecutor
-from pprint import pprint
-from datetime import datetime
-import time
-from itertools import repeat
-
-import yaml
-from netmiko import ConnectHandler
-
-
-start_msg = '===> {} Connection to device: {}'
-received_msg = '<=== {} Received result from device: {}'
-```
-
-+++
-### Использование ProcessPoolExecutor с map
-
-```python
-def connect_ssh(device_dict, command):
-    print(start_msg.format(datetime.now().time(), device_dict['ip']))
-    if device_dict['ip'] == '192.168.100.1':
-        time.sleep(10)
-    with ConnectHandler(**device_dict) as ssh:
-        ssh.enable()
-        result = ssh.send_command(command)
-        print(received_msg.format(datetime.now().time(), device_dict['ip']))
-    return {device_dict['ip']: result}
-
-
-
-def threads_conn(function, devices, limit=2, command=''):
-    with ProcessPoolExecutor(max_workers=limit) as executor:
-        f_result = executor.map(function, devices, repeat(command))
-    return list(f_result)
-
-
-if __name__ == '__main__':
-    devices = yaml.load(open('devices.yaml'))
-    all_done = threads_conn(connect_ssh,
-                            devices['routers'],
-                            command='sh clock')
-    pprint(all_done)
-
-```
-
-+++
-### Использование ProcessPoolExecutor с map
-
-Результат выполнения:
-```
-$ python netmiko_processes_map_final.py
-===> 05:26:42.974505 Connection to device: 192.168.100.1
-===> 05:26:42.975733 Connection to device: 192.168.100.2
-<=== 05:26:48.389420 Received result from device: 192.168.100.2
-===> 05:26:48.495598 Connection to device: 192.168.100.3
-<=== 05:26:54.104585 Received result from device: 192.168.100.3
-<=== 05:26:58.367981 Received result from device: 192.168.100.1
-[{'192.168.100.1': '*05:26:58.195 UTC Mon Aug 28 2017'},
- {'192.168.100.2': '*05:26:48.218 UTC Mon Aug 28 2017'},
- {'192.168.100.3': '*05:26:53.932 UTC Mon Aug 28 2017'}]
-```
-
----
-## Метод submit и работа с futures
-
-
-+++
-### Метод submit и работа с futures
-
-При использовании метода map объект future использовался внутри, но в итоге мы получали уже готовый результат функции.
-
-Метод submit позволяет запускать future, а функция as_completed, которая ожидает как аргумент итерируемый объект с futures и возвращает future по мере завершения.
-В этом случае порядок не будет соблюдаться, как с map.
-
-+++
-### Метод submit и работа с futures
-
-Файл netmiko_threads_submit.py:
+Файл netmiko_threads_submit_basics.py:
 ```python
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pprint import pprint
 from datetime import datetime
 import time
-from itertools import repeat
+import logging
 
 import yaml
-from netmiko import ConnectHandler
+from netmiko import ConnectHandler, NetMikoAuthenticationException
 
 
-start_msg = '===> {} Connection to device: {}'
-received_msg = '<=== {} Received result from device: {}'
+logging.getLogger("paramiko").setLevel(logging.WARNING)
+
+logging.basicConfig(
+    format = '%(threadName)s %(name)s %(levelname)s: %(message)s',
+    level=logging.INFO)
 ```
 
 +++
-### Метод submit и работа с futures
+### Метод submit
 
+Файл netmiko_threads_submit_basics.py:
 ```python
-def connect_ssh(device_dict, command):
-    print(start_msg.format(datetime.now().time(), device_dict['ip']))
-    if device_dict['ip'] == '192.168.100.1':
-        time.sleep(10)
+def send_show(device_dict, command):
+    start_msg = '===> {} Connection: {}'
+    received_msg = '<=== {} Received: {}'
+    ip = device_dict['ip']
+    logging.info(start_msg.format(datetime.now().time(), ip))
+    if ip == '192.168.100.1':
+        time.sleep(5)
+
     with ConnectHandler(**device_dict) as ssh:
         ssh.enable()
         result = ssh.send_command(command)
-        print(received_msg.format(datetime.now().time(), device_dict['ip']))
-    return {device_dict['ip']: result}
+        logging.info(received_msg.format(datetime.now().time(), ip))
+    return {ip: result}
+
+
+with open('devices.yaml') as f:
+    devices = yaml.safe_load(f)
+
+with ThreadPoolExecutor(max_workers=2) as executor:
+    future_list = []
+    for device in devices:
+        future = executor.submit(send_show, device, 'sh clock')
+        future_list.append(future)
+    for f in as_completed(future_list):
+        print(f.result())
 ```
 
 +++
 ### Метод submit и работа с futures
 
-Теперь функция threads_conn выглядит немного по-другому:
+* future_list - это список объектов future
+* следующий цикл проходится по списку future с помощью функции as_completed. Эта функция возвращает future только когда они завершили работу или были отменены. При этом future возвращаются по мере завершения работы, не в порядке добавления в список future_list
+
 ```python
-def threads_conn(function, devices, limit=2, command=''):
-    all_results = []
-    with ThreadPoolExecutor(max_workers=limit) as executor:
-        future_ssh = [executor.submit(function, device, command)
-                      for device in devices]
-        for f in as_completed(future_ssh):
-            all_results.append(f.result())
-    return all_results
-
-
-if __name__ == '__main__':
-    devices = yaml.load(open('devices.yaml'))
-    all_done = threads_conn(connect_ssh,
-                            devices['routers'],
-                            command='sh clock')
-    pprint(all_done)
+with ThreadPoolExecutor(max_workers=2) as executor:
+    future_list = []
+    for device in devices:
+        future = executor.submit(send_show, device, 'sh clock')
+        future_list.append(future)
+    for f in as_completed(future_list):
+        print(f.result())
 ```
 
 +++
 ### Метод submit и работа с futures
 
-Остальной код не изменился, поэтому разобраться надо только с функцией threads_conn:
-```python
-def threads_conn(function, devices, limit=2, command=''):
-    all_results = []
-    with ThreadPoolExecutor(max_workers=limit) as executor:
-        future_ssh = [executor.submit(function, device, command)
-                      for device in devices]
-        for f in as_completed(future_ssh):
-            all_results.append(f.result())
-    return all_results
 ```
-
-+++
-### Метод submit и работа с futures
-
-В блоке with два цикла:
-* ```future_ssh``` - это список объектов future, который создается с помощью list comprehensions
-* для создания future используется функция submit
-  * ей как аргументы передаются: имя функции, которую надо выполнить, и ее аргументы
-* следующий цикл проходится по списку future с помощью функции as_completed. Эта функция возвращает future только когда они завершили работу или были отменены. При этом future возвращаются по мере завершения работы
-
-+++
-### Метод submit и работа с futures
-
-Результат выполнения:
+$ python netmiko_threads_submit_basics.py
+ThreadPoolExecutor-0_0 root INFO: ===> 17:32:59.088025 Connection: 192.168.100.1
+ThreadPoolExecutor-0_1 root INFO: ===> 17:32:59.094103 Connection: 192.168.100.2
+ThreadPoolExecutor-0_1 root INFO: <=== 17:33:11.639672 Received: 192.168.100.2
+{'192.168.100.2': '*17:33:11.429 UTC Thu Jul 4 2019'}
+ThreadPoolExecutor-0_1 root INFO: ===> 17:33:11.849132 Connection: 192.168.100.3
+ThreadPoolExecutor-0_0 root INFO: <=== 17:33:17.735761 Received: 192.168.100.1
+{'192.168.100.1': '*17:33:17.694 UTC Thu Jul 4 2019'}
+ThreadPoolExecutor-0_1 root INFO: <=== 17:33:23.230123 Received: 192.168.100.3
+{'192.168.100.3': '*17:33:23.188 UTC Thu Jul 4 2019'}
 ```
-$ python netmiko_threads_submit.py
-===> 06:02:14.582011 Connection to device: 192.168.100.1
-===> 06:02:14.582155 Connection to device: 192.168.100.2
-<=== 06:02:20.155865 Received result from device: 192.168.100.2
-===> 06:02:20.262584 Connection to device: 192.168.100.3
-<=== 06:02:25.864270 Received result from device: 192.168.100.3
-<=== 06:02:29.962225 Received result from device: 192.168.100.1
-[{'192.168.100.2': '*06:02:19.983 UTC Mon Aug 28 2017'},
- {'192.168.100.3': '*06:02:25.691 UTC Mon Aug 28 2017'},
- {'192.168.100.1': '*06:02:29.789 UTC Mon Aug 28 2017'}]
-
-```
-
-Обратите внимание, что порядок не сохраняется и зависит от того, какие функции раньше завершили работу.
-
-
----
-### Обработка исключений
-
-+++
-### Обработка исключений
-
-Если при выполнении функции возникло исключение, оно будет сгенерировано при получении результата
-
-Например, в файле devices.yaml пароль для устройства 192.168.100.2 изменен на неправильный:
-```
-$ python netmiko_threads_submit.py
-===> 06:29:40.871851 Connection to device: 192.168.100.1
-===> 06:29:40.872888 Connection to device: 192.168.100.2
-===> 06:29:43.571296 Connection to device: 192.168.100.3
-<=== 06:29:48.921702 Received result from device: 192.168.100.3
-<=== 06:29:56.269284 Received result from device: 192.168.100.1
-Traceback (most recent call last):
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/base_connection.py", line 491, in establish_connection
-    self.remote_conn_pre.connect(**ssh_connect_params)
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/client.py", line 394, in connect
-    look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host)
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/client.py", line 649, in _auth
-    raise saved_exception
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/client.py", line 636, in _auth
-    self._transport.auth_password(username, password)
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/transport.py", line 1329, in auth_password
-    return self.auth_handler.wait_for_response(my_event)
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/paramiko/auth_handler.py", line 217, in wait_for_response
-    raise e
-paramiko.ssh_exception.AuthenticationException: Authentication failed.
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "netmiko_threads_submit.py", line 40, in <module>
-    command='sh clock')
-  File "netmiko_threads_submit.py", line 32, in threads_conn
-    all_results.append(f.result())
-  File "/usr/local/lib/python3.6/concurrent/futures/_base.py", line 398, in result
-    return self.__get_result()
-  File "/usr/local/lib/python3.6/concurrent/futures/_base.py", line 357, in __get_result
-    raise self._exception
-  File "/usr/local/lib/python3.6/concurrent/futures/thread.py", line 55, in run
-    result = self.fn(*self.args, **self.kwargs)
-  File "netmiko_threads_submit.py", line 19, in connect_ssh
-    with ConnectHandler(**device_dict) as ssh:
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/ssh_dispatcher.py", line 122, in ConnectHandler
-    return ConnectionClass(*args, **kwargs)
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/base_connection.py", line 145, in __init__
-    self.establish_connection()
-  File "/home/vagrant/venv/py3_convert/lib/python3.6/site-packages/netmiko/base_connection.py", line 500, in establish_connection
-    raise NetMikoAuthenticationException(msg)
-netmiko.ssh_exception.NetMikoAuthenticationException: Authentication failure: unable to connect cisco_ios 192.168.100.2:22
-Authentication failed.
-```
-
-+++
-### Обработка исключений
-
-Так как исключение возникает при получении результата, легко добавить обработку исключений (файл netmiko_threads_submit_exception.py):
-```python
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from pprint import pprint
-from datetime import datetime
-import time
-from itertools import repeat
-
-import yaml
-from netmiko import ConnectHandler
-from netmiko.ssh_exception import NetMikoAuthenticationException
-
-
-start_msg = '===> {} Connection to device: {}'
-received_msg = '<=== {} Received result from device: {}'
-
-
-def connect_ssh(device_dict, command):
-    print(start_msg.format(datetime.now().time(), device_dict['ip']))
-    if device_dict['ip'] == '192.168.100.1':
-        time.sleep(10)
-    with ConnectHandler(**device_dict) as ssh:
-        ssh.enable()
-        result = ssh.send_command(command)
-        print(received_msg.format(datetime.now().time(), device_dict['ip']))
-    return {device_dict['ip']: result}
-```
-
-+++
-### Обработка исключений
-
-```python
-def threads_conn(function, devices, limit=2, command=''):
-    all_results = {}
-    with ThreadPoolExecutor(max_workers=limit) as executor:
-        future_ssh = [executor.submit(function, device, command)
-                      for device in devices]
-        for f in as_completed(future_ssh):
-            try:
-                result = f.result()
-            except NetMikoAuthenticationException as e:
-                print(e)
-            else:
-                all_results.update(result)
-    return all_results
-
-
-if __name__ == '__main__':
-    devices = yaml.load(open('devices.yaml'))
-    all_done = threads_conn(connect_ssh,
-                            devices['routers'],
-                            command='sh clock')
-    pprint(all_done)
-
-```
-
-+++
-### Обработка исключений
-
-Результат выполнения:
-```
-$ python netmiko_threads_submit_exception.py
-===> 06:45:56.327892 Connection to device: 192.168.100.1
-===> 06:45:56.328190 Connection to device: 192.168.100.2
-===> 06:45:58.964806 Connection to device: 192.168.100.3
-Authentication failure: unable to connect cisco_ios 192.168.100.2:22
-Authentication failed.
-<=== 06:46:04.325812 Received result from device: 192.168.100.3
-<=== 06:46:11.731541 Received result from device: 192.168.100.1
-{'192.168.100.1': '*06:46:11.556 UTC Mon Aug 28 2017',
- '192.168.100.3': '*06:46:04.154 UTC Mon Aug 28 2017'}
-```
-
-
-+++
-### ProcessPoolExecutor
-
-Так как все работает аналогичным образом и для процессов, тут приведет последний вариант (файл netmiko_processes_submit_exception.py):
-```python
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from pprint import pprint
-from datetime import datetime
-import time
-from itertools import repeat
-
-import yaml
-from netmiko import ConnectHandler
-from netmiko.ssh_exception import NetMikoAuthenticationException
-
-
-start_msg = '===> {} Connection to device: {}'
-received_msg = '<=== {} Received result from device: {}'
-
-
-def connect_ssh(device_dict, command):
-    print(start_msg.format(datetime.now().time(), device_dict['ip']))
-    if device_dict['ip'] == '192.168.100.1':
-        time.sleep(10)
-    with ConnectHandler(**device_dict) as ssh:
-        ssh.enable()
-        result = ssh.send_command(command)
-        print(received_msg.format(datetime.now().time(), device_dict['ip']))
-    return {device_dict['ip']: result}
-```
-
-+++
-### ProcessPoolExecutor
-
-```python
-def processes_conn(function, devices, limit=2, command=''):
-    all_results = {}
-    with ProcessPoolExecutor(max_workers=limit) as executor:
-        future_ssh = [executor.submit(function, device, command)
-                      for device in devices]
-        for f in as_completed(future_ssh):
-            try:
-                result = f.result()
-            except NetMikoAuthenticationException as e:
-                print(e)
-            else:
-                all_results.update(result)
-    return all_results
-
-
-if __name__ == '__main__':
-    devices = yaml.load(open('devices.yaml'))
-    all_done = processes_conn(connect_ssh,
-                              devices['routers'],
-                              command='sh clock')
-    pprint(all_done)
-
-```
-
-+++
-### ProcessPoolExecutor
-
-Результат выполнения:
-```
-$ python netmiko_processes_submit_exception.py
-===> 06:40:43.828249 Connection to device: 192.168.100.1
-===> 06:40:43.828664 Connection to device: 192.168.100.2
-Authentication failure: unable to connect cisco_ios 192.168.100.2:22
-Authentication failed.
-===> 06:40:46.292613 Connection to device: 192.168.100.3
-<=== 06:40:51.890816 Received result from device: 192.168.100.3
-<=== 06:40:59.231330 Received result from device: 192.168.100.1
-{'192.168.100.1': '*06:40:59.056 UTC Mon Aug 28 2017',
- '192.168.100.3': '*06:40:51.719 UTC Mon Aug 28 2017'}
-```
-
