@@ -61,6 +61,12 @@
 * [Best Python Podcasts](https://www.fullstackpython.com/best-python-podcasts.html)
 
 +++
+### PyCon
+
+* [PyCon 2019](https://www.youtube.com/channel/UCxs2IIVXaEHHA4BtTiWZ2mQ/videos?view=0&sort=p&flow=grid)
+* [PyCon 2018](https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos?view=0&sort=p&flow=grid)
+
++++
 ### Документация
 
 * [Официальная документация Python](https://docs.python.org/3/index.html)
