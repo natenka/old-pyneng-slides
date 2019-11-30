@@ -4,6 +4,15 @@
 ## Продолжение обучения
 
 +++
+### Люди
+
+* [David Beazley](https://www.dabeaz.com/), [twitter](https://twitter.com/dabeaz)
+* [Raymond Hettinger](https://rhettinger.wordpress.com/category/python/), [twitter](https://twitter.com/raymondh)
+* [Yury Selivanov](https://twitter.com/1st1)
+* [Andrew Svetlov](https://twitter.com/andrew_svetlov)
+* [Dane Hillard](https://twitter.com/easyaspython)
+
++++
 ### Книги. Среднего/продвинутого уровня
 
 * [Python Tricks](https://www.amazon.com/Python-Tricks-Buffet-Awesome-Features-ebook/dp/B0785Q7GSY) - отличный вариант для 2-3 книги по Python. В книге описываются различные аспекты Python и то как правильно использовать. Книга достаточно новая (конец 2017 года), в ней рассматривается Python 3.
@@ -21,7 +30,6 @@
 
 * [Python Testing with pytest: Simple, Rapid, Effective, and Scalable](https://www.amazon.com/Python-Testing-pytest-Effective-Scalable/dp/1680502409/)
 * [Using Asyncio in Python](https://www.amazon.com/Using-Asyncio-Python-Understanding-Asynchronous/dp/1492075337/)
-* 
 
 +++
 ### Курсы
@@ -29,10 +37,11 @@
 * [Python от Computer Science Center](https://www.youtube.com/playlist?list=PLlb7e2G7aSpTTNp7HBYzCBByaE1h54ruW) - отличные видеолекции по Python. Тут есть и немного основ и более продвинутые темы
 
 +++
-### Платные курсы:
+### Платные курсы
 
-* [#100DaysOfCode in Python](https://training.talkpython.fm/courses/explore_100days_in_python/100-days-of-code-in-python)
+* [Python Programming Language by David Beazley](https://www.oreilly.com/library/view/python-programming-language/9780134217314/)
 * [Write Pythonic Code Like a Seasoned Developer](https://training.talkpython.fm/courses/explore_pythonic_code/write-pythonic-code-like-a-seasoned-developer)
+* [#100DaysOfCode in Python](https://training.talkpython.fm/courses/explore_100days_in_python/100-days-of-code-in-python)
 * [#100DaysOfWeb in Python](https://training.talkpython.fm/courses/explore_100days_web/100-days-of-web-in-python)
 * [Async Techniques and Examples in Python](https://training.talkpython.fm/courses/explore_async_python/async-in-python-with-threading-and-multiprocessing)
 
@@ -42,7 +51,6 @@
 * [Bites of Py](https://codechalleng.es/bites/) - очень хороший сайт на котором много заданий разного уровня сложности. На нем вполне можно набить руку и на базовых вещах, но в то же время есть куда расти
 * [HackerRank](https://www.hackerrank.com/) - на этом сайте задачи разбиты по областям: алгоритмы, регулярные выражения, базы данных и другие. Но есть и базовые задачи 
 * [CheckIO - online game for Python and JavaScript coders](https://checkio.org/)
-
 
 +++
 ### Подкасты
