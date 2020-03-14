@@ -5,6 +5,8 @@
 
 +++
 
+Было:
+
 ```python
 import re
 
@@ -22,7 +24,7 @@ with open("log.txt") as f:
 print(f"Петля между портами {', '.join(ports)}")
 ```
 
-+++
+Стало:
 
 ```python
 with open("log.txt") as f:
@@ -33,6 +35,8 @@ with open("log.txt") as f:
 ```
 
 +++
+    
+Было:
 
 ```python
 def create_user(db, **kwargs):
@@ -44,8 +48,11 @@ def create_user(db, **kwargs):
             break
     with open(db, 'a') as f:
         f.write(f"{username},{password}\n")
+```
 
+Стало:
 
+```python
 def create_user(db, **kwargs):
     username = input("Введите имя пользователя: ")
     while not check_password(
