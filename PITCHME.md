@@ -39,11 +39,11 @@ with open("log.txt") as f:
 Было
 
 ```python
-def create_user(db, **kwargs):
+def create_user(db):
     username = input("Введите имя пользователя: ")
     while True:
         password = input("Введите пароль: ")
-        check = check_password(username, password, **kwargs)
+        check = check_password(username, password)
         if check:
             break
     with open(db, 'a') as f:
@@ -53,7 +53,7 @@ def create_user(db, **kwargs):
 Стало
 
 ```python
-def create_user(db, **kwargs):
+def create_user(db):
     username = input("Введите имя пользователя: ")
     while not check_password(
         username, password := input("Введите пароль: ")
