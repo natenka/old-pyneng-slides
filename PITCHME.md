@@ -36,7 +36,7 @@ with open("log.txt") as f:
 
 +++
     
-Было:
+Было
 
 ```python
 def create_user(db, **kwargs):
@@ -50,7 +50,7 @@ def create_user(db, **kwargs):
         f.write(f"{username},{password}\n")
 ```
 
-Стало:
+Стало
 
 ```python
 def create_user(db, **kwargs):
