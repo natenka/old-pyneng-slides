@@ -35,10 +35,10 @@ with open("log.txt") as f:
 ```
 
 +++
-    
+
 Было
 
-```python
+```
 def create_user(db):
     username = input("Введите имя пользователя: ")
     while True:
@@ -114,5 +114,5 @@ if (n := len(a)) > 10:
 ### Protocol
 
 ---
-### 
+###
 
