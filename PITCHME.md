@@ -36,7 +36,7 @@ with open("log.txt") as f:
 
 +++
 
-Было
+Было:
 
 ```
 def create_user(db):
@@ -50,9 +50,9 @@ def create_user(db):
         f.write(f"{username},{password}\n")
 ```
 
-Стало
+Стало:
 
-```python
+```
 def create_user(db):
     username = input("Введите имя пользователя: ")
     while not check_password(
