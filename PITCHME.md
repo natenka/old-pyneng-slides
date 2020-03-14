@@ -127,14 +127,142 @@ Out[26]: "ip='10.1.1.1' mask=24"
 ---
 ### iterable unpacking in yield and return
 
+До Python 3.8 можно было так:
 ```
->>> def parse(family):
-        lastname, *members = family.split()
-        return lastname.upper(), *members
+In [27]: data = [1, 2, 3]
 
->>> parse('simpsons homer marge bart lisa sally')
-('SIMPSONS', 'homer', 'marge', 'bart', 'lisa', 'sally')
+In [28]: result = 1, 2, *data
+
+In [29]: result
+Out[29]: (1, 2, 1, 2, 3)
 ```
+
+После можно еще и так:
+```
+In [30]: def func():
+    ...:     data = [1, 2, 3]
+    ...:     return 1, 2, *data
+    ...:
+
+In [31]: func()
+Out[31]: (1, 2, 1, 2, 3)
+
+```
+
+---
+### typing
+
++++
+### TypedDict
+
+```
+from netmiko import ConnectHandler
+from typing import List, Dict, Any
+
+
+def send_show(device_dict: Dict[str, Any], command: str) -> str:
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+    return result
+
+
+device_dict = {
+    'device_type': 'cisco_ios',
+    'host': '192.168.100.1',
+    'username': 'cisco',
+    'password': 'cisco',
+    'secret': 'cisco',
+    'port': 20020,
+    }
+```
+
++++
+### TypedDict
+
+```
+from typing import TypedDict, NamedTuple
+
+
+class IPAddress(NamedTuple):
+    ip: str
+    mask: int = 24
+
+
+ip1 = IPAddress('10.1.1.1', 28)
+
+#IPAddress(ip='10.1.1.1', mask=28)
+
+
+class IPAddress(TypedDict):
+    ipaddress: str
+    mask: int
+
+ip1 = IPAddress(ipaddress="8.8.8.8", mask=26)
+
+```
+
++++
+### TypedDict
+
+```
+from netmiko import ConnectHandler
+from typing import List, TypedDict, NamedTuple
+
+
+class DeviceParams(TypedDict, total=False):
+    device_type: str
+    host: str
+    username: str
+    password: str
+    secret: str
+    port: int
+
+
+def send_show(device_dict: DeviceParams, command: str) -> str:
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+    return result
+
+
+if __name__ == "__main__":
+    r1 = DeviceParams(
+        device_type="cisco_ios",
+        host="192.168.100.1",
+        username="cisco",
+        password="cisco",
+        secret="cisco",
+        port=20020,
+    )
+    print(send_show(r1, "sh clock"))
+
+```
+
++++
+### Literal
+
+```
+from typing import Literal
+
+
+def get_data_by_key_value(
+    db_name: str, key: Literal["mac", "ip", "vlan", "interface"], value: str
+) -> str:
+    return "line"
+
+
+print(get_data_by_key_value("database.db", "ip", "8.8.8.8"))
+```
+
++++
+### Final
+
++++
+### final
+
++++
+### Protocol
 
 ---
 ### SyntaxWarning
@@ -151,25 +279,4 @@ Out[26]: "ip='10.1.1.1' mask=24"
 ---
 ### pprint
 
----
-
-### typing
-
-+++
-### TypedDict
-
-+++
-### Literal
-
-+++
-### Final
-
-+++
-### final
-
-+++
-### Protocol
-
----
-###
 
