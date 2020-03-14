@@ -1,3 +1,13 @@
 footnote : "© 2020 Наташа Самойленко"
 highlight : tomorrow
 transition : none
+theme            : mytemplate
+theme-background : [ "#FFF" ]
+theme-headline : [ "Consolas", "#5289F7", "none", "#5289F7", "100", "120", "15" ]
+theme-byline   : [ "Raleway", "#111111", "none", "#111111", "100", "110", "15" ]
+theme-text     : [ "Consolas", "#1C1C1C", "none", "#1C1C1C", "100", "100", "15" ]
+theme-links    : [ "#5289F7", "#5254F7" ]
+theme-code     : [ "Source Code Pro", "100", "120" ]
+theme-controls : [ "#484848" ]
+theme-margins  : [ "0", "15px" ]
+
