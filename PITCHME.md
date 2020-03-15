@@ -600,8 +600,6 @@ In [6]: logging.debug("test")
 ```
 $ ipython
 Python 3.8.0 (default, Nov  9 2019, 12:40:50)
-Type 'copyright', 'credits' or 'license' for more information
-IPython 7.9.0 -- An enhanced Interactive Python. Type '?' for help.
 
 In [1]: import logging
    ...:
@@ -611,12 +609,6 @@ In [1]: import logging
    ...:     level=logging.INFO)
 
 In [2]: logging.debug("test")
-
-In [3]: logging.basicConfig(
-   ...:     format='%(threadName)s %(name)s %(levelname)s: %(message)s',
-   ...:     level=logging.DEBUG)
-
-In [4]: logging.debug("test")
 
 In [5]: logging.basicConfig(
    ...:     format='%(threadName)s %(name)s %(levelname)s: %(message)s',
@@ -630,6 +622,33 @@ MainThread root DEBUG: test
 ---
 ### pprint
 
+```
+In [10]: from pprint import pp, pprint
+
+In [11]: pprint?
+Signature:
+pprint(
+    object,
+    stream=None,
+    indent=1,
+    width=80,
+    depth=None,
+    *,
+    compact=False,
+    sort_dicts=True,
+)
+
+In [12]: pp?
+Signature: pp(object, *args, sort_dicts=False, **kwargs)
+
+In [15]: d = {1: 10, 5: 50, 3: 30, 2: 20}
+
+In [16]: pp(d)
+{1: 10, 5: 50, 3: 30, 2: 20}
+
+In [17]: pprint(d)
+{1: 10, 2: 20, 3: 30, 5: 50}
+```
 
 ---
 ### asyncio REPL
