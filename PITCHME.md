@@ -432,11 +432,145 @@ Out[31]: (1, 2, 1, 2, 3)
 ---
 ### SyntaxWarning
 
+Python 3.7
+```
+In [1]: name = "test"
+
+In [2]: name is "test"
+Out[2]: True
+```
+
+Python 3.8
+```
+In [1]: name = "test"
+
+In [2]: name is "test"
+<>:1: SyntaxWarning: "is" with a literal. Did you mean "=="?
+<ipython-input-2-ea7008bc46b6>:1: SyntaxWarning: "is" with a literal. Did you mean "=="?
+  name is "test"
+Out[2]: True
+```
+
++++
+### SyntaxWarning
+
+Python 3.7
+```
+In [3]: [("r1", "Gi0/1") ("r2", "Gi0/2")]
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-3-6b8485007d3b> in <module>
+----> 1 [("r1", "Gi0/1") ("r2", "Gi0/2")]
+
+TypeError: 'tuple' object is not callable
+```
+
+Python 3.8
+```
+In [3]: [("r1", "Gi0/1") ("r2", "Gi0/2")]
+<>:1: SyntaxWarning: 'tuple' object is not callable; perhaps you missed a comma?
+<ipython-input-3-6b8485007d3b>:1: SyntaxWarning: 'tuple' object is not callable; perhaps you missed a comma?
+  [("r1", "Gi0/1") ("r2", "Gi0/2")]
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-3-6b8485007d3b> in <module>
+----> 1 [("r1", "Gi0/1") ("r2", "Gi0/2")]
+
+TypeError: 'tuple' object is not callable
+```
+
 ---
-### asyncio REPL
+### Optimizations
+
+Sped-up field lookups in collections.namedtuple(). They are now more than two times faster, making them the fastest form of instance variable lookup in Python.
+
+Python 3.7
+```
+In [2]: from timeit import timeit
+
+In [3]: from collections import namedtuple
+
+In [4]: RouterClass = namedtuple('Router', ['hostname', 'ip', 'ios'])
+
+In [5]: r1 = RouterClass('r1', '10.1.1.1', '15.4')
+
+In [6]: timeit("r1.hostname", globals=globals())
+Out[6]: 0.23264930900768377
+```
+
+Python 3.8
+```
+In [3]: from collections import namedtuple
+
+In [4]: from timeit import timeit
+
+In [5]: RouterClass = namedtuple('Router', ['hostname', 'ip', 'ios'])
+
+In [6]: r1 = RouterClass('r1', '10.1.1.1', '15.4')
+
+In [7]: timeit("r1.hostname", globals=globals())
+Out[7]: 0.1512959760002559
+
+```
+
++++
+### Optimizations
+
+The list constructor does not overallocate the internal item buffer if the input iterable has a known length (the input implements __len__). This makes the created list 12% smaller on average. (Contributed by Raymond Hettinger and Pablo Galindo in bpo-33234.)
+
+
+Python 3.7
+```
+In [1]: import sys
+
+In [2]: sys.getsizeof(list(range(20191014)))
+Out[2]: 90859616
+```
+
+Python 3.8
+```
+In [10]: import sys
+
+In [11]: sys.getsizeof(list(range(20191014)))
+Out[11]: 80764084
+```
+
 
 ---
 ### collections, csv - dict
+
+The csv.DictReader now returns instances of dict instead of a collections.OrderedDict. 
+
+Python 3.8
+```
+In [3]: import csv
+   ...:
+   ...: with open('sw_data.csv') as f:
+   ...:     reader = csv.DictReader(f)
+   ...:     for row in reader:
+   ...:         print(row)
+   ...:
+{'hostname': 'sw1', 'vendor': 'Cisco', 'model': '3750', 'location': 'London'}
+{'hostname': 'sw2', 'vendor': 'Cisco', 'model': '3850', 'location': 'Liverpool'}
+{'hostname': 'sw3', 'vendor': 'Cisco', 'model': '3650', 'location': 'Liverpool'}
+{'hostname': 'sw4', 'vendor': 'Cisco', 'model': '3650', 'location': 'London'}
+```
+
+Python 3.7
+```
+In [1]: import csv
+   ...:
+   ...: with open('sw_data.csv') as f:
+   ...:     reader = csv.DictReader(f)
+   ...:     for row in reader:
+   ...:         print(row)
+   ...:
+OrderedDict([('hostname', 'sw1'), ('vendor', 'Cisco'), ('model', '3750'), ('location', 'London')])
+OrderedDict([('hostname', 'sw2'), ('vendor', 'Cisco'), ('model', '3850'), ('location', 'Liverpool')])
+OrderedDict([('hostname', 'sw3'), ('vendor', 'Cisco'), ('model', '3650'), ('location', 'Liverpool')])
+OrderedDict([('hostname', 'sw4'), ('vendor', 'Cisco'), ('model', '3650'), ('location', 'London')])
+
+```
 
 ---
 ### logging
@@ -444,4 +578,7 @@ Out[31]: (1, 2, 1, 2, 3)
 ---
 ### pprint
 
+
+---
+### asyncio REPL
 
