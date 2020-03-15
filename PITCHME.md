@@ -539,8 +539,6 @@ Out[11]: 80764084
 ---
 ### collections, csv - dict
 
-The csv.DictReader now returns instances of dict instead of a collections.OrderedDict. 
-
 Python 3.8
 ```
 In [3]: import csv
@@ -574,6 +572,60 @@ OrderedDict([('hostname', 'sw4'), ('vendor', 'Cisco'), ('model', '3650'), ('loca
 
 ---
 ### logging
+
+```
+$ ipython
+Python 3.7.3 (default, May 13 2019, 15:44:23)
+
+In [2]: import logging
+   ...:
+   ...:
+   ...: logging.basicConfig(
+   ...:     format='%(threadName)s %(name)s %(levelname)s: %(message)s',
+   ...:     level=logging.INFO)
+
+In [4]: logging.debug("test")
+
+In [5]: logging.basicConfig(
+   ...:     format='%(threadName)s %(name)s %(levelname)s: %(message)s',
+   ...:     level=logging.DEBUG)
+
+In [6]: logging.debug("test")
+
+```
+
++++
+### logging
+
+```
+$ ipython
+Python 3.8.0 (default, Nov  9 2019, 12:40:50)
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.9.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: import logging
+   ...:
+   ...:
+   ...: logging.basicConfig(
+   ...:     format='%(threadName)s %(name)s %(levelname)s: %(message)s',
+   ...:     level=logging.INFO)
+
+In [2]: logging.debug("test")
+
+In [3]: logging.basicConfig(
+   ...:     format='%(threadName)s %(name)s %(levelname)s: %(message)s',
+   ...:     level=logging.DEBUG)
+
+In [4]: logging.debug("test")
+
+In [5]: logging.basicConfig(
+   ...:     format='%(threadName)s %(name)s %(levelname)s: %(message)s',
+   ...:     level=logging.DEBUG,
+   ...:     force=True)
+
+In [6]: logging.debug("test")
+MainThread root DEBUG: test
+```
 
 ---
 ### pprint
