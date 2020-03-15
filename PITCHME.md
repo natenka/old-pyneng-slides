@@ -458,9 +458,9 @@ Python 3.7
 
 ```
 In [3]: [("r1", "Gi0/1") ("r2", "Gi0/2")]
-TypeError                                 Traceback (most recent call last)
+TypeError                  Traceback (most recent call last)
 <ipython-input-3-6b8485007d3b> in <module>
-----> 1 [("r1", "Gi0/1") ("r2", "Gi0/2")]
+--> 1 [("r1", "Gi0/1") ("r2", "Gi0/2")]
 
 TypeError: 'tuple' object is not callable
 ```
@@ -472,9 +472,9 @@ In [3]: [("r1", "Gi0/1") ("r2", "Gi0/2")]
 <>:1: SyntaxWarning: 'tuple' object is not callable; perhaps you missed a comma?
 <ipython-input-3-6b8485007d3b>:1: SyntaxWarning: 'tuple' object is not callable; perhaps you missed a comma?
   [("r1", "Gi0/1") ("r2", "Gi0/2")]
-TypeError                                 Traceback (most recent call last)
+TypeError                  Traceback (most recent call last)
 <ipython-input-3-6b8485007d3b> in <module>
-----> 1 [("r1", "Gi0/1") ("r2", "Gi0/2")]
+--> 1 [("r1", "Gi0/1") ("r2", "Gi0/2")]
 
 TypeError: 'tuple' object is not callable
 ```
