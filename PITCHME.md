@@ -81,6 +81,24 @@ def create_user(db):
         f.write(f"{username},{password}\n")
 ```
 
++++
+### Walrus operator
+
+```
+In [11]: data
+Out[11]: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+In [12]: def func(item):
+    ...:     if item in [1, 2, 3]:
+    ...:         return item * 100
+    ...:
+
+In [13]: [new for item in data if (new := func(item))]
+Out[13]: [100, 200, 300]
+
+In [15]: [func(item) for item in data if func(item)]
+Out[15]: [100, 200, 300]
+```
 
 ---
 ### Positional-only arguments
@@ -107,6 +125,23 @@ Return a new list containing all items from the iterable in ascending order.
 A custom key function can be supplied to customize the sort order, and the
 reverse flag can be set to request the result in descending order.
 Type:      builtin_function_or_method
+```
+
++++
+### Positional-only and keyword-only arguments
+
+```
+def check_passwd(username, password, /, *, min_length=8, check_username=True):
+    if len(password) < min_length:
+        print(f'{password} слишком короткий')
+        return False
+    elif check_username and username in password:
+        print(f'{password} содержит имя пользователя')
+        return False
+    else:
+        print(f'{password} для пользователя {username} прошел все проверки')
+        return True
+
 ```
 
 ---
