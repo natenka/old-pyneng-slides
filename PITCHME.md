@@ -145,9 +145,10 @@ def check_passwd(username, password, /, *, min_length=8, check_username=True):
 ```
 
 ---
-### f-strings support = for self-documenting expressions and debugging
+### f-strings support =
 
 +++
+### f-strings support =
 
 ```
 In [23]: ip = "10.1.1.1"
@@ -161,6 +162,18 @@ In [26]: f"{ip=} {mask=}"
 Out[26]: "ip='10.1.1.1' mask=24"
 ```
 
++++
+### f-strings support =
+
+```
+In [9]: vlans = [1, 2, 3]
+
+In [10]: f"{','.join(map(str, vlans))}"
+Out[10]: '1,2,3'
+
+In [11]: f"{','.join(map(str, vlans))=}"
+Out[11]: "','.join(map(str, vlans))='1,2,3'"
+```
 
 ---
 ### Модуль typing
