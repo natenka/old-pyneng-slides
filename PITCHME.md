@@ -20,6 +20,7 @@ if (n := len(a)) > 10:
 ```
 
 +++
+### Walrus operator
 
 Было:
 
@@ -51,6 +52,7 @@ with open("log.txt") as f:
 ```
 
 +++
+### Walrus operator
 
 Было:
 
@@ -124,33 +126,61 @@ In [26]: f"{ip=} {mask=}"
 Out[26]: "ip='10.1.1.1' mask=24"
 ```
 
----
-### iterable unpacking in yield and return
-
-До Python 3.8 можно было так:
-```
-In [27]: data = [1, 2, 3]
-
-In [28]: result = 1, 2, *data
-
-In [29]: result
-Out[29]: (1, 2, 1, 2, 3)
-```
-
-После можно еще и так:
-```
-In [30]: def func():
-    ...:     data = [1, 2, 3]
-    ...:     return 1, 2, *data
-    ...:
-
-In [31]: func()
-Out[31]: (1, 2, 1, 2, 3)
-
-```
 
 ---
-### typing
+### Модуль typing
+
++++
+### Аннотация типов
+
+Пример аннотации функции:
+```
+import ipaddress
+
+
+def check_ip(ip: str) -> bool:
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError as err:
+        return False
+```
+
+Пример аннотации функции со значениями по умолчанию:
+```
+def check_passwd(username: str, password: str,
+                 min_length: int = 8, check_username: bool = True) -> bool:
+    if len(password) < min_length:
+        print('Пароль слишком короткий')
+        return False
+    elif check_username and username in password:
+        print('Пароль содержит имя пользователя')
+        return False
+    else:
+        print(f'Пароль для пользователя {username} прошел все проверки')
+        return True
+```
+
++++
+### Аннотация типов
+
+Аннотация класса:
+
+```
+from typing import Union, List
+
+
+class BaseSSH:
+    def __init__(self, ip: str, username: str, password: str) -> None:
+        self.ip = ip
+        self.username = username
+        self.password = password
+
+    def send_config_commands(self, commands: Union[str, List[str]]) -> str:
+        if isinstance(commands, str):
+            commands = [commands]
+        for command in commands:
+```
 
 +++
 ### TypedDict
@@ -263,6 +293,31 @@ print(get_data_by_key_value("database.db", "ip", "8.8.8.8"))
 
 +++
 ### Protocol
+
+---
+### iterable unpacking in yield and return
+
+До Python 3.8 можно было так:
+```
+In [27]: data = [1, 2, 3]
+
+In [28]: result = 1, 2, *data
+
+In [29]: result
+Out[29]: (1, 2, 1, 2, 3)
+```
+
+После можно еще и так:
+```
+In [30]: def func():
+    ...:     data = [1, 2, 3]
+    ...:     return 1, 2, *data
+    ...:
+
+In [31]: func()
+Out[31]: (1, 2, 1, 2, 3)
+
+```
 
 ---
 ### SyntaxWarning
