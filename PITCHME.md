@@ -653,3 +653,13 @@ In [17]: pprint(d)
 ---
 ### asyncio REPL
 
+$ python -m asyncio
+asyncio REPL 3.8.0 (default, Nov  9 2019, 12:40:50)
+[GCC 4.9.2] on linux
+Use "await" directly instead of "asyncio.run()".
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import asyncio
+>>> await asyncio.sleep(10, result='hello')
+'hello'
+>>>
+
