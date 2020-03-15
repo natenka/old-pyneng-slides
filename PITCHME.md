@@ -164,7 +164,6 @@ def check_passwd(username: str, password: str,
 +++
 ### Аннотация типов
 
-Аннотация класса:
 
 ```
 from typing import Union, List
@@ -288,11 +287,122 @@ print(get_data_by_key_value("database.db", "ip", "8.8.8.8"))
 +++
 ### Final
 
+
+```
+import sqlite3
+from typing import Final, final
+
+DATABASE: Final[str] = "dhcp_snooping.db"
+
+
+def create_db(db_name: str, schema: str) -> None:
+    with open(schema) as f:
+        schema_f = f.read()
+        connection = sqlite3.connect(db_name)
+        connection.executescript(schema_f)
+        connection.close()
+
+
+if __name__ == "__main__":
+    DATABASE = "mydb.db"
+    schema_filename = "dhcp_snooping_schema.sql"
+    create_db(DATABASE, schema_filename)
+```
+
+Ошибка:
+```
+$ mypy typing_final.py
+typing_final.py:19: error: Cannot assign to final name "DATABASE"
+Found 1 error in 1 file (checked 1 source file)
+
+```
+
++++
+### Final
+
+```
+from typing import Final
+
+
+class BaseSSH:
+    TIMEOUT: Final[int] = 10
+
+class CiscoSSH(BaseSSH):
+    TIMEOUT = 1
+
+```
+
 +++
 ### final
 
+Декоратор final указывает, что метод не может быть переписан
+
+```
+from typing import final
+
+
+class BaseSSH:
+    @final
+    def done(self) -> None:
+        pass
+
+
+class CiscoSSH(BaseSSH):
+    def done(self) -> None:
+        pass
+
+```
+
++++
+### final
+
+Декоратор final указывает, что класс не может наследоваться
+
+```
+from typing import final
+
+@final
+class CiscoIosSSH:
+    pass
+
+
+class Other(CiscoIosSSH):
+    pass
+
+```
+
 +++
 ### Protocol
+
+```
+class ConnectSSH(Protocol):
+    def send_command(self, command: str) -> str:
+        ...
+
+    def send_config_commands(self, commands: str) -> str:
+        ...
+
+
+class CiscoSSH:
+
+    def send_command(self, command: str) -> str:
+        result = self._ssh.send_command(command)
+        return result
+
+    def send_config_commands(self, commands: str) -> str:
+        result = self._ssh.send_config_set(commands)
+        return result
+
+
+def func(connection: ConnectSSH, command: str) -> str:
+    return connection.send_command(command)
+
+
+if __name__ == "__main__":
+    r1 = CiscoSSH("192.168.100.1", "cisco", "cisco", "cisco")
+    print(func(r1, "sh clock"))
+
+```
 
 ---
 ### iterable unpacking in yield and return
