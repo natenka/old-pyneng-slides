@@ -45,7 +45,7 @@ for item in items:
 ---?color=linear-gradient(180deg, white 50%, black 50%)
 
 @snap[north]
-@code[py zoom-13 code-max code-shadow](src/pomodoro.py)
+@code[py code-max code-shadow](src/pomodoro.py)
 @snapend
 
 @snap[south]
