@@ -44,7 +44,7 @@ for item in items:
 
 ---?color=linear-gradient(180deg, black 50%, white 50%)
 
-@snap[south span-100]
+@snap[north span-100]
 ```
 def pomodoro(
     pomodoros_to_run: int = 5,
@@ -60,7 +60,7 @@ def pomodoro(
 
 @snapend
 
-@snap[north span-100]
+@snap[south span-100]
 @code[py code-max code-shadow](src/pomodoro.py)
 @snapend
 
