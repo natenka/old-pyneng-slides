@@ -48,7 +48,7 @@ for item in items:
 @code[py code-max code-shadow](src/pomodoro.py)
 @snapend
 
-@snap[south]
+@snap[south span-100]
 ```
 def pomodoro(
     pomodoros_to_run: int = 5,
