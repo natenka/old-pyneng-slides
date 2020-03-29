@@ -44,7 +44,7 @@ for item in items:
 
 ---?color=linear-gradient(180deg, white 50%, black 50%)
 
-@snap[north span-40 text-center]
+@snap[north]
 
 ```
 def pomodoro(pomodoros_to_run: int = 5, work_minutes: int = 25,
@@ -55,7 +55,7 @@ def pomodoro(pomodoros_to_run: int = 5, work_minutes: int = 25,
 ```
 @snapend
 
-@snap[south span-40 text-center]
+@snap[south]
 ```
 def pomodoro(
     pomodoros_to_run: int = 5,
