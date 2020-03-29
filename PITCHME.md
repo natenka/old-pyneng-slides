@@ -45,6 +45,9 @@ for item in items:
 ---?color=linear-gradient(180deg, black 50%, white 50%)
 
 @snap[north span-100]
+
+## Параметры функции
+
 ```
 def pomodoro(
     pomodoros_to_run: int = 5,
