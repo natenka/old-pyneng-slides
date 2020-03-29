@@ -21,6 +21,27 @@
 @box[](Step 3. Mutate # Modify data with Mutations)
 @snapend
 
+
+---?color=linear-gradient(90deg, white 50%, gray 50%)
+
+@snap[west span-40 text-center]
+
+```
+for item in items:
+    print(item)
+```
+
+@snapend
+
+@snap[east span-40 text-center]
+
+```
+for item in items:
+    print(item)
+```
+@snapend
+
+
 ---
 ### Assignment expressions
 
