@@ -44,7 +44,7 @@ for item in items:
 
 ---?color=linear-gradient(180deg, black 50%, white 50%)
 
-@snap[north span-100]
+@snap[north span-100 text-08]
 
 ## Параметры функции
 
