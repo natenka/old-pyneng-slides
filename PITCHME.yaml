@@ -1,2 +1,4 @@
+theme-override : PITCHME.css
 footnote : "© 2020 Наташа Самойленко"
+highlight : tomorrow
 transition : none
