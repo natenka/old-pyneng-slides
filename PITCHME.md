@@ -65,6 +65,9 @@ def pomodoro(
 
 @snap[south span-100]
 @code[py code-max code-shadow](src/pomodoro.py)
+
+## Параметры функции
+
 @snapend
 
 
