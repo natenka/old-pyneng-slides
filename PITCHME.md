@@ -109,6 +109,23 @@ def pomodoro(
 @snapend
 
 
+---?color=linear-gradient(180deg, black 50%, white 50%)
+
+@snap[north span-100]
+
+## Параметры функции
+
+@code[py code-max code-shadow](src/pomodoro.py)
+
+@snapend
+
+@snap[south span-100 text-center]
+@code[py code-max code-shadow](src/pomodoro.py)
+
+
+@snapend
+
+
 
 ---
 ### Assignment expressions
