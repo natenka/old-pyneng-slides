@@ -191,7 +191,8 @@ Ad-hoc команды - это возможность запустить как�
 
 Пример ad-hoc команды:
 ```
-$ ansible 192.168.100.1 -i myhosts.ini -c network_cli -e ansible_network_os=ios -u cisco -k -m ios_command -a "commands='sh clock'"
+$ ansible 192.168.100.1 -i myhosts.ini -c network_cli -e ansible_network_os=ios
+ -u cisco -k -m ios_command -a "commands='sh clock'"
 ```
 
 +++
@@ -199,7 +200,8 @@ $ ansible 192.168.100.1 -i myhosts.ini -c network_cli -e ansible_network_os=ios 
 
 Результат выполнения будет таким:
 ```
-$ ansible 192.168.100.1 -i myhosts.ini -c network_cli -e ansible_network_os=ios -u cisco -k -m ios_command -a "commands='sh clock'"
+$ ansible 192.168.100.1 -i myhosts.ini -c network_cli -e ansible_network_os=ios
+ -u cisco -k -m ios_command -a "commands='sh clock'"
 ```
 
 ![ad-hoc](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/1_ad-hoc.png)
