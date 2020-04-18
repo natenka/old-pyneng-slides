@@ -484,10 +484,10 @@ Playbook (файл сценариев) — это файл в котором о�
       raw: show vlan
 ```
 
+
+---?image=https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook.png&size=80% auto
+
 +++
-
-И тот же playbook с отображением элементов:
-
 ![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook.png)
 
 +++
