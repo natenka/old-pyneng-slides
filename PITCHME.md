@@ -754,8 +754,6 @@ ansible-playbook 1_show_commands.yml -vvv
 
 В выводе видны результаты выполнения задачи, они возвращаются в формате JSON:
 * __changed__ - ключ, который указывает были ли внесены изменения
-* __rc__ - return code. Это поле появляется в выводе тех модулей, которые выполняют какие-то команды
-* __stderr__ - ошибки, при выполнении команды. Это поле появляется в выводе тех модулей, которые выполняют какие-то команды
 * __stdout__ - вывод команды
 * __stdout_lines__ - вывод в виде списка команд, разбитых построчно
 
@@ -772,13 +770,14 @@ ansible-playbook 1_show_commands.yml -vvv
 В playbook 2_register_vars.yml, с помощью register, вывод команды sh ip int br сохранен в переменную sh_ip_int_br_result:
 ```
 - name: Run show commands on routers
-  hosts: cisco_routers
+  hosts: 192.168.100.1
   gather_facts: false
 
   tasks:
 
     - name: run sh ip int br
-      raw: sh ip int br | ex unass
+      ios_command:
+        commands: sh ip int br
       register: sh_ip_int_br_result
 ```
 
@@ -801,13 +800,14 @@ ansible-playbook 1_show_commands.yml -vvv
 Для отображения сохраненных результатов выполнения команды, в playbook 2_register_vars.yml добавлена задача с модулем debug:
 ```
 - name: Run show commands on routers
-  hosts: cisco_routers
+  hosts: 192.168.100.1
   gather_facts: false
 
   tasks:
 
     - name: run sh ip int br
-      raw: sh ip int br | ex unass
+      ios_command:
+        commands: sh ip int br
       register: sh_ip_int_br_result
 
     - name: Debug registered var
@@ -845,20 +845,22 @@ when в Ansible используется как if в Python.
 
 Пример playbook 3_register_debug_when.yml:
 ```
-- name: Run show commands on routers
-  hosts: cisco_routers
-  gather_facts: false
+    - name: Run show commands on routers
+      hosts: 192.168.100.1
+      gather_facts: false
 
-  tasks:
+      tasks:
 
-    - name: run sh ip int br
-      raw: sh ip int bri | ex unass
-      register: sh_ip_int_br_result
+        - name: run sh ip int br
+          ios_command:
+            commands: sh ip int br
+          register: sh_ip_int_br_result
 
-    - name: Debug registered var
-      debug:
-        msg: "Error in command"
-      when: "'invalid' in sh_ip_int_br_result.stdout"
+        - name: Debug registered var
+          debug:
+            msg: "IP адрес не найден"
+          when: "'4.4.4.4' not in sh_ip_int_br_result.stdout[0]"
+
 ```
 
 +++
@@ -868,7 +870,7 @@ when в Ansible используется как if в Python.
 
 Задача будет выполнена только в том случае, если в выводе sh_ip_int_br_result.stdout будет найдена строка invalid
 ```
-when: "'invalid' in sh_ip_int_br_result.stdout"
+when: "'4.4.4.4' not in sh_ip_int_br_result.stdout[0]"
 ```
 
 Модули, которые работают с сетевым оборудованием, автоматически проверяют ошибки, при выполнении команд. Тут этот пример используется для демонстрации возможностей Ansible.
@@ -886,30 +888,6 @@ $ ansible-playbook 3_register_debug_when.yml
 +++
 ### register, debug, when
 
-Выполнение того же playbook, но с ошибкой в команде:
-```
-- name: Run show commands on routers
-  hosts: cisco_routers
-  gather_facts: false
-
-  tasks:
-
-    - name: run sh ip int br
-      raw: shh ip int bri | ex unass
-      register: sh_ip_int_br_result
-
-    - name: Debug registered var
-      debug:
-        msg: "Error in command"
-      when: "'invalid' in sh_ip_int_br_result.stdout"
-```
-
-+++
-### register, debug, when
-
-Теперь результат выполнения такой:
-```
-$ ansible-playbook 3_register_debug_when.yml
-```
+Выполнение того же playbook:
 
 ![Verbose playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/3_register_debug_when.png)
