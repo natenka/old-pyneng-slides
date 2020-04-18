@@ -485,10 +485,8 @@ Playbook (файл сценариев) — это файл в котором о�
 ```
 
 
----?image=https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook.png&size=80% auto
++++?image=https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook.png&size=contain
 
-+++
-![Ansible playbook](https://raw.githubusercontent.com/natenka/PyNEng/master/images/15_ansible/playbook.png)
 
 +++
 ### Синтаксис playbook
