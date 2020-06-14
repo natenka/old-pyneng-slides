@@ -293,10 +293,9 @@ ip ssh version 2
 
 ```python
 In [5]: delete_exclamation_from_cfg('r1.txt')
----------------------------------------------------------------------------
 TypeError                                 Traceback (most recent call last)
 <ipython-input-12-66ae381f1c4f> in <module>()
-----> 1 delete_exclamation_from_cfg('r1.txt')
+-> 1 delete_exclamation_from_cfg('r1.txt')
 
 TypeError: delete_exclamation_from_cfg() missing 1 required positional argument: 'out_cfg'
 ```
@@ -730,7 +729,6 @@ In [6]: interfaces_info = [['Fa0/1', '10.0.1.1', '/24'],
 In [7]: for info in interfaces_info:
    ....:     print(config_interface(info))
    ....:
----------------------------------------------------------------------------
 TypeError                                 Traceback (most recent call last)
 <ipython-input-5-f7d6a9d80d48> in <module>()
       1 for info in interfaces_info:
@@ -819,7 +817,6 @@ In [10]: cfg = [dict(cfg_file='r1.txt', delete_excl=True, delete_empty=True, str
 In [11]: for d in cfg:
    ....:     print(config_to_list(d))
    ....:
----------------------------------------------------------------------------
 TypeError                                 Traceback (most recent call last)
 <ipython-input-4-8d1e8defad71> in <module>()
       1 for d in cfg:
