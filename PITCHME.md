@@ -31,6 +31,7 @@
 ---
 ### Книги
 
++++
 ### Problem Solving with Algorithms and Data Structures using Python
 
 [Problem Solving with Algorithms and Data Structures using Python](https://runestone.academy/runestone/static/pythonds/index.html) - отличная книга по структурам данных и алгоритмам. Много примеров и домашних заданий. [На русском](http://aliev.me/runestone/)
@@ -72,7 +73,7 @@
 
 ![](https://images-na.ssl-images-amazon.com/images/I/51c3J7lMbfL._AC_SY400_.jpg)
 
-+++
+---
 ### Курсы
 
 * [Python от Computer Science Center](https://www.youtube.com/playlist?list=PLlb7e2G7aSpTTNp7HBYzCBByaE1h54ruW) - отличные видеолекции по Python. Тут есть и немного основ и более продвинутые темы
@@ -86,14 +87,14 @@
 * [#100DaysOfWeb in Python](https://training.talkpython.fm/courses/explore_100days_web/100-days-of-web-in-python)
 * [Async Techniques and Examples in Python](https://training.talkpython.fm/courses/explore_async_python/async-in-python-with-threading-and-multiprocessing)
 
-+++
+---
 ### Сайты с задачами
 
 * [Bites of Py](https://codechalleng.es/bites/) - очень хороший сайт на котором много заданий разного уровня сложности. На нем вполне можно набить руку и на базовых вещах, но в то же время есть куда расти
 * [HackerRank](https://www.hackerrank.com/) - на этом сайте задачи разбиты по областям: алгоритмы, регулярные выражения, базы данных и другие. Но есть и базовые задачи 
 * [CheckIO - online game for Python and JavaScript coders](https://checkio.org/)
 
-+++
+---
 ### Подкасты
 
 Позволят в целом расширить кругозор и получить представление о разных проектах, модулях и библиотеках Python:
@@ -101,14 +102,14 @@
 * [Talk Python To Me](https://talkpython.fm/)
 * [Best Python Podcasts](https://www.fullstackpython.com/best-python-podcasts.html)
 
-+++
+---
 ### PyCon
 
 * [PyCon 2020](https://www.youtube.com/c/PyCon2020/videos?view=0&sort=p&flow=grid)
 * [PyCon 2019](https://www.youtube.com/channel/UCxs2IIVXaEHHA4BtTiWZ2mQ/videos?view=0&sort=p&flow=grid)
 * [PyCon 2018](https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos?view=0&sort=p&flow=grid)
 
-+++
+---
 ### Документация
 
 * [Официальная документация Python](https://docs.python.org/3/index.html)
