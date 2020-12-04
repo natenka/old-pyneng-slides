@@ -3,7 +3,7 @@
 +++
 ## Продолжение обучения
 
-+++
+---
 ### Люди
 
 * [David Beazley](https://www.dabeaz.com/), [twitter](https://twitter.com/dabeaz)
@@ -12,24 +12,49 @@
 * [Andrew Svetlov](https://twitter.com/andrew_svetlov)
 * [Dane Hillard](https://twitter.com/easyaspython)
 
-+++
-### Книги. Среднего/продвинутого уровня
+---
+### Книги
 
-* [Python Tricks](https://www.amazon.com/Python-Tricks-Buffet-Awesome-Features-ebook/dp/B0785Q7GSY) - отличный вариант для 2-3 книги по Python. В книге описываются различные аспекты Python и то как правильно использовать. Книга достаточно новая (конец 2017 года), в ней рассматривается Python 3.
-* [Problem Solving with Algorithms and Data Structures using Python](https://runestone.academy/runestone/static/pythonds/index.html) - отличная книга по структурам данных и алгоритмам. Много примеров и домашних заданий. [На русском](http://aliev.me/runestone/)
+### Problem Solving with Algorithms and Data Structures using Python
 
-+++
-### Книги. Среднего/продвинутого уровня
+[Problem Solving with Algorithms and Data Structures using Python](https://runestone.academy/runestone/static/pythonds/index.html) - отличная книга по структурам данных и алгоритмам. Много примеров и домашних заданий. [На русском](http://aliev.me/runestone/)
 
-* [Fluent Python](https://www.amazon.com/gp/product/1491946008/) - отличная книга по более продвинутым темам. Даже те темы, которые устарели в текущей версии Python (asyncio) стоит прочитать ради прекрасного объяснения темы.
-* [Effective Python: 90 Specific Ways to Write Better Python (2nd Edition)](https://www.amazon.com/Effective-Python-Specific-Software-Development/dp/0134853989/).
-* [Python Cookbook](https://www.amazon.com/gp/product/1449340377/) - отличная книга рецептов. Рассматривается огромное количество сценариев с решениями и пояснением.
+![](https://images-na.ssl-images-amazon.com/images/I/71cLnzwRH0L._AC_UL600_SR489,600_.jpg)
 
 +++
-### Книги. По конкретной тематике
+### Fluent Python
 
-* [Python Testing with pytest: Simple, Rapid, Effective, and Scalable](https://www.amazon.com/Python-Testing-pytest-Effective-Scalable/dp/1680502409/)
-* [Using Asyncio in Python](https://www.amazon.com/Using-Asyncio-Python-Understanding-Asynchronous/dp/1492075337/)
+[Fluent Python](https://www.amazon.com/gp/product/1491946008/) - отличная книга по более продвинутым темам. Даже те темы, которые устарели в текущей версии Python (asyncio) стоит прочитать ради прекрасного объяснения темы.
+
+![](https://covers.oreillystatic.com/images/0636920032519/lrg.jpg)
+
++++
+### Effective Python
+
+[Effective Python: 90 Specific Ways to Write Better Python (2nd Edition)](https://www.amazon.com/Effective-Python-Specific-Software-Development/dp/0134853989/).
+
+![](https://www.pearson.com/store/medias/-bigcovers-0134853989.jpg-size-W370?context=bWFzdGVyfGltYWdlc3w1NTI4M3xpbWFnZS9qcGVnfHN5cy1tYXN0ZXIvaW1hZ2VzL2gxOS9oZTMvODkxMDEwMTgwNzEzNC9iaWdjb3ZlcnMvMDEzNDg1Mzk4OS5qcGdfc2l6ZV9XMzcwfDlkM2Q0MTgzNWVmNWZiZjAxYTE1ZDJjYTc3YmZhYjI4Y2JiZDdlNWZjYWRmODg5NzE5MTIzZDBkNzU2MGYzMWU)
+
++++
+### Python Cookbook
+
+[Python Cookbook](https://www.amazon.com/gp/product/1449340377/) - отличная книга рецептов. Рассматривается огромное количество сценариев с решениями и пояснением.
+
+![](https://images-na.ssl-images-amazon.com/images/I/51jrF94LNsL._AC_SY400_.jpg)
+
++++
+### Python Testing with pytest
+
+[Python Testing with pytest: Simple, Rapid, Effective, and Scalable](https://www.amazon.com/Python-Testing-pytest-Effective-Scalable/dp/1680502409/)
+
+![](https://pragprog.com/titles/bopytest/python-testing-with-pytest/bopytest.jpg)
+
++++
+### Using Asyncio in Python
+
+[Using Asyncio in Python](https://www.amazon.com/Using-Asyncio-Python-Understanding-Asynchronous/dp/1492075337/)
+
+![](https://images-na.ssl-images-amazon.com/images/I/51c3J7lMbfL._AC_SY400_.jpg)
 
 +++
 ### Курсы
