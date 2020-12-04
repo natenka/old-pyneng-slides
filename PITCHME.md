@@ -6,11 +6,27 @@
 ---
 ### Люди
 
-* [David Beazley](https://www.dabeaz.com/), [twitter](https://twitter.com/dabeaz)
-* [Raymond Hettinger](https://rhettinger.wordpress.com/category/python/), [twitter](https://twitter.com/raymondh)
++++
+### David Beazley
+
+[David Beazley](https://www.dabeaz.com/), [twitter](https://twitter.com/dabeaz)
+
+![](https://upload.wikimedia.org/wikipedia/commons/d/d4/David_Beazley_-_PyData_Chicago_2016.png)
+
++++
+### Raymond Hettinger
+
+[Raymond Hettinger](https://rhettinger.wordpress.com/category/python/), [twitter](https://twitter.com/raymondh)
+
+![](https://rahmonov.me/static/images/post-images/python-decorators/raymondhettinger.jpg)
+
++++
+### Люди
+
 * [Yury Selivanov](https://twitter.com/1st1)
 * [Andrew Svetlov](https://twitter.com/andrew_svetlov)
 * [Dane Hillard](https://twitter.com/easyaspython)
+* [Corey Schafer](https://twitter.com/coreymschafer)
 
 ---
 ### Книги
@@ -88,6 +104,7 @@
 +++
 ### PyCon
 
+* [PyCon 2020](https://www.youtube.com/c/PyCon2020/videos?view=0&sort=p&flow=grid)
 * [PyCon 2019](https://www.youtube.com/channel/UCxs2IIVXaEHHA4BtTiWZ2mQ/videos?view=0&sort=p&flow=grid)
 * [PyCon 2018](https://www.youtube.com/channel/UCsX05-2sVSH7Nx3zuk3NYuQ/videos?view=0&sort=p&flow=grid)
 
